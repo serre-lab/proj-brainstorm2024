@@ -27,4 +27,4 @@ if __name__ == '__main__':
     with torch.no_grad():
         outputs = model(**batched_inputs)
 
-    print(outputs.shape)
+    assert outputs.shape == (len(video_paths), 1568, 768)

@@ -4,7 +4,7 @@ from transformers import VideoMAEModel
 from util.data import process_video
 
 
-class VideoMAE(nn.Module):
+class VideoEncoder(nn.Module):
     def __init__(self, ckpt):
         super().__init__()
         self.model = VideoMAEModel.from_pretrained(ckpt)
@@ -15,7 +15,7 @@ class VideoMAE(nn.Module):
 
 if __name__ == '__main__':
     ckpt = "MCG-NJU/videomae-base"
-    model = VideoMAE(ckpt)
+    model = VideoEncoder(ckpt)
 
     # Process the videos
     video_paths = ['../data/dev/eating_spaghetti.mp4', '../data/dev/eating_spaghetti-copy.mp4']

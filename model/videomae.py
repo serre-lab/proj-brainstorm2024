@@ -1,9 +1,7 @@
-import av
 import torch
 import torch.nn as nn
 from transformers import VideoMAEModel
-from transformers import VideoMAEImageProcessor
-from util.data import get_frames, sample_frame_indices
+from util.data import process_video
 
 
 class VideoMAE(nn.Module):
@@ -19,19 +17,12 @@ if __name__ == '__main__':
     ckpt = "MCG-NJU/videomae-base"
     model = VideoMAE(ckpt)
 
-    file_path = '../data/dev/eating_spaghetti.mp4'
-    container = av.open(file_path)
-
-    # sample 16 frames
-    indices = sample_frame_indices(num_frame_2_sample=16, frame_sample_rate=2,
-                                   max_end_frame_idx=container.streams.video[0].frames)
-    frames = get_frames(container, indices)
-
-    image_processor = VideoMAEImageProcessor.from_pretrained(ckpt)
-
-    inputs = image_processor(list(frames), return_tensors="pt")
+    # Process the videos
+    video_paths = ['../data/dev/eating_spaghetti.mp4', '../data/dev/eating_spaghetti-copy.mp4']
+    inputs = [process_video(video_path, ckpt) for video_path in video_paths]
+    batched_inputs = {key: torch.cat([input[key] for input in inputs], dim=0) for key in inputs[0]}
 
     with torch.no_grad():
-        outputs = model(**inputs)
+        outputs = model(**batched_inputs)
 
     print(outputs.shape)

@@ -1,4 +1,6 @@
+import av
 import numpy as np
+from transformers import VideoMAEImageProcessor
 
 
 # The following function is adapted from the Hugging Face Transformers documentation.
@@ -48,3 +50,32 @@ def sample_frame_indices(num_frame_2_sample, frame_sample_rate, max_end_frame_id
     indices = np.linspace(start_idx, end_idx, num=num_frame_2_sample)
     indices = np.clip(indices, start_idx, end_idx - 1).astype(np.int64)
     return indices
+
+
+def process_video(file_path, ckpt, num_frame_2_sample=16, frame_sample_rate=1):
+    """
+    Process a video file and return an input dict for VideoMAEModel.
+
+    Parameters:
+        file_path (`str`): Path to the video file.
+        ckpt (`str`): The checkpoint of VideoMAEImageProcessor to use.
+        num_frame_2_sample (`int`): Total number of frames to sample.
+        frame_sample_rate (`int`): Sample every n-th frame.
+
+    Returns:
+        input (`Dict[str, torch.Tensor]`): An input dict for VideoMAEModel. The dict contains a key "pixel_values"
+        which is a tensor of shape (1, num_frame_2_sample, 3, 224, 224)
+    """
+    container = av.open(file_path)
+
+    # Get `num_frame_2_sample` frame indices
+    indices = sample_frame_indices(num_frame_2_sample=num_frame_2_sample, frame_sample_rate=frame_sample_rate,
+                                   max_end_frame_idx=container.streams.video[0].frames)
+
+    # Get frames of given indices
+    frames = get_frames(container, indices)
+
+    # Process frames and return the input dict
+    image_processor = VideoMAEImageProcessor.from_pretrained(ckpt)
+    input = image_processor(list(frames), return_tensors="pt")
+    return input

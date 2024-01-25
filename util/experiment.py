@@ -45,3 +45,47 @@ def get_args():
                                                                                     "encoder")
     args = arg_parser.parse_args()
     return args
+
+
+class AverageMeter(object):
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self.val = 0
+        self.avg = 0
+        self.sum = 0
+        self.count = 0
+
+    def update(self, val, n=1):
+        self.val = val
+        self.sum += val
+        self.count += n
+        self.avg = self.sum / self.count
+
+
+def compute_top_k_acc(pred, target, top_k=[1, ]):
+    """
+    Compute the top-k accuracy for the specified values of k.
+
+    Parameters:
+        pred (`torch.Tensor`): The predicted labels.
+        target (`torch.Tensor`): The ground truth labels.
+        top_k (`list`): The values of k for which the top-k accuracy will be computed.
+
+    Returns:
+        top_k_acc (`list`): The top-k accuracy for the specified values of k.
+    """
+    with torch.no_grad():
+        max_k = max(top_k)
+        batch_size = target.size(0)
+
+        _, top_k_pred = pred.topk(max_k, 1)
+        top_k_pred = top_k_pred.t()
+        correct = top_k_pred.eq(target.view(1, -1).expand_as(top_k_pred))
+
+        top_k_acc = []
+        for k in top_k:
+            correct_k = correct[:k].reshape(-1).float().sum(0)
+            top_k_acc.append(correct_k.mul_(100.0 / batch_size))
+        return top_k_acc

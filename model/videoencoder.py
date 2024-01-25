@@ -9,8 +9,8 @@ class VideoEncoder(nn.Module):
         super().__init__()
         self.model = VideoMAEModel.from_pretrained(ckpt)
 
-    def forward(self, **kwargs):
-        return self.model(**kwargs).last_hidden_state
+    def forward(self, x):
+        return self.model(x).last_hidden_state
 
 
 if __name__ == '__main__':
@@ -22,9 +22,9 @@ if __name__ == '__main__':
     frame_sample_rate = 2
     video_paths = ['../data/dev/eating_spaghetti.mp4', '../data/dev/eating_spaghetti-copy.mp4']
     inputs = [process_video(video_path, ckpt, num_frame_2_sample, frame_sample_rate) for video_path in video_paths]
-    batched_inputs = {key: torch.cat([input[key] for input in inputs], dim=0) for key in inputs[0]}
+    batched_inputs = torch.cat([input['pixel_values'] for input in inputs], dim=0)
 
     with torch.no_grad():
-        outputs = model(**batched_inputs)
+        outputs = model(batched_inputs)
 
     assert outputs.shape == (len(video_paths), 1568, 768)

@@ -8,9 +8,14 @@ class VideoEncoder(nn.Module):
     def __init__(self, ckpt):
         super().__init__()
         self.model = VideoMAEModel.from_pretrained(ckpt)
+        self.freeze_parameters()
 
     def forward(self, x):
         return self.model(x).last_hidden_state
+
+    def freeze_parameters(self):
+        for param in self.model.parameters():
+            param.requires_grad = False
 
 
 if __name__ == '__main__':

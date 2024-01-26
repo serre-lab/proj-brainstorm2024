@@ -7,7 +7,7 @@ import torch.nn.functional as F
 
 def train(epoch, video_encoder, seeg_encoder, optimizer, train_loader, writer, device):
     # Set the model to train mode
-    video_encoder.train()
+    video_encoder.eval()
     seeg_encoder.train()
 
     # Initialize average meters

@@ -38,7 +38,7 @@ class SEEGEncoder(nn.Module):
     def forward(self, x, padding_mask):
         """
         Parameters:
-        - x (torch.Tensor): A (batch_size, input_length, max_num_input_channels) tensor containing the input sEEG data.
+        - x (torch.Tensor): A (batch_size, max_num_input_channels, input_length) tensor containing the input sEEG data.
         - padding_mask (torch.Tensor): A (batch_size, max_num_input_channels) boolean tensor containing the mask for the
         padding.
         True indicates a padding position and False indicates a valid data position.
@@ -47,7 +47,6 @@ class SEEGEncoder(nn.Module):
         - output (torch.Tensor): A (batch_size, output_length, num_output_channels) tensor containing the output
         sequence.
         """
-        x = x.permute(0, 2, 1)
         x += self.positional_encoding
         output = self.transformer_encoder(x, src_key_padding_mask=padding_mask)
 
@@ -73,13 +72,13 @@ if __name__ == '__main__':
     model = SEEGEncoder(max_num_input_channels, num_output_channels, input_length, output_length, num_heads,
                         num_encoder_layers, dim_feedforward)
 
-    seeg1 = torch.randn(input_length, 85)
-    padded_seeg1 = F.pad(seeg1, (0, max_num_input_channels - 85), 'constant', 0)
+    seeg1 = torch.randn(85, input_length)
+    padded_seeg1 = F.pad(seeg1, (0, 0, max_num_input_channels - 85, 0), 'constant', 0)
     padding_mask1 = torch.zeros(max_num_input_channels, dtype=torch.bool)
     padding_mask1[85:] = True
 
-    seeg2 = torch.randn(input_length, 100)
-    padded_seeg2 = F.pad(seeg2, (0, max_num_input_channels - 100), 'constant', 0)
+    seeg2 = torch.randn(100, input_length)
+    padded_seeg2 = F.pad(seeg2, (0, 0, max_num_input_channels - 100, 0), 'constant', 0)
     padding_mask2 = torch.zeros(max_num_input_channels, dtype=torch.bool)
 
     seegs = torch.stack([padded_seeg1, padded_seeg2], dim=0)

@@ -1,4 +1,5 @@
 import av
+import glob
 import numpy as np
 from transformers import VideoMAEImageProcessor
 
@@ -58,12 +59,11 @@ def process_video(file_path, ckpt, num_frame_2_sample=16, frame_sample_rate=1):
     Parameters:
         file_path (`str`): Path to the video file.
         ckpt (`str`): The checkpoint of VideoMAEImageProcessor to use.
-        num_frame_2_sample (`int`): Total number of frames to sample.
         frame_sample_rate (`int`): Sample every n-th frame.
 
     Returns:
-        input (`Dict[str, torch.Tensor]`): An input dict for VideoMAEModel. The dict contains a key "pixel_values"
-        which is a tensor of shape (1, num_frame_2_sample, 3, 224, 224)
+        input torch.Tensor: Processed video for VideoMAEModel, which is a tensor of shape
+        (num_frame_2_sample, 3, 224, 224)
     """
     container = av.open(file_path)
 
@@ -76,5 +76,17 @@ def process_video(file_path, ckpt, num_frame_2_sample=16, frame_sample_rate=1):
 
     # Process frames and return the input dict
     image_processor = VideoMAEImageProcessor.from_pretrained(ckpt)
-    input = image_processor(list(frames), return_tensors="pt")
-    return input
+    video = image_processor(list(frames), return_tensors="pt")['pixel_values'][0]
+    return video
+
+
+if __name__ == '__main__':
+    import torch
+
+    ckpt = "MCG-NJU/videomae-base"
+    num_frame_2_sample = 16
+    frame_sample_rate = 2
+    video_paths = glob.glob('../data/dev/Movie Clips/*.avi')
+    inputs = [process_video(video_path, ckpt, num_frame_2_sample, frame_sample_rate) for video_path in video_paths]
+    batched_inputs = torch.stack(inputs, dim=0)
+    assert batched_inputs.shape == (len(video_paths), num_frame_2_sample, 3, 224, 224)

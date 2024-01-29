@@ -12,33 +12,34 @@ class MovieSEEGDataset(Dataset):
         self.seeg_dir = seeg_dir
         self.video_dir = video_dir
 
-        df = pd.read_csv(os.path.join(self.seeg_dir, self.id + "_preprocessed_data.csv"))
+        df = pd.read_csv(os.path.join(self.seeg_dir, f'{self.id}_preprocessed_data.csv'))
         df = df[df['Phase'] == self.phase]
         df = df.drop(['Error_Position', 'Error_Color'], axis=1)
         df = df.sort_values(['Condition', 'Electrode'])
 
-        self.movie_clips = df['Condition'].unique()
+        self.video_idxs = df['Condition'].unique()
         self.electrodes = df['Electrode'].unique()
-        self.video_seeg = []
-        for movie_clip in self.movie_clips:
-            df_movie_clip = df[df['Condition'] == movie_clip].iloc[:, 4:]
-            cap = cv.VideoCapture(self.video_dir + str(movie_clip) + ".avi")
-            frames = []
+        self.data = []
+
+        for video_idx in self.video_idxs:
+            seeg = df[df['Condition'] == video_idx].iloc[:, 4:]
+            cap = cv.VideoCapture(os.path.join(self.video_dir, f'mov{video_idx}.avi'))
+            video = []
             while True:
                 ret, frame = cap.read()
                 if ret:
-                    frames.append(frame)
+                    video.append(frame)
                 else:
                     break
-            frames = np.array(frames)
-            self.video_seeg.append((movie_clip, df_movie_clip, frames))
-
-    def __len__(self):
-        return len(self.video_seeg)
+            video = np.array(video)
+            self.data.append((seeg, video, video_idx - 1))
 
     def __getitem__(self, idx):
-        movie_clip, df_movie_clip, frames = self.video_seeg[idx]
-        return movie_clip, df_movie_clip, frames
+        seeg, video, video_idx = self.data[idx]
+        return seeg, video, video_idx
+
+    def __len__(self):
+        return len(self.data)
 
 
 if __name__ == '__main__':
@@ -50,6 +51,6 @@ if __name__ == '__main__':
     dataset = MovieSEEGDataset(id, phase, seeg_dir, video_dir)
 
     for i in range(len(dataset)):
-        movie_clip, df_movie_clip, frames = dataset[i]
-        print(movie_clip, df_movie_clip, frames)
+        seeg, video, video_idx = dataset[i]
+        print(seeg.shape, video.shape, video_idx)
 

@@ -1,5 +1,4 @@
 import av
-import glob
 import numpy as np
 from transformers import VideoMAEImageProcessor
 
@@ -82,6 +81,7 @@ def process_video(file_path, ckpt, num_frame_2_sample=16, frame_sample_rate=1):
 
 if __name__ == '__main__':
     import torch
+    import glob
 
     ckpt = "MCG-NJU/videomae-base"
     num_frame_2_sample = 16

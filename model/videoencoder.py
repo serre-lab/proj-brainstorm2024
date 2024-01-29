@@ -19,15 +19,19 @@ class VideoEncoder(nn.Module):
 
 
 if __name__ == '__main__':
+    import glob
+
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
     ckpt = "MCG-NJU/videomae-base"
-    model = VideoEncoder(ckpt)
+    model = VideoEncoder(ckpt).to(device)
 
     # Process the videos
     num_frame_2_sample = 16
     frame_sample_rate = 2
-    video_paths = ['../data/dev/eating_spaghetti.mp4', '../data/dev/eating_spaghetti-copy.mp4']
+    video_paths = glob.glob('../data/dev/Movie Clips/*.avi')[:5]
     inputs = [process_video(video_path, ckpt, num_frame_2_sample, frame_sample_rate) for video_path in video_paths]
-    batched_inputs = torch.cat([input['pixel_values'] for input in inputs], dim=0)
+    batched_inputs = torch.stack(inputs, dim=0).to(device)
 
     with torch.no_grad():
         outputs = model(batched_inputs)

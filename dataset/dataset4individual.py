@@ -4,7 +4,7 @@ from torch.utils.data import Dataset
 from util.data import process_video
 
 
-class MovieSEEGDataset(Dataset):
+class Dataset4Individual(Dataset):
     def __init__(self, id, phase, seeg_dir, video_dir, video_processor_ckpt="MCG-NJU/videomae-base",
                  num_frame_2_sample=16):
         self.id = id
@@ -43,7 +43,7 @@ if __name__ == '__main__':
     seeg_dir = '../data/dev/sEEG/'
     video_dir = '../data/dev/Movie Clips/'
 
-    dataset = MovieSEEGDataset(id, phase, seeg_dir, video_dir)
+    dataset = Dataset4Individual(id, phase, seeg_dir, video_dir)
 
     for i in range(len(dataset)):
         seeg, video, video_idx = dataset[i]

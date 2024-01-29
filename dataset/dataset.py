@@ -1,16 +1,18 @@
 import os
-import numpy as np
 import pandas as pd
 from torch.utils.data import Dataset
-import cv2 as cv
+from util.data import process_video
 
 
 class MovieSEEGDataset(Dataset):
-    def __init__(self, id, phase, seeg_dir, video_dir):
+    def __init__(self, id, phase, seeg_dir, video_dir, video_processor_ckpt="MCG-NJU/videomae-base",
+                 num_frame_2_sample=16):
         self.id = id
         self.phase = phase
         self.seeg_dir = seeg_dir
         self.video_dir = video_dir
+        self.video_processor_ckpt = video_processor_ckpt
+        self.num_frame_2_sample = num_frame_2_sample
 
         df = pd.read_csv(os.path.join(self.seeg_dir, f'{self.id}_preprocessed_data.csv'))
         df = df[df['Phase'] == self.phase]
@@ -23,15 +25,8 @@ class MovieSEEGDataset(Dataset):
 
         for video_idx in self.video_idxs:
             seeg = df[df['Condition'] == video_idx].iloc[:, 4:]
-            cap = cv.VideoCapture(os.path.join(self.video_dir, f'mov{video_idx}.avi'))
-            video = []
-            while True:
-                ret, frame = cap.read()
-                if ret:
-                    video.append(frame)
-                else:
-                    break
-            video = np.array(video)
+            video_path = os.path.join(self.video_dir, f'mov{video_idx}.avi')
+            video = process_video(video_path, self.video_processor_ckpt, self.num_frame_2_sample)
             self.data.append((seeg, video, video_idx - 1))
 
     def __getitem__(self, idx):

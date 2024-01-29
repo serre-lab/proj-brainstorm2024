@@ -1,4 +1,5 @@
 import os
+import torch
 import pandas as pd
 from torch.utils.data import Dataset
 from util.data import process_video
@@ -24,10 +25,10 @@ class Dataset4Individual(Dataset):
         self.data = []
 
         for video_idx in self.video_idxs:
-            seeg = df[df['Condition'] == video_idx].iloc[:, 4:]
+            seeg = torch.tensor((df[df['Condition'] == video_idx].iloc[:, 4:]).values)
             video_path = os.path.join(self.video_dir, f'mov{video_idx}.avi')
             video = process_video(video_path, self.video_processor_ckpt, self.num_frame_2_sample)
-            self.data.append((seeg, video, video_idx - 1))
+            self.data.append((seeg, video, torch.tensor(video_idx - 1, dtype=torch.float32)))
 
     def __getitem__(self, idx):
         seeg, video, video_idx = self.data[idx]
@@ -48,4 +49,3 @@ if __name__ == '__main__':
     for i in range(len(dataset)):
         seeg, video, video_idx = dataset[i]
         print(seeg.shape, video.shape, video_idx)
-

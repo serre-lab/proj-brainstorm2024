@@ -22,7 +22,7 @@ class Dataset4All(Dataset):
             df = pd.read_csv(os.path.join(self.seeg_dir, f'{id}_preprocessed_data.csv'))
             df = df.drop(['Error_Position', 'Error_Color'], axis=1)
             df_list.append(df)
-            df_all = pd.concat(df_list).sort_values(['Condition', 'Electrode'])
+        df_all = pd.concat(df_list).sort_values(['Condition', 'Electrode'])
 
         self.video_idxs = df_all['Condition'].unique()
         self.electrodes = df_all['Electrode'].unique()

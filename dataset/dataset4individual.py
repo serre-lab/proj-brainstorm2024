@@ -6,37 +6,43 @@ from util.data import process_video
 
 
 class Dataset4Individual(Dataset):
-    def __init__(self, id, phase, seeg_dir, video_dir, video_processor_ckpt="MCG-NJU/videomae-base",
+    def __init__(self, id, phases, seeg_dir, video_dir, video_processor_ckpt="MCG-NJU/videomae-base",
                  num_frame_2_sample=16):
         self.id = id
-        self.phase = phase
+        self.phases = phases
         self.seeg_dir = seeg_dir
         self.video_dir = video_dir
         self.video_processor_ckpt = video_processor_ckpt
         self.num_frame_2_sample = num_frame_2_sample
 
+        assert os.path.exists(os.path.join(self.seeg_dir, f'{self.id}_preprocessed_data.csv'))
         df = pd.read_csv(os.path.join(self.seeg_dir, f'{self.id}_preprocessed_data.csv'))
-        df = df[df['Phase'] == self.phase]
         df = df.drop(['Error_Position', 'Error_Color'], axis=1)
         df = df.sort_values(['Condition', 'Electrode'])
 
         self.video_idxs = df['Condition'].unique()
         self.electrodes = df['Electrode'].unique()
-        self.data = []
+        if self.phases is None:
+            self.phases = df['Phase'].unique()
 
+        self.data = []
         for video_idx in self.video_idxs:
-            seeg = torch.tensor((df[df['Condition'] == video_idx].iloc[:, 4:]).values, dtype=torch.float32)
+            assert os.path.exists(os.path.join(self.video_dir, f'mov{video_idx}.avi'))
             video_path = os.path.join(self.video_dir, f'mov{video_idx}.avi')
             video = process_video(video_path, self.video_processor_ckpt, self.num_frame_2_sample)
-            self.data.append((seeg, video, torch.tensor(video_idx - 1, dtype=torch.float32)))
+            for phase in self.phases:
+                seeg = df[(df['Condition'] == video_idx) & (df['Phase'] == phase)].iloc[:, 4:]
+                seeg = torch.tensor(seeg.values, dtype=torch.float32)
+                self.data.append((seeg, video, torch.tensor(video_idx - 1, dtype=torch.float32),
+                                  self.phases.index(phase)))
 
     def __getitem__(self, idx):
-        seeg, video, video_idx = self.data[idx]
+        seeg, video, video_idx, phase = self.data[idx]
 
         # TODO: Remove the following line. It is only for testing.
         seeg_padding_mask = torch.zeros(seeg.shape[0], dtype=torch.bool)
 
-        return seeg, seeg_padding_mask, video, video_idx
+        return seeg, seeg_padding_mask, video, video_idx, phase
 
     def __len__(self):
         return len(self.data)
@@ -51,5 +57,5 @@ if __name__ == '__main__':
     dataset = Dataset4Individual(id, phase, seeg_dir, video_dir)
 
     for i in range(len(dataset)):
-        seeg, seeg_padding_mask, video, video_idx = dataset[i]
-        print(seeg.shape, seeg_padding_mask.shape, video.shape, video_idx)
+        seeg, seeg_padding_mask, video, video_idx, phase = dataset[i]
+        print(seeg.shape, seeg_padding_mask.shape, video.shape, video_idx, phase)

@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import torch
 from torch.utils.data import Dataset
 import numpy as np
 from util.data import process_video
@@ -15,13 +16,13 @@ class Dataset4All(Dataset):
         self.video_processor_ckpt = video_processor_ckpt
         self.num_frame_2_sample = num_frame_2_sample
 
-        df_all = pd.DataFrame()
+        df_list = []
         for id in self.ids:
             assert os.path.exists(os.path.join(self.seeg_dir, f'{id}_preprocessed_data.csv'))
             df = pd.read_csv(os.path.join(self.seeg_dir, f'{id}_preprocessed_data.csv'))
             df = df.drop(['Error_Position', 'Error_Color'], axis=1)
-            df_all = df_all.append(df)
-        df_all = df_all.sort_values(['Condition', 'Electrode'])
+            df_list.append(df)
+            df_all = pd.concat(df_list).sort_values(['Condition', 'Electrode'])
 
         self.video_idxs = df_all['Condition'].unique()
         self.electrodes = df_all['Electrode'].unique()
@@ -39,8 +40,10 @@ class Dataset4All(Dataset):
                 for phase in self.phases:
                     seeg = df_all[(df_all['Condition'] == video_idx) & (df_all['Participant_ID'] == participant) & (df_all['Phase'] == phase)].iloc[:, 4:]
                     seeg = seeg.reindex(self.electrodes, axis=0, fill_value=0)
+                    seeg = torch.tensor(seeg.values, dtype=torch.float32)
                     seeg_mask = seeg == 0
-                    self.data.append((seeg, seeg_mask, video, video_idx-1, self.phases.index(phase), self.ids.index(participant)))
+                    self.data.append((seeg, seeg_mask, video, torch.tensor(video_idx - 1, dtype=torch.float32),
+                                      self.phases.index(phase), self.ids.index(participant)))
 
     def __getitem__(self, idx):
         seeg, seeg_mask, video, video_idx, phase, id = self.data[idx]
@@ -52,9 +55,9 @@ class Dataset4All(Dataset):
 
 if __name__ == '__main__':
     phases = ['Encoding', 'SameDayRecall', 'NextDayRecall']
-    ids = ['e0010GP', 'e0011XQ', 'e0013LW', 'e0015TJ', 'e0016YR', 'e0017MC', 'e0019VQ', 'e0020JA', 'e0022ZG','e0024DV']
-    seeg_dir = '../sEEG/'
-    video_dir = '../Movie Clips/'
+    ids = ['e0010GP', 'e0011XQ', 'e0013LW', 'e0015TJ', 'e0016YR', 'e0017MC', 'e0019VQ', 'e0020JA', 'e0022ZG', 'e0024DV']
+    seeg_dir = '../data/dev/sEEG/'
+    video_dir = '../data/dev/Movie Clips/'
 
     dataset = Dataset4All(ids, phases, seeg_dir, video_dir)
 

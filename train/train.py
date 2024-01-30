@@ -15,7 +15,8 @@ def train(epoch, video_encoder, seeg_encoder, optimizer, train_loader, writer, d
     top1_acc_meter = AverageMeter()
     top2_acc_meter = AverageMeter()
 
-    for video, seeg, seeg_padding_mask in tqdm(train_loader):
+    # TODO: Utilize `video_idx` to save memory
+    for seeg, seeg_padding_mask, video, _ in tqdm(train_loader):
         batch_size = video.shape[0]
 
         video = video.to(device)

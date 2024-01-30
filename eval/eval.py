@@ -33,18 +33,16 @@ def eval(epoch, video_encoder, seeg_encoder, eval_loader, writer, device, split)
                 seeg_embeddings = torch.cat((seeg_embeddings, seeg_embedding), dim=0)
 
         # Compute similarity
-        sim = (video_embedding @ seeg_embedding.transpose(1, 0)) * math.e
+        sim = (video_embeddings @ seeg_embeddings.transpose(1, 0)) * math.e
         labels = torch.arange(video_embeddings.shape[0]).to(device)
 
         # Compute accuracy
         acc1, acc2 = compute_top_k_acc(sim, labels, top_k=[1, 2])
 
-        if split == 'val':
-            writer.add_scalar(f'Val/Acc@1 for Each Epoch', acc1, epoch + 1)
-            writer.add_scalar(f'Val/Acc@2 for Each Epoch', acc2, epoch + 1)
-
-        print(f'{split} Acc@1 {acc1:.3f}')
-        print(f'{split} Acc@2 {acc2:.3f}')
+        writer.add_scalar(f'Val/Acc@1 of Each Epoch', acc1, epoch + 1)
+        writer.add_scalar(f'Val/Acc@2 of Each Epoch', acc2, epoch + 1)
+        print(f'Val Acc@1 {acc1:.4f}%')
+        print(f'Val Acc@2 {acc2:.4f}%')
         return acc1, acc2
 
 
@@ -70,7 +68,7 @@ def compute_top_k_acc(pred, target, top_k=[1, ]):
     Compute the top-k accuracy for the specified values of k.
 
     Parameters:
-        pred (`torch.Tensor`): The predicted labels.
+        pred (`torch.Tensor`): The predicted similarity matrix.
         target (`torch.Tensor`): The ground truth labels.
         top_k (`list`): The values of k for which the top-k accuracy will be computed.
 

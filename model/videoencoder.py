@@ -28,9 +28,8 @@ if __name__ == '__main__':
 
     # Process the videos
     num_frame_2_sample = 16
-    frame_sample_rate = 2
     video_paths = glob.glob('../data/dev/Movie Clips/*.avi')[:5]
-    inputs = [process_video(video_path, ckpt, num_frame_2_sample, frame_sample_rate) for video_path in video_paths]
+    inputs = [process_video(video_path, ckpt, num_frame_2_sample) for video_path in video_paths]
     batched_inputs = torch.stack(inputs, dim=0).to(device)
 
     with torch.no_grad():

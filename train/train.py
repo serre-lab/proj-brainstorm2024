@@ -39,19 +39,20 @@ def train(epoch, video_encoder, seeg_encoder, optimizer, train_loader, writer, d
         labels = torch.arange(batch_size).to(device)
         loss = F.cross_entropy(sim, labels)
 
-        # update metric
-        loss_meter.update(loss.item(), batch_size)
-        acc1, acc2 = compute_top_k_acc(sim, labels, top_k=[1, 2])
-        top1_acc_meter.update(acc1, batch_size)
-        top2_acc_meter.update(acc2, batch_size)
-
         loss.backward()
         optimizer.step()
 
-    writer.add_scalar(f'Train/Avg Loss for Each Epoch', loss_meter.avg, epoch + 1)
-    writer.add_scalar(f'Train/Avg Acc@1 for Each Epoch', top1_acc_meter.avg, epoch + 1)
-    writer.add_scalar(f'Train/Avg Acc@2 for Each Epoch', top2_acc_meter.avg, epoch + 1)
+        # update metric
+        with torch.no_grad():
+            loss_meter.update(loss.item(), 1)
+            acc1, acc2 = compute_top_k_acc(sim, labels, top_k=[1, 2])
+            top1_acc_meter.update(acc1, batch_size)
+            top2_acc_meter.update(acc2, batch_size)
+
+    writer.add_scalar(f'Train/Avg Loss of Each Epoch', loss_meter.avg, epoch + 1)
+    writer.add_scalar(f'Train/Avg Acc@1 of Each Epoch', top1_acc_meter.avg, epoch + 1)
+    writer.add_scalar(f'Train/Avg Acc@2 of Each Epoch', top2_acc_meter.avg, epoch + 1)
     print(f'Epoch: {epoch + 1}')
     print(f'Average Train Loss {loss_meter.avg:.4f}')
-    print(f'Average Train Acc@1 {top1_acc_meter.avg:.3f}')
-    print(f'Average Train Acc@2 {top2_acc_meter.avg:.3f}')
+    print(f'Average Train Acc@1 {top1_acc_meter.avg:.4f}%')
+    print(f'Average Train Acc@2 {top2_acc_meter.avg:.4f}%')

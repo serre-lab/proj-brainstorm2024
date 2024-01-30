@@ -25,14 +25,18 @@ class Dataset4Individual(Dataset):
         self.data = []
 
         for video_idx in self.video_idxs:
-            seeg = torch.tensor((df[df['Condition'] == video_idx].iloc[:, 4:]).values)
+            seeg = torch.tensor((df[df['Condition'] == video_idx].iloc[:, 4:]).values, dtype=torch.float32)
             video_path = os.path.join(self.video_dir, f'mov{video_idx}.avi')
             video = process_video(video_path, self.video_processor_ckpt, self.num_frame_2_sample)
             self.data.append((seeg, video, torch.tensor(video_idx - 1, dtype=torch.float32)))
 
     def __getitem__(self, idx):
         seeg, video, video_idx = self.data[idx]
-        return seeg, video, video_idx
+
+        # TODO: Remove the following line. It is only for testing.
+        seeg_padding_mask = torch.zeros(seeg.shape[0], dtype=torch.bool)
+
+        return seeg, seeg_padding_mask, video, video_idx
 
     def __len__(self):
         return len(self.data)
@@ -47,5 +51,5 @@ if __name__ == '__main__':
     dataset = Dataset4Individual(id, phase, seeg_dir, video_dir)
 
     for i in range(len(dataset)):
-        seeg, video, video_idx = dataset[i]
-        print(seeg.shape, video.shape, video_idx)
+        seeg, seeg_padding_mask, video, video_idx = dataset[i]
+        print(seeg.shape, seeg_padding_mask.shape, video.shape, video_idx)

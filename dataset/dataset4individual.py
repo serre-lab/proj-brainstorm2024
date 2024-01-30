@@ -29,6 +29,8 @@ class Dataset4Individual(Dataset):
         for video_idx in self.video_idxs:
             assert os.path.exists(os.path.join(self.video_dir, f'mov{video_idx}.avi'))
             video_path = os.path.join(self.video_dir, f'mov{video_idx}.avi')
+            # I would suggest we only load the video here
+            # and do the processing in __getitem__
             video = process_video(video_path, self.video_processor_ckpt, self.num_frame_2_sample)
             for phase in self.phases:
                 seeg = df[(df['Condition'] == video_idx) & (df['Phase'] == phase)].iloc[:, 4:]
@@ -38,6 +40,9 @@ class Dataset4Individual(Dataset):
 
     def __getitem__(self, idx):
         seeg, video, video_idx, phase = self.data[idx]
+
+        # TODO: we need the downsample the seeg randomly
+        # TODO: we also need to select the random frame of the video and send it to the pretrained model
 
         # TODO: Remove the following line. It is only for testing.
         seeg_padding_mask = torch.zeros(seeg.shape[0], dtype=torch.bool)

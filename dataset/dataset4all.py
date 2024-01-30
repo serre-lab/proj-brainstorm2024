@@ -35,6 +35,8 @@ class Dataset4All(Dataset):
         for video_idx in self.video_idxs:
             video_path = os.path.join(self.video_dir, f'mov{video_idx}.avi')
             assert os.path.exists(video_path)
+            # I would suggest we only load the video here
+            # and do the processing in __getitem__
             video = process_video(video_path, self.video_processor_ckpt, self.num_frame_2_sample)
             for participant in self.ids:
                 for phase in self.phases:
@@ -47,6 +49,8 @@ class Dataset4All(Dataset):
 
     def __getitem__(self, idx):
         seeg, seeg_mask, video, video_idx, phase, id = self.data[idx]
+        # TODO: we need the downsample the seeg randomly
+        # TODO: we also need to select the random frame of the video and send it to the pretrained model
         return seeg, seeg_mask, video, video_idx, phase, id
 
     def __len__(self):

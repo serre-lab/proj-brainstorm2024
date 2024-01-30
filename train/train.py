@@ -41,7 +41,7 @@ def train(epoch, video_encoder, seeg_encoder, optimizer, train_loader, writer, d
 
         # update metric
         loss_meter.update(loss.item(), batch_size)
-        acc1, acc2 = compute_top_k_acc(sim, labels, topk=[1, 2])
+        acc1, acc2 = compute_top_k_acc(sim, labels, top_k=[1, 2])
         top1_acc_meter.update(acc1, batch_size)
         top2_acc_meter.update(acc2, batch_size)
 

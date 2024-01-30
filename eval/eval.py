@@ -36,7 +36,7 @@ def eval(epoch, video_encoder, seeg_encoder, eval_loader, writer, device, split)
         labels = torch.arange(video_embeddings.shape[0]).to(device)
 
         # Compute accuracy
-        acc1, acc2 = compute_top_k_acc(sim, labels, topk=[1, 2])
+        acc1, acc2 = compute_top_k_acc(sim, labels, top_k=[1, 2])
 
         if split == 'val':
             writer.add_scalar(f'Val/Acc@1 for Each Epoch', acc1, epoch + 1)

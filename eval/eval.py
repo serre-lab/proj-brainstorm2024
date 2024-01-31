@@ -12,7 +12,7 @@ def eval(epoch, video_encoder, seeg_encoder, eval_loader, writer, device, split)
 
     with torch.no_grad():
         # TODO: Utilize `video_idx` to save memory
-        for seeg, seeg_padding_mask, video, _ in tqdm(eval_loader):
+        for seeg, seeg_padding_mask, video, _, _ in tqdm(eval_loader):
             video = video.to(device)
             seeg = seeg.to(device)
             seeg_padding_mask = seeg_padding_mask.to(device)

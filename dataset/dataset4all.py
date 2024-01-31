@@ -60,8 +60,8 @@ class Dataset4All(Dataset):
 if __name__ == '__main__':
     phases = ['Encoding', 'SameDayRecall', 'NextDayRecall']
     ids = ['e0010GP', 'e0011XQ', 'e0013LW', 'e0015TJ', 'e0016YR', 'e0017MC', 'e0019VQ', 'e0020JA', 'e0022ZG', 'e0024DV']
-    seeg_dir = '../data/dev/sEEG/'
-    video_dir = '../data/dev/Movie Clips/'
+    seeg_dir = '/oscar/data/brainstorm-ws/seeg_data/Memory Task Data/Epilepsy/Monitoring'
+    video_dir = '/oscar/data/brainstorm-ws/seeg_data/Movie Clips'
 
     dataset = Dataset4All(ids, phases, seeg_dir, video_dir)
 

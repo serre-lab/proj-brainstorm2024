@@ -31,7 +31,7 @@ def main(args):
     # Define the datasets and dataloaders
     print('Loading datasets and dataloaders ...')
     id = 'e0010GP'
-    phase = 'Encoding'
+    phase = ['Encoding']
     seeg_dir = args.seeg_dir
     video_dir = args.video_dir
     num_frame_2_sample = 16
@@ -40,7 +40,7 @@ def main(args):
     val_size = len(dataset) - train_size
     print(f'Train size: {train_size}, Val size: {val_size}')
     train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
-    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
+    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers, drop_last=True)
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers)
 
     # Define the video encoder

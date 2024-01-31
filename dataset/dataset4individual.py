@@ -54,10 +54,10 @@ class Dataset4Individual(Dataset):
 
 
 if __name__ == '__main__':
-    phase = 'Encoding'
+    phase = ['Encoding']
     id = 'e0010GP'
-    seeg_dir = '../data/dev/sEEG/'
-    video_dir = '../data/dev/Movie Clips/'
+    seeg_dir = '../sEEG/'
+    video_dir = '../Movie Clips/'
 
     dataset = Dataset4Individual(id, phase, seeg_dir, video_dir)
 

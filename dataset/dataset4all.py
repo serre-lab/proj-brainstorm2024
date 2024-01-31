@@ -43,7 +43,7 @@ class Dataset4All(Dataset):
                     seeg = df_all[(df_all['Condition'] == video_idx) & (df_all['Participant_ID'] == participant) & (df_all['Phase'] == phase)].iloc[:, 4:]
                     seeg = seeg.reindex(self.electrodes, axis=0, fill_value=0)
                     seeg = torch.tensor(seeg.values, dtype=torch.float32)
-                    seeg_mask = seeg == 0
+                    seeg_mask = (seeg == 0)[:, 0]
                     self.data.append((seeg, seeg_mask, video, torch.tensor(video_idx - 1, dtype=torch.float32),
                                       self.phases.index(phase), self.ids.index(participant)))
 
@@ -60,12 +60,11 @@ class Dataset4All(Dataset):
 if __name__ == '__main__':
     phases = ['Encoding', 'SameDayRecall', 'NextDayRecall']
     ids = ['e0010GP', 'e0011XQ', 'e0013LW', 'e0015TJ', 'e0016YR', 'e0017MC', 'e0019VQ', 'e0020JA', 'e0022ZG', 'e0024DV']
-    seeg_dir = '/oscar/data/brainstorm-ws/seeg_data/Memory Task Data/Epilepsy/Monitoring'
-    video_dir = '/oscar/data/brainstorm-ws/seeg_data/Movie Clips'
+    seeg_dir = '../sEEG/'
+    video_dir = '../Movie Clips/'
 
     dataset = Dataset4All(ids, phases, seeg_dir, video_dir)
 
     for i in range(len(dataset)):
         seeg, seeg_mask, video, video_idx, phase, id = dataset[i]
         print(seeg.shape, seeg_mask.shape, video.shape, video_idx, phase, id)
-

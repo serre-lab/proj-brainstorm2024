@@ -23,7 +23,7 @@ class Dataset4Individual(Dataset):
         self.data = []
         for video_idx in self.video_idxs:
             for phase in self.phases:
-                seeg = df[(df['Condition'] == video_idx) & (df['Phase'] == phase)].iloc[:, 4:]
+                seeg = df[(df['Condition'] == video_idx) & (df['Phase'] == phase)].iloc[:, 4:].astype('float32')
                 if not seeg.empty:
                     self.data.append((seeg.values, video_idx - 1, self.phases.index(phase)))
 

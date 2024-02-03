@@ -1,9 +1,8 @@
 import os
-import torch
 import pandas as pd
 from torch.utils.data import Dataset
 from torch.utils.data import random_split, DataLoader
-import numpy as np
+
 
 class Dataset4Individual(Dataset):
     def __init__(self, id, phases, seeg_dir):

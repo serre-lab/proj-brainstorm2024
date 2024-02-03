@@ -32,10 +32,10 @@ class AutoEncoder(nn.Module):
         num_channels = x.size(1)
 
         x = x.view(batch_size, -1)
-        x = self.encoder(x)
-        x = self.decoder(x)
-        x = x.view(batch_size, num_channels, -1)
-        return x
+        embedding = self.encoder(x)
+        output = self.decoder(embedding)
+        output = output.view(batch_size, num_channels, -1)
+        return output, embedding
 
 
 if __name__ == '__main__':
@@ -48,9 +48,10 @@ if __name__ == '__main__':
     input = torch.randn(90, 234, 5120).to(device)
 
     with torch.no_grad():
-        output = model(input)
+        output, embed = model(input)
 
     assert input.size() == output.size()
+    assert embed.size() == (90, 32)
 
     loss = recon_loss(input, output)
     print(f'Reconstruction loss: {loss.item()}')

@@ -39,6 +39,8 @@ class AutoEncoder(nn.Module):
 
 
 if __name__ == '__main__':
+    from util.loss import recon_loss
+
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     model = AutoEncoder().to(device)
@@ -49,3 +51,6 @@ if __name__ == '__main__':
         output = model(input)
 
     assert input.size() == output.size()
+
+    loss = recon_loss(input, output)
+    print(f'Reconstruction loss: {loss.item()}')

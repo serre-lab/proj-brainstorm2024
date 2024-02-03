@@ -1,58 +1,48 @@
 import torch
-import math
-from eval.eval import AverageMeter, compute_top_k_acc
+from eval.eval import AverageMeter
 from tqdm import tqdm
-import torch.nn.functional as F
+from util.loss import recon_loss, general_contrast_loss, agg_loss
 
 
-def train(epoch, video_encoder, seeg_encoder, optimizer, train_loader, writer, device):
-    video_encoder.eval()
-    seeg_encoder.train()
+def train(epoch, model, optimizer, train_loader, writer, device):
+    model.train()
 
     # Initialize average meters
-    loss_meter = AverageMeter()
-    top1_acc_meter = AverageMeter()
-    top2_acc_meter = AverageMeter()
+    recon_loss_meter = AverageMeter()
+    contrast_loss_meter = AverageMeter()
+    total_loss_meter = AverageMeter()
 
     # TODO: Utilize `video_idx` to save memory
-    for seeg, seeg_padding_mask, video, _, _ in tqdm(train_loader):
-        batch_size = video.shape[0]
+    for seeg, video_idx, phase in tqdm(train_loader):
+        batch_size = seeg.shape[0]
 
-        video = video.to(device)
         seeg = seeg.to(device)
-        seeg_padding_mask = seeg_padding_mask.to(device)
+        video_idx = video_idx.to(device)
 
         optimizer.zero_grad()
 
         # Forward
-        video_embedding = video_encoder(video)
-        seeg_embedding = seeg_encoder(seeg, seeg_padding_mask)
-
-        # Flatten the output for later similarity computation
-        video_embedding = video_embedding.flatten(1, 2)
-        seeg_embedding = seeg_embedding.flatten(1, 2)
-
-        # Compute similarity
-        sim = (video_embedding @ seeg_embedding.transpose(1, 0)) * math.e
+        seeg_recon, embed = model(seeg)
 
         # Compute loss
-        labels = torch.arange(batch_size).to(device)
-        loss = F.cross_entropy(sim, labels)
+        r_loss = recon_loss(seeg, seeg_recon)
+        sim = embed @ embed.transpose(1, 0)
+        c_loss = general_contrast_loss(sim, video_idx)
+        total_loss = agg_loss(r_loss, c_loss)
 
-        loss.backward()
+        total_loss.backward()
         optimizer.step()
 
         # update metric
         with torch.no_grad():
-            loss_meter.update(loss.item(), 1)
-            acc1, acc2 = compute_top_k_acc(sim, labels, top_k=[1, 2])
-            top1_acc_meter.update(acc1, batch_size)
-            top2_acc_meter.update(acc2, batch_size)
+            recon_loss_meter.update(r_loss.item(), batch_size)
+            contrast_loss_meter.update(c_loss.item(), batch_size)
+            total_loss_meter.update(total_loss.item(), 1)
 
-    writer.add_scalar(f'Train/Avg Loss of Each Epoch', loss_meter.avg, epoch + 1)
-    writer.add_scalar(f'Train/Avg Acc@1 of Each Epoch', top1_acc_meter.avg, epoch + 1)
-    writer.add_scalar(f'Train/Avg Acc@2 of Each Epoch', top2_acc_meter.avg, epoch + 1)
+    writer.add_scalar(f'Train/Avg Reconstruction Loss of Each Epoch', recon_loss_meter.avg, epoch + 1)
+    writer.add_scalar(f'Train/Avg Contrastive Loss of Each Epoch', contrast_loss_meter.avg, epoch + 1)
+    writer.add_scalar(f'Train/Avg Total Loss of Each Epoch', total_loss_meter.avg, epoch + 1)
     print(f'Epoch: {epoch + 1}')
-    print(f'Average Train Loss {loss_meter.avg:.4f}')
-    print(f'Average Train Acc@1 {top1_acc_meter.avg:.4f}%')
-    print(f'Average Train Acc@2 {top2_acc_meter.avg:.4f}%')
+    print(f'Recontruction Loss: {recon_loss_meter.avg:.4f}')
+    print(f'Contrastive Loss: {contrast_loss_meter.avg:.4f}')
+    print(f'Total Loss: {total_loss_meter.avg:.4f}')

@@ -24,7 +24,6 @@ class AutoEncoder(nn.Module):
             nn.Linear(128, 256),
             nn.ReLU(True),
             nn.Linear(256, 234 * 5120),
-            nn.Tanh()
         )
 
     def forward(self, x):

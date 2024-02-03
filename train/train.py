@@ -12,7 +12,6 @@ def train(epoch, model, optimizer, train_loader, writer, device):
     contrast_loss_meter = AverageMeter()
     total_loss_meter = AverageMeter()
 
-    # TODO: Utilize `video_idx` to save memory
     for seeg, video_idx, phase in tqdm(train_loader):
         batch_size = seeg.shape[0]
 

@@ -1,49 +1,46 @@
 import torch
-import math
 from tqdm import tqdm
+from util.loss import recon_loss, general_contrast_loss, agg_loss
 
 
-def eval(epoch, video_encoder, seeg_encoder, eval_loader, writer, device, split):
-    video_encoder.eval()
-    seeg_encoder.eval()
+def eval(epoch, model, eval_loader, writer, device, split):
+    model.eval()
 
-    video_embeddings = None
-    seeg_embeddings = None
+    embeds = None
+    labels = None
+
+    recon_loss_meter = AverageMeter()
 
     with torch.no_grad():
-        # TODO: Utilize `video_idx` to save memory
-        for seeg, seeg_padding_mask, video, _, _ in tqdm(eval_loader):
-            video = video.to(device)
+        for seeg, video_idx, phase in tqdm(eval_loader):
+            batch_size = seeg.size(0)
+
             seeg = seeg.to(device)
-            seeg_padding_mask = seeg_padding_mask.to(device)
 
             # Forward
-            video_embedding = video_encoder(video)
-            seeg_embedding = seeg_encoder(seeg, seeg_padding_mask)
+            seeg_recon, embed = model(seeg)
 
-            # Flatten the output for later similarity computation
-            video_embedding = video_embedding.flatten(1, 2)
-            seeg_embedding = seeg_embedding.flatten(1, 2)
-
-            if video_embeddings is None:
-                video_embeddings = video_embedding
-                seeg_embeddings = seeg_embedding
+            if embeds is None:
+                embeds = embed
+                labels = video_idx
             else:
-                video_embeddings = torch.cat((video_embeddings, video_embedding), dim=0)
-                seeg_embeddings = torch.cat((seeg_embeddings, seeg_embedding), dim=0)
+                embeds = torch.cat((embeds, embed), dim=0)
+                labels = torch.cat((labels, video_idx), dim=0)
+
+            r_loss = recon_loss(seeg, seeg_recon)
+
+            with torch.no_grad():
+                recon_loss_meter.update(r_loss.item(), batch_size)
 
         # Compute similarity
-        sim = (video_embeddings @ seeg_embeddings.transpose(1, 0)) * math.e
-        labels = torch.arange(video_embeddings.shape[0]).to(device)
+        sim = embeds @ embeds.transpose(1, 0)
+        c_loss = general_contrast_loss(sim, labels) / len(eval_loader)
+        total_loss = agg_loss(recon_loss_meter.avg, c_loss)
 
-        # Compute accuracy
-        acc1, acc2 = compute_top_k_acc(sim, labels, top_k=[1, 2])
-
-        writer.add_scalar(f'Val/Acc@1 of Each Epoch', acc1, epoch + 1)
-        writer.add_scalar(f'Val/Acc@2 of Each Epoch', acc2, epoch + 1)
-        print(f'Val Acc@1 {acc1:.4f}%')
-        print(f'Val Acc@2 {acc2:.4f}%')
-        return acc1, acc2
+        writer.add_scalar(f'{split}/Avg Reconstruction Loss of Each Epoch', recon_loss_meter.avg, epoch + 1)
+        writer.add_scalar(f'{split}/Avg Contrastive Loss of Each Epoch', c_loss / len(eval_loader), epoch + 1)
+        writer.add_scalar(f'{split}/Avg Total Loss of Each Epoch', total_loss, epoch + 1)
+        return recon_loss_meter.avg, c_loss / len(eval_loader), total_loss
 
 
 class AverageMeter(object):

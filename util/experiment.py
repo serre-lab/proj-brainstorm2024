@@ -28,7 +28,7 @@ def get_args():
     arg_parser.add_argument('--video_dir', '-vd', type=str, default='./data/dev/Movie Clips/',  help="Root of the video"
                                                                                                      " data")
     arg_parser.add_argument('--lr', '-l', type=float, default=1e-3, help="Learning rate")
-    arg_parser.add_argument('--num_epochs', '-e', type=int, default=5, help="total number of epochs for training")
+    arg_parser.add_argument('--num_epochs', '-e', type=int, default=2, help="total number of epochs for training")
     arg_parser.add_argument('--ckpt', '-c', type=str, default=None, help="path to the checkpoint file")
     arg_parser.add_argument('--batch_size', '-b', type=int, default=30, help="batch size")
     arg_parser.add_argument('--train_ratio', '-tr', type=float, default=0.7,

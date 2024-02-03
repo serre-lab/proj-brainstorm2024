@@ -44,7 +44,7 @@ def main(args):
     # Define the optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
 
-    best_val_acc1 = 0.0
+    best_val_loss = None
     best_epoch = 0
     start_epoch = 0
 
@@ -53,7 +53,7 @@ def main(args):
         ckpt_state = torch.load(args.ckpt)
         model.load_state_dict(ckpt_state['seeg_encoder'])
         optimizer.load_state_dict(ckpt_state['optimizer'])
-        best_val_acc1 = ckpt_state['best_val_acc1']
+        best_val_loss = ckpt_state['best_val_loss']
         best_epoch = ckpt_state['best_epoch']
         start_epoch = ckpt_state['epoch']
 
@@ -62,22 +62,26 @@ def main(args):
         train(epoch, model, optimizer, train_loader, writer, device)
 
         # Validation
-        # acc1, acc2 = eval(epoch, video_encoder, seeg_encoder, val_loader, writer, device, 'val')
+        recon_loss, contrast_loss, total_loss = eval(epoch, model, val_loader, writer, device, 'val')
 
-        # if acc1 > best_val_acc1:
-        #     best_val_acc1 = acc1
-        #     best_epoch = epoch + 1
-        #     print(f'New best model found at epoch {best_epoch}')
+        if best_val_loss is None:
+            best_val_loss = total_loss
+            best_epoch = epoch + 1
+            print(f'New best model found at epoch {best_epoch}')
+        elif total_loss < best_val_loss:
+            best_val_loss = total_loss
+            best_epoch = epoch + 1
+            print(f'New best model found at epoch {best_epoch}')
 
-        # state = {
-        #     'seeg_encoder': seeg_encoder.state_dict(),
-        #     'optimizer': optimizer.state_dict(),
-        #     'best_val_acc1': best_val_acc1,
-        #     'best_epoch': best_epoch,
-        #     'epoch': epoch + 1,
-        # }
-        # ckpt_file = os.path.join(ckpt_folder, f'epoch_{epoch + 1}.pth')
-        # torch.save(state, ckpt_file)
+        state = {
+            'seeg_encoder': model.state_dict(),
+            'optimizer': optimizer.state_dict(),
+            'best_val_loss': best_val_loss,
+            'best_epoch': best_epoch,
+            'epoch': epoch + 1,
+        }
+        ckpt_file = os.path.join(ckpt_folder, f'epoch_{epoch + 1}.pth')
+        torch.save(state, ckpt_file)
 
     writer.close()
 

@@ -1,7 +1,7 @@
 import torch
 from eval.eval import AverageMeter
 from tqdm import tqdm
-from util.loss import recon_loss, general_contrast_loss, agg_loss
+from util.loss import recon_loss, general_contrast_loss, agg_loss, contrastive_loss
 
 
 def train(epoch, model, optimizer, train_loader, writer, device):
@@ -27,6 +27,7 @@ def train(epoch, model, optimizer, train_loader, writer, device):
         r_loss = recon_loss(seeg, seeg_recon)
         sim = embed @ embed.transpose(1, 0)
         c_loss = general_contrast_loss(sim, video_idx)
+        c_loss = contrastive_loss(embed, video_idx)
         total_loss = agg_loss(r_loss, c_loss)
 
         total_loss.backward()

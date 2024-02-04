@@ -23,7 +23,7 @@ def general_contrast_loss(sim, label):
 
 def contrastive_loss(embeddings, movie_indices, margin=1.0):
     """
-    Calculate the contrastive loss using cosine similarity for a batch of embeddings.
+    Calculate the contrastive loss using Euclidean distance for a batch of embeddings.
 
     Parameters:
     - embeddings: Tensor of shape (batch_size, feature_dimension) containing the embeddings.

@@ -45,7 +45,7 @@ def general_contrast_loss(embeddings, movie_indices, temperature=0.07):
     sim_softmax_negative = sim_softmax_negative.sum(dim=1)/negative_mask.float().sum(dim=1)
 
     # loss is mean of the negative sim_softmax
-    c_loss = torch.log(sim_softmax_negative).mean()
+    c_loss = sim_softmax_negative.mean()
 
     return c_loss
 

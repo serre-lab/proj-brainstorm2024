@@ -36,13 +36,16 @@ def contrastive_loss(embeddings, movie_indices, margin=1.0):
 
     # Calculate cosine similarity matrix
     distance_matrix = torch.cdist(embeddings, embeddings, p=2)
+    distance_matrix.to(embeddings.device)
 
     positive_mask = movie_indices.unsqueeze(1) == movie_indices.unsqueeze(0)
+    positive_mask.to(embeddings.device)
     negative_mask = ~positive_mask
 
     # Mask for excluding self-similarity
     eye_mask = torch.eye(embeddings.size(0), device=embeddings.device).bool()
-    positive_mask.masked_fill_(eye_mask, 0)
+    
+    positive_mask.masked_fill_(eye_mask, torch.tensor(0.0, device=embeddings.device))
 
     # Cosine similarity for positive and negative pairs
     positive_sim = distance_matrix * positive_mask.float()

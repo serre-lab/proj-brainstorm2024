@@ -16,6 +16,7 @@ def eval(epoch, model, eval_loader, writer, device, split):
             batch_size = seeg.size(0)
 
             seeg = seeg.to(device)
+            video_idx = video_idx.to(device)
 
             # Forward
             seeg_recon, embed = model(seeg)

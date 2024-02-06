@@ -24,7 +24,7 @@ def get_args():
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument('--exp_name', '-n', type=str, default='baseline',
                             help="The checkpoints and logs will be save in /experiments/$EXP_NAME")
-    arg_parser.add_argument('--seeg_dir', '-sd', type=str, default='./data/dev/sEEG/', help="Root of the sEEG data")
+    arg_parser.add_argument('--seeg_dir', '-sd', type=str, default='/oscar/data/brainstorm-ws/seeg_data/Memory Task Data/Epilepsy/Monitoring', help="Root of the sEEG data")
     arg_parser.add_argument('--video_dir', '-vd', type=str, default='./data/dev/Movie Clips/',  help="Root of the video"
                                                                                                      " data")
     arg_parser.add_argument('--lr', '-l', type=float, default=1e-3, help="Learning rate")

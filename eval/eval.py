@@ -38,7 +38,7 @@ def eval(epoch, model, eval_loader, writer, device, split):
         # Compute similarity
         sim = embeds @ embeds.transpose(1, 0)
         c_loss = general_contrast_loss(sim, labels) / len(eval_loader)
-        c_loss = contrastive_loss(embeds, labels) / len(eval_loader)
+#        c_loss = contrastive_loss(embeds, labels) / len(eval_loader)
         total_loss = agg_loss(recon_loss_meter.avg, c_loss)
 
         contrast_loss_meter.update(c_loss, 1)

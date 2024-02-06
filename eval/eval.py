@@ -10,6 +10,8 @@ def eval(epoch, model, eval_loader, writer, device, split):
     labels = None
 
     recon_loss_meter = AverageMeter()
+    contrast_loss_meter = AverageMeter()
+    total_loss_meter = AverageMeter()
 
     with torch.no_grad():
         for seeg, video_idx, phase in tqdm(eval_loader):
@@ -39,10 +41,16 @@ def eval(epoch, model, eval_loader, writer, device, split):
         c_loss = contrastive_loss(embeds, labels) / len(eval_loader)
         total_loss = agg_loss(recon_loss_meter.avg, c_loss)
 
+        contrast_loss_meter.update(c_loss, 1)
+        total_loss_meter.update(total_loss, 1)
+
         writer.add_scalar(f'{split}/Avg Reconstruction Loss of Each Epoch', recon_loss_meter.avg, epoch + 1)
-        writer.add_scalar(f'{split}/Avg Contrastive Loss of Each Epoch', c_loss / len(eval_loader), epoch + 1)
-        writer.add_scalar(f'{split}/Avg Total Loss of Each Epoch', total_loss, epoch + 1)
-        return recon_loss_meter.avg, c_loss / len(eval_loader), total_loss
+        writer.add_scalar(f'{split}/Avg Contrastive Loss of Each Epoch', contrast_loss_meter.avg, epoch + 1)
+        writer.add_scalar(f'{split}/Avg Total Loss of Each Epoch', total_loss_meter.avg, epoch + 1)
+        print(f'Recontruction Loss: {recon_loss_meter.avg:.4f}')
+        print(f'Contrastive Loss: {contrast_loss_meter.avg:.4f}')
+        print(f'Total Loss: {total_loss_meter.avg:.4f}')
+        return recon_loss_meter.avg, contrast_loss_meter.avg, total_loss_meter.avg
 
 
 class AverageMeter(object):

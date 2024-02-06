@@ -37,7 +37,7 @@ def train(epoch, model, optimizer, train_loader, writer, device):
         with torch.no_grad():
             recon_loss_meter.update(r_loss.item(), batch_size)
             contrast_loss_meter.update(c_loss.item(), batch_size)
-            total_loss_meter.update(total_loss.item(), 1)
+            total_loss_meter.update(total_loss.item(), batch_size)
 
     writer.add_scalar(f'Train/Avg Reconstruction Loss of Each Epoch', recon_loss_meter.avg, epoch + 1)
     writer.add_scalar(f'Train/Avg Contrastive Loss of Each Epoch', contrast_loss_meter.avg, epoch + 1)

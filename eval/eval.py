@@ -1,7 +1,7 @@
 import torch
 from tqdm import tqdm
 from util.loss import recon_loss, general_contrast_loss, agg_loss, contrastive_loss
-
+import wandb
 
 def eval(epoch, model, eval_loader, writer, device, split, alpha_value):
     model.eval()
@@ -44,11 +44,13 @@ def eval(epoch, model, eval_loader, writer, device, split, alpha_value):
         contrast_loss_meter.update(c_loss, 1)
         total_loss_meter.update(total_loss, 1)
 
+        wandb.log({"validation_loss": total_loss_meter.avg, "val_reconstruction_loss":recon_loss_meter.avg, "val_contrastive_loss": contrast_loss_meter.avg, "val_scaled_contrastive_loss": contrast_loss_meter.avg * alpha_value})
+
         writer.add_scalar(f'{split}/Avg Reconstruction Loss of Each Epoch', recon_loss_meter.avg, epoch + 1)
         writer.add_scalar(f'{split}/Avg Contrastive Loss of Each Epoch', contrast_loss_meter.avg, epoch + 1)
         writer.add_scalar(f'{split}/Avg Total Loss of Each Epoch', total_loss_meter.avg, epoch + 1)
         print(f'Recontruction Loss: {recon_loss_meter.avg:.4f}')
-        print(f'Contrastive Loss: {contrast_loss_meter.avg:.4f}')
+        print(f'Scaled Contrastive Loss: {contrast_loss_meter.avg*alpha_value:.4f}')
         print(f'Total Loss: {total_loss_meter.avg:.4f}')
         return recon_loss_meter.avg, contrast_loss_meter.avg, total_loss_meter.avg
 

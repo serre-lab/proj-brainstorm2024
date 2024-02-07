@@ -89,7 +89,7 @@ def main(args):
         # }
         ckpt_file = os.path.join(ckpt_folder, f'epoch_{epoch + 1}.pth')
        # torch.save(state, ckpt_file)
-        torch.save(model.state_dict(), ckpt_file)
+       # torch.save(model.state_dict(), ckpt_file)
 
     writer.close()
 

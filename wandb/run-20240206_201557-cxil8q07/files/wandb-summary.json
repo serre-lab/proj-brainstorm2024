@@ -1,0 +1,1 @@
+{"training_loss": 23978.129512392243, "reconstruction_loss": 23978.112877155174, "contrastive_loss": 0.01631743088364601, "_timestamp": 1707268628.0061536, "_runtime": 70.02097463607788, "_step": 19, "_wandb": {"runtime": 74}}

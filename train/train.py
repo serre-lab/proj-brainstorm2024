@@ -21,8 +21,8 @@ def train(epoch, model, optimizer, train_loader, writer, device, alpha_value):
         optimizer.zero_grad()
 
         # Forward
-        seeg_recon, embed = model(seeg)
-
+        seeg_recon, embed_before = model(seeg)
+        embed = embed_before.flatten(start_dim=1) 
         # Compute loss
         r_loss = recon_loss(seeg, seeg_recon)
         c_loss = general_contrast_loss(embed, video_idx)

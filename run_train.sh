@@ -37,4 +37,4 @@ lscpu
 echo "WHICH Python:"
 which python
 python -c "import torch; print('TORCH_VERSION:',torch.__version__)"
-python -u main.py -e 100
+python -u main.py -e 10

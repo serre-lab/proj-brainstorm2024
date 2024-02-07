@@ -1,41 +1,49 @@
 wandb: Currently logged in as: grassknoted (serrelab). Use `wandb login --relogin` to force relogin
 wandb: Appending key for api.wandb.ai to your netrc file: /users/schen336/.netrc
-/users/schen336/.local/lib/python3.10/site-packages/torch/utils/data/dataloader.py:558: UserWarning: This DataLoader will create 4 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+/users/schen336/.local/lib/python3.9/site-packages/torch/utils/data/dataloader.py:557: UserWarning: This DataLoader will create 4 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
   warnings.warn(_create_warning_msg(
 wandb: Tracking run with wandb version 0.16.3
-wandb: Run data is saved locally in /oscar/home/schen336/Desktop/proj-brainstorm2024/wandb/run-20240206_181128-97jxdntz
+wandb: Run data is saved locally in /oscar/home/schen336/Desktop/proj-brainstorm2024/wandb/run-20240206_222013-x4p2ieht
 wandb: Run `wandb offline` to turn off syncing.
-wandb: Syncing run dashing-morning-1
+wandb: Syncing run comfy-donkey-8
 wandb: ⭐️ View project at https://wandb.ai/serrelab/prj_brainstorm
-wandb: 🚀 View run at https://wandb.ai/serrelab/prj_brainstorm/runs/97jxdntz
-  0%|          | 0/2 [00:00<?, ?it/s]/users/schen336/.local/lib/python3.10/site-packages/torch/utils/data/dataloader.py:558: UserWarning: This DataLoader will create 4 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+wandb: 🚀 View run at https://wandb.ai/serrelab/prj_brainstorm/runs/x4p2ieht
+  0%|          | 0/2 [00:00<?, ?it/s]/users/schen336/.local/lib/python3.9/site-packages/torch/utils/data/dataloader.py:557: UserWarning: This DataLoader will create 4 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
   warnings.warn(_create_warning_msg(
- 50%|█████     | 1/2 [00:07<00:07,  7.75s/it]100%|██████████| 2/2 [00:08<00:00,  3.34s/it]100%|██████████| 2/2 [00:08<00:00,  4.19s/it]
-  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:02<00:00,  2.41s/it]100%|██████████| 1/1 [00:02<00:00,  2.79s/it]
-Traceback (most recent call last):
-  File "/oscar/home/schen336/Desktop/proj-brainstorm2024/main.py", line 97, in <module>
-    main(args)
-  File "/oscar/home/schen336/Desktop/proj-brainstorm2024/main.py", line 89, in main
-    torch.save(state, ckpt_file)
-  File "/users/schen336/.local/lib/python3.10/site-packages/torch/serialization.py", line 628, in save
-    with _open_zipfile_writer(f) as opened_zipfile:
-  File "/users/schen336/.local/lib/python3.10/site-packages/torch/serialization.py", line 502, in _open_zipfile_writer
-    return container(name_or_buffer)
-  File "/users/schen336/.local/lib/python3.10/site-packages/torch/serialization.py", line 473, in __init__
-    super().__init__(torch._C.PyTorchFileWriter(self.name))
-RuntimeError: File ./experiments/baseline/ckpt/epoch_1.pth cannot be opened.
-wandb: - 0.006 MB of 0.006 MB uploadedwandb: \ 0.006 MB of 0.006 MB uploadedwandb: | 0.009 MB of 0.016 MB uploadedwandb: / 0.016 MB of 0.016 MB uploadedwandb: 
+/users/schen336/.local/lib/python3.9/site-packages/torch/nn/modules/conv.py:306: UserWarning: Applied workaround for CuDNN issue, install nvrtc.so (Triggered internally at ../aten/src/ATen/native/cudnn/Conv_v8.cpp:80.)
+  return F.conv1d(input, weight, bias, self.stride,
+ 50%|█████     | 1/2 [00:04<00:04,  4.90s/it]100%|██████████| 2/2 [00:05<00:00,  2.17s/it]100%|██████████| 2/2 [00:05<00:00,  2.64s/it]
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:01<00:00,  1.87s/it]100%|██████████| 1/1 [00:01<00:00,  1.99s/it]
+  0%|          | 0/2 [00:00<?, ?it/s] 50%|█████     | 1/2 [00:02<00:02,  2.20s/it]100%|██████████| 2/2 [00:02<00:00,  1.06s/it]100%|██████████| 2/2 [00:02<00:00,  1.29s/it]
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:01<00:00,  1.95s/it]100%|██████████| 1/1 [00:02<00:00,  2.07s/it]
+  0%|          | 0/2 [00:00<?, ?it/s] 50%|█████     | 1/2 [00:02<00:02,  2.25s/it]100%|██████████| 2/2 [00:02<00:00,  1.08s/it]100%|██████████| 2/2 [00:02<00:00,  1.30s/it]
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:01<00:00,  1.83s/it]100%|██████████| 1/1 [00:01<00:00,  1.94s/it]
+  0%|          | 0/2 [00:00<?, ?it/s] 50%|█████     | 1/2 [00:02<00:02,  2.14s/it]100%|██████████| 2/2 [00:02<00:00,  1.03s/it]100%|██████████| 2/2 [00:02<00:00,  1.25s/it]
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:01<00:00,  1.88s/it]100%|██████████| 1/1 [00:01<00:00,  1.99s/it]
+  0%|          | 0/2 [00:00<?, ?it/s] 50%|█████     | 1/2 [00:02<00:02,  2.20s/it]100%|██████████| 2/2 [00:02<00:00,  1.06s/it]100%|██████████| 2/2 [00:02<00:00,  1.29s/it]
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:01<00:00,  1.92s/it]100%|██████████| 1/1 [00:02<00:00,  2.07s/it]
+  0%|          | 0/2 [00:00<?, ?it/s] 50%|█████     | 1/2 [00:02<00:02,  2.08s/it]100%|██████████| 2/2 [00:02<00:00,  1.01s/it]100%|██████████| 2/2 [00:02<00:00,  1.22s/it]
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:02<00:00,  2.07s/it]100%|██████████| 1/1 [00:02<00:00,  2.19s/it]
+  0%|          | 0/2 [00:00<?, ?it/s] 50%|█████     | 1/2 [00:02<00:02,  2.19s/it]100%|██████████| 2/2 [00:02<00:00,  1.06s/it]100%|██████████| 2/2 [00:02<00:00,  1.28s/it]
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:02<00:00,  2.14s/it]100%|██████████| 1/1 [00:02<00:00,  2.25s/it]
+  0%|          | 0/2 [00:00<?, ?it/s] 50%|█████     | 1/2 [00:02<00:02,  2.61s/it]100%|██████████| 2/2 [00:02<00:00,  1.23s/it]100%|██████████| 2/2 [00:02<00:00,  1.49s/it]
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:01<00:00,  1.67s/it]100%|██████████| 1/1 [00:01<00:00,  1.78s/it]
+  0%|          | 0/2 [00:00<?, ?it/s] 50%|█████     | 1/2 [00:02<00:02,  2.23s/it]100%|██████████| 2/2 [00:02<00:00,  1.07s/it]100%|██████████| 2/2 [00:02<00:00,  1.29s/it]
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:01<00:00,  1.90s/it]100%|██████████| 1/1 [00:02<00:00,  2.01s/it]
+  0%|          | 0/2 [00:00<?, ?it/s] 50%|█████     | 1/2 [00:02<00:02,  2.21s/it]100%|██████████| 2/2 [00:02<00:00,  1.06s/it]100%|██████████| 2/2 [00:02<00:00,  1.29s/it]
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:02<00:00,  2.15s/it]100%|██████████| 1/1 [00:02<00:00,  2.26s/it]
+wandb: - 0.008 MB of 0.008 MB uploadedwandb: \ 0.008 MB of 0.008 MB uploadedwandb: | 0.012 MB of 0.012 MB uploaded (0.003 MB deduped)wandb: / 0.022 MB of 0.022 MB uploaded (0.003 MB deduped)wandb: 
 wandb: Run history:
-wandb:    contrastive_loss ▁█
-wandb: reconstruction_loss ▁█
-wandb:       training_loss ▁█
+wandb:    contrastive_loss ███▆▂▇▁▃▃▅▁▃▆▆▃▃█▄▁▂
+wandb: reconstruction_loss ▇▅▄▅▃▅█▅▅▄▆▄▁▄▃▃▆▃▄▃
+wandb:       training_loss ▇▅▄▅▃▅█▅▅▄▆▄▁▄▃▃▆▃▄▃
 wandb: 
 wandb: Run summary:
-wandb:    contrastive_loss 0.01669
-wandb: reconstruction_loss 55435.0427
-wandb:       training_loss 55435.06008
+wandb:    contrastive_loss 0.00189
+wandb: reconstruction_loss 23483.64884
+wandb:       training_loss 23483.65079
 wandb: 
-wandb: 🚀 View run dashing-morning-1 at: https://wandb.ai/serrelab/prj_brainstorm/runs/97jxdntz
-wandb: ️⚡ View job at https://wandb.ai/serrelab/prj_brainstorm/jobs/QXJ0aWZhY3RDb2xsZWN0aW9uOjEzNzY5NzI1MQ==/version_details/v0
+wandb: 🚀 View run comfy-donkey-8 at: https://wandb.ai/serrelab/prj_brainstorm/runs/x4p2ieht
+wandb: ️⚡ View job at https://wandb.ai/serrelab/prj_brainstorm/jobs/QXJ0aWZhY3RDb2xsZWN0aW9uOjEzNzY5NzI1MQ==/version_details/v3
 wandb: Synced 6 W&B file(s), 0 media file(s), 2 artifact file(s) and 0 other file(s)
-wandb: Find logs at: ./wandb/run-20240206_181128-97jxdntz/logs
+wandb: Find logs at: ./wandb/run-20240206_222013-x4p2ieht/logs

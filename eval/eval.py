@@ -21,7 +21,8 @@ def eval(epoch, model, eval_loader, writer, device, split):
             video_idx = video_idx.to(device)
 
             # Forward
-            seeg_recon, embed = model(seeg)
+            seeg_recon, embed_before = model(seeg)
+            embed = embed_before.flatten(start_dim=1)
 
             if embeds is None:
                 embeds = embed

@@ -3,7 +3,7 @@ import torch
 from util.experiment import set_seeds, get_args
 from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import random_split, DataLoader
-from model.autoencoder import AutoEncoder
+from model.autoencoder import AutoEncoder,ConvAutoEncoder
 from train.train import train
 from eval.eval import eval
 from dataset.dataset4individual import Dataset4Individual
@@ -45,7 +45,8 @@ def main(args):
     
     # Define the seeg encoder
     print('Creating sEEG encoder ...')
-    model = AutoEncoder().to(device)
+    #model = AutoEncoder().to(device)
+    model= ConvAutoEncoder().to(device)
 
     # Define the optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
@@ -87,7 +88,8 @@ def main(args):
             'epoch': epoch + 1,
         }
         ckpt_file = os.path.join(ckpt_folder, f'epoch_{epoch + 1}.pth')
-        torch.save(state, ckpt_file)
+       # torch.save(state, ckpt_file)
+        torch.save(model.state_dict(), ckpt_file)
 
     writer.close()
 

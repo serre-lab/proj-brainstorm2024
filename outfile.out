@@ -1,13 +1,13 @@
 ## SLURM PROLOG ###############################################################
-##    Job ID : 430856
+##    Job ID : 448573
 ##  Job Name : trainingBrainstorm
 ##  Nodelist : gpu2106
 ##      CPUs : 
 ##  Mem/Node : 65536 MB
 ## Directory : /oscar/home/schen336/Desktop/proj-brainstorm2024
-##   Job Started : Tue Feb  6 10:19:33 PM EST 2024
+##   Job Started : Wed Feb  7 03:47:40 PM EST 2024
 ###############################################################################
-Tue Feb  6 22:19:35 2024       
+Wed Feb  7 15:47:41 2024       
 +---------------------------------------------------------------------------------------+
 | NVIDIA-SMI 535.129.03             Driver Version: 535.129.03   CUDA Version: 12.2     |
 |-----------------------------------------+----------------------+----------------------+
@@ -15,8 +15,8 @@ Tue Feb  6 22:19:35 2024
 | Fan  Temp   Perf          Pwr:Usage/Cap |         Memory-Usage | GPU-Util  Compute M. |
 |                                         |                      |               MIG M. |
 |=========================================+======================+======================|
-|   0  NVIDIA GeForce RTX 3090        On  | 00000000:25:00.0 Off |                  N/A |
-| 31%   34C    P8              27W / 350W |     16MiB / 24576MiB |      0%      Default |
+|   0  NVIDIA GeForce RTX 3090        On  | 00000000:61:00.0 Off |                  N/A |
+| 30%   25C    P8              39W / 350W |     32MiB / 24576MiB |      0%      Default |
 |                                         |                      |                  N/A |
 +-----------------------------------------+----------------------+----------------------+
                                                                                          
@@ -25,7 +25,7 @@ Tue Feb  6 22:19:35 2024
 |  GPU   GI   CI        PID   Type   Process name                            GPU Memory |
 |        ID   ID                                                             Usage      |
 |=======================================================================================|
-|    0   N/A  N/A     24386      G   /usr/libexec/Xorg                             5MiB |
+|    0   N/A  N/A     24386      G   /usr/libexec/Xorg                            21MiB |
 +---------------------------------------------------------------------------------------+
 Architecture:                    x86_64
 CPU op-mode(s):                  32-bit, 64-bit
@@ -72,82 +72,1570 @@ Loading datasets and dataloaders ...
 Train size: 58, Val size: 26
 Creating sEEG encoder ...
 Epoch: 1
-Recontruction Loss: 28383.0568
-Contrastive Loss: 0.0035
-Total Loss: 28383.0607
-Recontruction Loss: 19440.2305
-Contrastive Loss: 0.0021
-Total Loss: 19440.2324
+Recontruction Loss: 28384.1242
+Scaled Contrastive Loss: 29399.7931
+Total Loss: 57783.9176
+Recontruction Loss: 19443.1777
+Scaled Contrastive Loss: 8457.7334
+Total Loss: 27900.9102
 New best model found at epoch 1
 Epoch: 2
-Recontruction Loss: 28350.8094
-Contrastive Loss: 0.0031
-Total Loss: 28350.8124
-Recontruction Loss: 19396.5566
-Contrastive Loss: 0.0022
-Total Loss: 19396.5586
+Recontruction Loss: 28362.3208
+Scaled Contrastive Loss: 14434.9672
+Total Loss: 42797.2893
+Recontruction Loss: 19431.3535
+Scaled Contrastive Loss: 4839.5210
+Total Loss: 24270.8750
 New best model found at epoch 2
 Epoch: 3
-Recontruction Loss: 28243.5640
-Contrastive Loss: 0.0033
-Total Loss: 28243.5669
-Recontruction Loss: 19257.8125
-Contrastive Loss: 0.0022
-Total Loss: 19257.8145
+Recontruction Loss: 28344.1856
+Scaled Contrastive Loss: 12104.0567
+Total Loss: 40448.2421
+Recontruction Loss: 19429.4258
+Scaled Contrastive Loss: 1746.2900
+Total Loss: 21175.7148
 New best model found at epoch 3
 Epoch: 4
-Recontruction Loss: 27965.0550
-Contrastive Loss: 0.0021
-Total Loss: 27965.0559
-Recontruction Loss: 18896.1426
-Contrastive Loss: 0.0021
-Total Loss: 18896.1445
+Recontruction Loss: 28347.4658
+Scaled Contrastive Loss: 1837.5424
+Total Loss: 30185.0082
+Recontruction Loss: 19440.0820
+Scaled Contrastive Loss: 1202.4926
+Total Loss: 20642.5742
 New best model found at epoch 4
 Epoch: 5
-Recontruction Loss: 27149.8717
-Contrastive Loss: 0.0029
-Total Loss: 27149.8746
-Recontruction Loss: 18175.2285
-Contrastive Loss: 0.0020
-Total Loss: 18175.2305
+Recontruction Loss: 28367.5651
+Scaled Contrastive Loss: 7504.2501
+Total Loss: 35871.8158
+Recontruction Loss: 19443.6992
+Scaled Contrastive Loss: 369.2961
+Total Loss: 19812.9961
 New best model found at epoch 5
 Epoch: 6
-Recontruction Loss: 25843.7990
-Contrastive Loss: 0.0022
-Total Loss: 25843.8009
-Recontruction Loss: 17757.1895
-Contrastive Loss: 0.0019
-Total Loss: 17757.1914
+Recontruction Loss: 28370.1141
+Scaled Contrastive Loss: 341.4745
+Total Loss: 28711.5885
+Recontruction Loss: 19442.1582
+Scaled Contrastive Loss: 232.8124
+Total Loss: 19674.9707
 New best model found at epoch 6
 Epoch: 7
-Recontruction Loss: 25455.2321
-Contrastive Loss: 0.0029
-Total Loss: 25455.2360
-Recontruction Loss: 17431.0352
-Contrastive Loss: 0.0018
-Total Loss: 17431.0371
+Recontruction Loss: 28366.9300
+Scaled Contrastive Loss: 6218.3483
+Total Loss: 34585.2775
+Recontruction Loss: 19438.6699
+Scaled Contrastive Loss: 135.9523
+Total Loss: 19574.6230
 New best model found at epoch 7
 Epoch: 8
-Recontruction Loss: 24655.9300
-Contrastive Loss: 0.0021
-Total Loss: 24655.9320
-Recontruction Loss: 17128.6152
-Contrastive Loss: 0.0020
-Total Loss: 17128.6172
+Recontruction Loss: 28361.5843
+Scaled Contrastive Loss: 118.2292
+Total Loss: 28479.8132
+Recontruction Loss: 19432.5879
+Scaled Contrastive Loss: 89.9200
+Total Loss: 19522.5078
 New best model found at epoch 8
 Epoch: 9
-Recontruction Loss: 24211.8592
-Contrastive Loss: 0.0025
-Total Loss: 24211.8621
-Recontruction Loss: 16750.7852
-Contrastive Loss: 0.0019
-Total Loss: 16750.7871
+Recontruction Loss: 28352.3816
+Scaled Contrastive Loss: 125.1653
+Total Loss: 28477.5478
+Recontruction Loss: 19423.4414
+Scaled Contrastive Loss: 67.0727
+Total Loss: 19490.5137
 New best model found at epoch 9
 Epoch: 10
-Recontruction Loss: 23483.6488
-Contrastive Loss: 0.0019
-Total Loss: 23483.6508
-Recontruction Loss: 16327.6738
-Contrastive Loss: 0.0017
-Total Loss: 16327.6758
+Recontruction Loss: 28337.5835
+Scaled Contrastive Loss: 68.7654
+Total Loss: 28406.3490
+Recontruction Loss: 19406.7148
+Scaled Contrastive Loss: 60.7512
+Total Loss: 19467.4668
 New best model found at epoch 10
+Epoch: 11
+Recontruction Loss: 28312.4205
+Scaled Contrastive Loss: 75.8009
+Total Loss: 28388.2214
+Recontruction Loss: 19384.4941
+Scaled Contrastive Loss: 55.8552
+Total Loss: 19440.3496
+New best model found at epoch 11
+Epoch: 12
+Recontruction Loss: 28274.9813
+Scaled Contrastive Loss: 77.3729
+Total Loss: 28352.3541
+Recontruction Loss: 19343.2285
+Scaled Contrastive Loss: 56.8765
+Total Loss: 19400.1055
+New best model found at epoch 12
+Epoch: 13
+Recontruction Loss: 28192.7150
+Scaled Contrastive Loss: 6611.6801
+Total Loss: 34804.3966
+Recontruction Loss: 19260.6699
+Scaled Contrastive Loss: 68.9217
+Total Loss: 19329.5918
+New best model found at epoch 13
+Epoch: 14
+Recontruction Loss: 28065.7969
+Scaled Contrastive Loss: 6490.6059
+Total Loss: 34556.4033
+Recontruction Loss: 19059.7480
+Scaled Contrastive Loss: 149.8292
+Total Loss: 19209.5781
+New best model found at epoch 14
+Epoch: 15
+Recontruction Loss: 27490.9011
+Scaled Contrastive Loss: 439.7799
+Total Loss: 27930.6811
+Recontruction Loss: 18771.9160
+Scaled Contrastive Loss: 244.3703
+Total Loss: 19016.2871
+New best model found at epoch 15
+Epoch: 16
+Recontruction Loss: 27104.6593
+Scaled Contrastive Loss: 482.5194
+Total Loss: 27587.1781
+Recontruction Loss: 18511.6992
+Scaled Contrastive Loss: 217.9504
+Total Loss: 18729.6504
+New best model found at epoch 16
+Epoch: 17
+Recontruction Loss: 26480.2438
+Scaled Contrastive Loss: 334.2035
+Total Loss: 26814.4480
+Recontruction Loss: 17581.5801
+Scaled Contrastive Loss: 801.5501
+Total Loss: 18383.1309
+New best model found at epoch 17
+Epoch: 18
+Recontruction Loss: 24951.5187
+Scaled Contrastive Loss: 1438.5568
+Total Loss: 26390.0752
+Recontruction Loss: 17271.4160
+Scaled Contrastive Loss: 992.0700
+Total Loss: 18263.4863
+New best model found at epoch 18
+Epoch: 19
+Recontruction Loss: 24404.2258
+Scaled Contrastive Loss: 6961.0478
+Total Loss: 31365.2728
+Recontruction Loss: 17123.5078
+Scaled Contrastive Loss: 719.4805
+Total Loss: 17842.9883
+New best model found at epoch 19
+Epoch: 20
+Recontruction Loss: 24223.7518
+Scaled Contrastive Loss: 7455.6893
+Total Loss: 31679.4417
+Recontruction Loss: 17035.0684
+Scaled Contrastive Loss: 311.8276
+Total Loss: 17346.8965
+New best model found at epoch 20
+Epoch: 21
+Recontruction Loss: 23940.5923
+Scaled Contrastive Loss: 457.0486
+Total Loss: 24397.6406
+Recontruction Loss: 16844.0137
+Scaled Contrastive Loss: 312.1691
+Total Loss: 17156.1836
+New best model found at epoch 21
+Epoch: 22
+Recontruction Loss: 23559.9190
+Scaled Contrastive Loss: 551.9431
+Total Loss: 24111.8617
+Recontruction Loss: 16666.5938
+Scaled Contrastive Loss: 200.2442
+Total Loss: 16866.8379
+New best model found at epoch 22
+Epoch: 23
+Recontruction Loss: 23284.2274
+Scaled Contrastive Loss: 6784.3607
+Total Loss: 30068.5886
+Recontruction Loss: 16236.4160
+Scaled Contrastive Loss: 326.5285
+Total Loss: 16562.9453
+New best model found at epoch 23
+Epoch: 24
+Recontruction Loss: 22561.0279
+Scaled Contrastive Loss: 6962.3168
+Total Loss: 29523.3453
+Recontruction Loss: 15955.8047
+Scaled Contrastive Loss: 292.1330
+Total Loss: 16247.9375
+New best model found at epoch 24
+Epoch: 25
+Recontruction Loss: 22162.0165
+Scaled Contrastive Loss: 6576.4096
+Total Loss: 28738.4269
+Recontruction Loss: 15623.3389
+Scaled Contrastive Loss: 339.6833
+Total Loss: 15963.0225
+New best model found at epoch 25
+Epoch: 26
+Recontruction Loss: 21704.3057
+Scaled Contrastive Loss: 6805.7024
+Total Loss: 28510.0082
+Recontruction Loss: 15383.4736
+Scaled Contrastive Loss: 324.4164
+Total Loss: 15707.8896
+New best model found at epoch 26
+Epoch: 27
+Recontruction Loss: 21269.4403
+Scaled Contrastive Loss: 6586.6175
+Total Loss: 27856.0579
+Recontruction Loss: 15094.4805
+Scaled Contrastive Loss: 332.7586
+Total Loss: 15427.2393
+New best model found at epoch 27
+Epoch: 28
+Recontruction Loss: 20835.2237
+Scaled Contrastive Loss: 6662.2671
+Total Loss: 27497.4916
+Recontruction Loss: 14935.1084
+Scaled Contrastive Loss: 234.3499
+Total Loss: 15169.4580
+New best model found at epoch 28
+Epoch: 29
+Recontruction Loss: 20395.2504
+Scaled Contrastive Loss: 6947.0708
+Total Loss: 27342.3219
+Recontruction Loss: 14548.0811
+Scaled Contrastive Loss: 334.8634
+Total Loss: 14882.9443
+New best model found at epoch 29
+Epoch: 30
+Recontruction Loss: 19925.9253
+Scaled Contrastive Loss: 7135.8991
+Total Loss: 27061.8240
+Recontruction Loss: 14624.4580
+Scaled Contrastive Loss: 190.2499
+Total Loss: 14814.7080
+New best model found at epoch 30
+Epoch: 31
+Recontruction Loss: 19802.8504
+Scaled Contrastive Loss: 277.7115
+Total Loss: 20080.5618
+Recontruction Loss: 14253.2275
+Scaled Contrastive Loss: 358.0315
+Total Loss: 14611.2588
+New best model found at epoch 31
+Epoch: 32
+Recontruction Loss: 19234.6676
+Scaled Contrastive Loss: 583.6832
+Total Loss: 19818.3501
+Recontruction Loss: 13925.2207
+Scaled Contrastive Loss: 232.6800
+Total Loss: 14157.9004
+New best model found at epoch 32
+Epoch: 33
+Recontruction Loss: 19121.9103
+Scaled Contrastive Loss: 6296.3935
+Total Loss: 25418.3043
+Recontruction Loss: 13625.5166
+Scaled Contrastive Loss: 284.2691
+Total Loss: 13909.7861
+New best model found at epoch 33
+Epoch: 34
+Recontruction Loss: 18631.7404
+Scaled Contrastive Loss: 349.9406
+Total Loss: 18981.6810
+Recontruction Loss: 13584.6113
+Scaled Contrastive Loss: 324.1786
+Total Loss: 13908.7900
+New best model found at epoch 34
+Epoch: 35
+Recontruction Loss: 18434.6950
+Scaled Contrastive Loss: 7067.1260
+Total Loss: 25501.8212
+Recontruction Loss: 14122.9951
+Scaled Contrastive Loss: 228.8965
+Total Loss: 14351.8916
+Epoch: 36
+Recontruction Loss: 19158.7567
+Scaled Contrastive Loss: 6279.6516
+Total Loss: 25438.4080
+Recontruction Loss: 13309.9746
+Scaled Contrastive Loss: 286.9445
+Total Loss: 13596.9189
+New best model found at epoch 36
+Epoch: 37
+Recontruction Loss: 18370.8672
+Scaled Contrastive Loss: 6963.0107
+Total Loss: 25333.8765
+Recontruction Loss: 13522.3232
+Scaled Contrastive Loss: 324.2176
+Total Loss: 13846.5410
+Epoch: 38
+Recontruction Loss: 17982.5153
+Scaled Contrastive Loss: 6704.6655
+Total Loss: 24687.1811
+Recontruction Loss: 13421.7168
+Scaled Contrastive Loss: 210.0766
+Total Loss: 13631.7930
+Epoch: 39
+Recontruction Loss: 18434.4386
+Scaled Contrastive Loss: 300.6657
+Total Loss: 18735.1043
+Recontruction Loss: 13370.9492
+Scaled Contrastive Loss: 205.3745
+Total Loss: 13576.3242
+New best model found at epoch 39
+Epoch: 40
+Recontruction Loss: 17998.1495
+Scaled Contrastive Loss: 240.2590
+Total Loss: 18238.4084
+Recontruction Loss: 13383.8340
+Scaled Contrastive Loss: 319.2865
+Total Loss: 13703.1201
+Epoch: 41
+Recontruction Loss: 18031.5174
+Scaled Contrastive Loss: 6719.7436
+Total Loss: 24751.2612
+Recontruction Loss: 13061.1064
+Scaled Contrastive Loss: 291.3432
+Total Loss: 13352.4492
+New best model found at epoch 41
+Epoch: 42
+Recontruction Loss: 17745.0317
+Scaled Contrastive Loss: 6207.7706
+Total Loss: 23952.8027
+Recontruction Loss: 13269.2822
+Scaled Contrastive Loss: 274.6178
+Total Loss: 13543.9004
+Epoch: 43
+Recontruction Loss: 17811.5078
+Scaled Contrastive Loss: 6867.9266
+Total Loss: 24679.4339
+Recontruction Loss: 12993.4873
+Scaled Contrastive Loss: 299.4663
+Total Loss: 13292.9531
+New best model found at epoch 43
+Epoch: 44
+Recontruction Loss: 17506.8608
+Scaled Contrastive Loss: 576.0031
+Total Loss: 18082.8641
+Recontruction Loss: 13022.0791
+Scaled Contrastive Loss: 295.8802
+Total Loss: 13317.9590
+Epoch: 45
+Recontruction Loss: 17441.6350
+Scaled Contrastive Loss: 6340.9445
+Total Loss: 23782.5796
+Recontruction Loss: 12969.0020
+Scaled Contrastive Loss: 244.2958
+Total Loss: 13213.2979
+New best model found at epoch 45
+Epoch: 46
+Recontruction Loss: 17441.2607
+Scaled Contrastive Loss: 211.3955
+Total Loss: 17652.6565
+Recontruction Loss: 12960.5430
+Scaled Contrastive Loss: 230.4727
+Total Loss: 13191.0156
+New best model found at epoch 46
+Epoch: 47
+Recontruction Loss: 17378.1230
+Scaled Contrastive Loss: 6750.0766
+Total Loss: 24128.1997
+Recontruction Loss: 12905.2959
+Scaled Contrastive Loss: 245.1515
+Total Loss: 13150.4473
+New best model found at epoch 47
+Epoch: 48
+Recontruction Loss: 17305.8955
+Scaled Contrastive Loss: 6563.8061
+Total Loss: 23869.7011
+Recontruction Loss: 12881.0381
+Scaled Contrastive Loss: 248.8636
+Total Loss: 13129.9014
+New best model found at epoch 48
+Epoch: 49
+Recontruction Loss: 17259.3419
+Scaled Contrastive Loss: 201.8278
+Total Loss: 17461.1697
+Recontruction Loss: 12855.8018
+Scaled Contrastive Loss: 239.3764
+Total Loss: 13095.1777
+New best model found at epoch 49
+Epoch: 50
+Recontruction Loss: 17232.1796
+Scaled Contrastive Loss: 233.4629
+Total Loss: 17465.6425
+Recontruction Loss: 12835.3398
+Scaled Contrastive Loss: 240.3885
+Total Loss: 13075.7285
+New best model found at epoch 50
+Epoch: 51
+Recontruction Loss: 17190.4966
+Scaled Contrastive Loss: 374.1939
+Total Loss: 17564.6907
+Recontruction Loss: 12815.9600
+Scaled Contrastive Loss: 230.8841
+Total Loss: 13046.8438
+New best model found at epoch 51
+Epoch: 52
+Recontruction Loss: 17165.7470
+Scaled Contrastive Loss: 431.5830
+Total Loss: 17597.3297
+Recontruction Loss: 12807.0547
+Scaled Contrastive Loss: 209.0034
+Total Loss: 13016.0586
+New best model found at epoch 52
+Epoch: 53
+Recontruction Loss: 17161.5603
+Scaled Contrastive Loss: 6932.3775
+Total Loss: 24093.9376
+Recontruction Loss: 12807.2656
+Scaled Contrastive Loss: 181.2276
+Total Loss: 12988.4932
+New best model found at epoch 53
+Epoch: 54
+Recontruction Loss: 17157.4657
+Scaled Contrastive Loss: 223.2680
+Total Loss: 17380.7335
+Recontruction Loss: 12799.4326
+Scaled Contrastive Loss: 169.4765
+Total Loss: 12968.9092
+New best model found at epoch 54
+Epoch: 55
+Recontruction Loss: 17143.2903
+Scaled Contrastive Loss: 6875.6364
+Total Loss: 24018.9277
+Recontruction Loss: 12785.7783
+Scaled Contrastive Loss: 163.9028
+Total Loss: 12949.6807
+New best model found at epoch 55
+Epoch: 56
+Recontruction Loss: 17124.0619
+Scaled Contrastive Loss: 173.1157
+Total Loss: 17297.1772
+Recontruction Loss: 12770.9648
+Scaled Contrastive Loss: 161.6261
+Total Loss: 12932.5908
+New best model found at epoch 56
+Epoch: 57
+Recontruction Loss: 17101.7126
+Scaled Contrastive Loss: 161.2738
+Total Loss: 17262.9870
+Recontruction Loss: 12757.0703
+Scaled Contrastive Loss: 161.3138
+Total Loss: 12918.3838
+New best model found at epoch 57
+Epoch: 58
+Recontruction Loss: 17082.2936
+Scaled Contrastive Loss: 165.3477
+Total Loss: 17247.6410
+Recontruction Loss: 12745.0371
+Scaled Contrastive Loss: 158.6403
+Total Loss: 12903.6777
+New best model found at epoch 58
+Epoch: 59
+Recontruction Loss: 17061.1535
+Scaled Contrastive Loss: 6318.0656
+Total Loss: 23379.2193
+Recontruction Loss: 12743.1709
+Scaled Contrastive Loss: 148.4897
+Total Loss: 12891.6602
+New best model found at epoch 59
+Epoch: 60
+Recontruction Loss: 17062.6933
+Scaled Contrastive Loss: 6725.2856
+Total Loss: 23787.9789
+Recontruction Loss: 12726.3799
+Scaled Contrastive Loss: 145.7264
+Total Loss: 12872.1064
+New best model found at epoch 60
+Epoch: 61
+Recontruction Loss: 17036.1663
+Scaled Contrastive Loss: 6407.3746
+Total Loss: 23443.5401
+Recontruction Loss: 12719.6387
+Scaled Contrastive Loss: 134.4204
+Total Loss: 12854.0586
+New best model found at epoch 61
+Epoch: 62
+Recontruction Loss: 17029.1984
+Scaled Contrastive Loss: 149.0930
+Total Loss: 17178.2914
+Recontruction Loss: 12707.5859
+Scaled Contrastive Loss: 133.8403
+Total Loss: 12841.4258
+New best model found at epoch 62
+Epoch: 63
+Recontruction Loss: 17007.7001
+Scaled Contrastive Loss: 6391.9712
+Total Loss: 23399.6710
+Recontruction Loss: 12696.9570
+Scaled Contrastive Loss: 127.9111
+Total Loss: 12824.8682
+New best model found at epoch 63
+Epoch: 64
+Recontruction Loss: 16995.7447
+Scaled Contrastive Loss: 6241.2779
+Total Loss: 23237.0222
+Recontruction Loss: 12682.0146
+Scaled Contrastive Loss: 129.0392
+Total Loss: 12811.0537
+New best model found at epoch 64
+Epoch: 65
+Recontruction Loss: 16971.6814
+Scaled Contrastive Loss: 175.9875
+Total Loss: 17147.6689
+Recontruction Loss: 12672.6016
+Scaled Contrastive Loss: 125.7565
+Total Loss: 12798.3584
+New best model found at epoch 65
+Epoch: 66
+Recontruction Loss: 16970.5908
+Scaled Contrastive Loss: 6341.0912
+Total Loss: 23311.6827
+Recontruction Loss: 12661.5723
+Scaled Contrastive Loss: 122.7799
+Total Loss: 12784.3525
+New best model found at epoch 66
+Epoch: 67
+Recontruction Loss: 16941.9769
+Scaled Contrastive Loss: 6162.9717
+Total Loss: 23104.9491
+Recontruction Loss: 12653.7158
+Scaled Contrastive Loss: 115.0666
+Total Loss: 12768.7822
+New best model found at epoch 67
+Epoch: 68
+Recontruction Loss: 16937.2480
+Scaled Contrastive Loss: 6717.2535
+Total Loss: 23654.5019
+Recontruction Loss: 12648.4160
+Scaled Contrastive Loss: 110.5312
+Total Loss: 12758.9473
+New best model found at epoch 68
+Epoch: 69
+Recontruction Loss: 16921.3782
+Scaled Contrastive Loss: 6547.4698
+Total Loss: 23468.8470
+Recontruction Loss: 12645.2324
+Scaled Contrastive Loss: 114.5863
+Total Loss: 12759.8184
+Epoch: 70
+Recontruction Loss: 16903.2995
+Scaled Contrastive Loss: 6326.7076
+Total Loss: 23230.0070
+Recontruction Loss: 12634.8174
+Scaled Contrastive Loss: 106.7345
+Total Loss: 12741.5518
+New best model found at epoch 70
+Epoch: 71
+Recontruction Loss: 16903.1876
+Scaled Contrastive Loss: 6215.5377
+Total Loss: 23118.7254
+Recontruction Loss: 12619.3535
+Scaled Contrastive Loss: 107.6366
+Total Loss: 12726.9902
+New best model found at epoch 71
+Epoch: 72
+Recontruction Loss: 16876.0719
+Scaled Contrastive Loss: 123.8980
+Total Loss: 16999.9702
+Recontruction Loss: 12602.2588
+Scaled Contrastive Loss: 104.9296
+Total Loss: 12707.1885
+New best model found at epoch 72
+Epoch: 73
+Recontruction Loss: 16854.7815
+Scaled Contrastive Loss: 145.5994
+Total Loss: 17000.3804
+Recontruction Loss: 12610.4268
+Scaled Contrastive Loss: 100.7241
+Total Loss: 12711.1514
+Epoch: 74
+Recontruction Loss: 16855.8872
+Scaled Contrastive Loss: 6309.6468
+Total Loss: 23165.5345
+Recontruction Loss: 12612.2764
+Scaled Contrastive Loss: 105.9059
+Total Loss: 12718.1826
+Epoch: 75
+Recontruction Loss: 16846.0991
+Scaled Contrastive Loss: 142.1604
+Total Loss: 16988.2598
+Recontruction Loss: 12602.4414
+Scaled Contrastive Loss: 95.0875
+Total Loss: 12697.5293
+New best model found at epoch 75
+Epoch: 76
+Recontruction Loss: 16842.8336
+Scaled Contrastive Loss: 131.2756
+Total Loss: 16974.1092
+Recontruction Loss: 12579.3477
+Scaled Contrastive Loss: 99.8377
+Total Loss: 12679.1855
+New best model found at epoch 76
+Epoch: 77
+Recontruction Loss: 16813.9901
+Scaled Contrastive Loss: 147.1768
+Total Loss: 16961.1670
+Recontruction Loss: 12560.5068
+Scaled Contrastive Loss: 94.8834
+Total Loss: 12655.3906
+New best model found at epoch 77
+Epoch: 78
+Recontruction Loss: 16802.5335
+Scaled Contrastive Loss: 118.8036
+Total Loss: 16921.3375
+Recontruction Loss: 12549.6934
+Scaled Contrastive Loss: 94.4843
+Total Loss: 12644.1777
+New best model found at epoch 78
+Epoch: 79
+Recontruction Loss: 16778.0917
+Scaled Contrastive Loss: 109.9959
+Total Loss: 16888.0878
+Recontruction Loss: 12551.9258
+Scaled Contrastive Loss: 96.5011
+Total Loss: 12648.4268
+Epoch: 80
+Recontruction Loss: 16774.4610
+Scaled Contrastive Loss: 6153.7886
+Total Loss: 22928.2494
+Recontruction Loss: 12550.9795
+Scaled Contrastive Loss: 90.3013
+Total Loss: 12641.2812
+New best model found at epoch 80
+Epoch: 81
+Recontruction Loss: 16765.2569
+Scaled Contrastive Loss: 6768.1099
+Total Loss: 23533.3671
+Recontruction Loss: 12536.2090
+Scaled Contrastive Loss: 93.0856
+Total Loss: 12629.2949
+New best model found at epoch 81
+Epoch: 82
+Recontruction Loss: 16749.5524
+Scaled Contrastive Loss: 6264.5170
+Total Loss: 23014.0693
+Recontruction Loss: 12525.8369
+Scaled Contrastive Loss: 88.5728
+Total Loss: 12614.4102
+New best model found at epoch 82
+Epoch: 83
+Recontruction Loss: 16744.1049
+Scaled Contrastive Loss: 6140.6385
+Total Loss: 22884.7437
+Recontruction Loss: 12514.8926
+Scaled Contrastive Loss: 90.1068
+Total Loss: 12604.9990
+New best model found at epoch 83
+Epoch: 84
+Recontruction Loss: 16728.4356
+Scaled Contrastive Loss: 6609.7472
+Total Loss: 23338.1831
+Recontruction Loss: 12508.1543
+Scaled Contrastive Loss: 89.0578
+Total Loss: 12597.2119
+New best model found at epoch 84
+Epoch: 85
+Recontruction Loss: 16725.7379
+Scaled Contrastive Loss: 132.9196
+Total Loss: 16858.6576
+Recontruction Loss: 12503.1641
+Scaled Contrastive Loss: 87.2163
+Total Loss: 12590.3809
+New best model found at epoch 85
+Epoch: 86
+Recontruction Loss: 16715.2169
+Scaled Contrastive Loss: 6163.0231
+Total Loss: 22878.2400
+Recontruction Loss: 12496.6465
+Scaled Contrastive Loss: 87.1692
+Total Loss: 12583.8154
+New best model found at epoch 86
+Epoch: 87
+Recontruction Loss: 16710.0659
+Scaled Contrastive Loss: 6092.4549
+Total Loss: 22802.5211
+Recontruction Loss: 12493.2373
+Scaled Contrastive Loss: 84.7289
+Total Loss: 12577.9658
+New best model found at epoch 87
+Epoch: 88
+Recontruction Loss: 16703.3354
+Scaled Contrastive Loss: 6146.5998
+Total Loss: 22849.9356
+Recontruction Loss: 12489.3486
+Scaled Contrastive Loss: 83.5633
+Total Loss: 12572.9121
+New best model found at epoch 88
+Epoch: 89
+Recontruction Loss: 16698.4538
+Scaled Contrastive Loss: 6254.2192
+Total Loss: 22952.6732
+Recontruction Loss: 12483.9395
+Scaled Contrastive Loss: 82.9284
+Total Loss: 12566.8682
+New best model found at epoch 89
+Epoch: 90
+Recontruction Loss: 16691.9855
+Scaled Contrastive Loss: 6270.6028
+Total Loss: 22962.5889
+Recontruction Loss: 12478.7070
+Scaled Contrastive Loss: 83.9809
+Total Loss: 12562.6875
+New best model found at epoch 90
+Epoch: 91
+Recontruction Loss: 16685.5730
+Scaled Contrastive Loss: 124.8412
+Total Loss: 16810.4140
+Recontruction Loss: 12476.5410
+Scaled Contrastive Loss: 81.0955
+Total Loss: 12557.6367
+New best model found at epoch 91
+Epoch: 92
+Recontruction Loss: 16682.5755
+Scaled Contrastive Loss: 121.7791
+Total Loss: 16804.3541
+Recontruction Loss: 12471.0615
+Scaled Contrastive Loss: 80.8414
+Total Loss: 12551.9033
+New best model found at epoch 92
+Epoch: 93
+Recontruction Loss: 16676.6314
+Scaled Contrastive Loss: 101.4699
+Total Loss: 16778.1016
+Recontruction Loss: 12466.8311
+Scaled Contrastive Loss: 81.1435
+Total Loss: 12547.9746
+New best model found at epoch 93
+Epoch: 94
+Recontruction Loss: 16673.8688
+Scaled Contrastive Loss: 117.0281
+Total Loss: 16790.8971
+Recontruction Loss: 12464.9414
+Scaled Contrastive Loss: 79.3378
+Total Loss: 12544.2793
+New best model found at epoch 94
+Epoch: 95
+Recontruction Loss: 16669.6075
+Scaled Contrastive Loss: 6597.0239
+Total Loss: 23266.6311
+Recontruction Loss: 12461.5537
+Scaled Contrastive Loss: 77.4901
+Total Loss: 12539.0439
+New best model found at epoch 95
+Epoch: 96
+Recontruction Loss: 16667.2598
+Scaled Contrastive Loss: 6620.9855
+Total Loss: 23288.2452
+Recontruction Loss: 12459.1875
+Scaled Contrastive Loss: 76.4012
+Total Loss: 12535.5889
+New best model found at epoch 96
+Epoch: 97
+Recontruction Loss: 16665.4903
+Scaled Contrastive Loss: 98.8385
+Total Loss: 16764.3281
+Recontruction Loss: 12455.4150
+Scaled Contrastive Loss: 77.9269
+Total Loss: 12533.3418
+New best model found at epoch 97
+Epoch: 98
+Recontruction Loss: 16662.2902
+Scaled Contrastive Loss: 6142.0498
+Total Loss: 22804.3408
+Recontruction Loss: 12451.9043
+Scaled Contrastive Loss: 79.9143
+Total Loss: 12531.8184
+New best model found at epoch 98
+Epoch: 99
+Recontruction Loss: 16660.1972
+Scaled Contrastive Loss: 85.6661
+Total Loss: 16745.8636
+Recontruction Loss: 12451.2549
+Scaled Contrastive Loss: 75.8417
+Total Loss: 12527.0967
+New best model found at epoch 99
+Epoch: 100
+Recontruction Loss: 16656.0661
+Scaled Contrastive Loss: 90.9538
+Total Loss: 16747.0193
+Recontruction Loss: 12448.4531
+Scaled Contrastive Loss: 72.9571
+Total Loss: 12521.4102
+New best model found at epoch 100
+Epoch: 101
+Recontruction Loss: 16654.7631
+Scaled Contrastive Loss: 97.1427
+Total Loss: 16751.9060
+Recontruction Loss: 12447.8203
+Scaled Contrastive Loss: 72.7145
+Total Loss: 12520.5352
+New best model found at epoch 101
+Epoch: 102
+Recontruction Loss: 16652.7664
+Scaled Contrastive Loss: 98.9351
+Total Loss: 16751.7010
+Recontruction Loss: 12444.7373
+Scaled Contrastive Loss: 71.0811
+Total Loss: 12515.8184
+New best model found at epoch 102
+Epoch: 103
+Recontruction Loss: 16648.2256
+Scaled Contrastive Loss: 6046.9580
+Total Loss: 22695.1836
+Recontruction Loss: 12445.9336
+Scaled Contrastive Loss: 69.8904
+Total Loss: 12515.8242
+Epoch: 104
+Recontruction Loss: 16651.9535
+Scaled Contrastive Loss: 6599.1696
+Total Loss: 23251.1238
+Recontruction Loss: 12440.1240
+Scaled Contrastive Loss: 70.4576
+Total Loss: 12510.5820
+New best model found at epoch 104
+Epoch: 105
+Recontruction Loss: 16647.5014
+Scaled Contrastive Loss: 81.0330
+Total Loss: 16728.5342
+Recontruction Loss: 12439.2061
+Scaled Contrastive Loss: 70.5187
+Total Loss: 12509.7246
+New best model found at epoch 105
+Epoch: 106
+Recontruction Loss: 16641.6927
+Scaled Contrastive Loss: 85.6399
+Total Loss: 16727.3320
+Recontruction Loss: 12442.8525
+Scaled Contrastive Loss: 68.2747
+Total Loss: 12511.1270
+Epoch: 107
+Recontruction Loss: 16643.6674
+Scaled Contrastive Loss: 6029.6596
+Total Loss: 22673.3268
+Recontruction Loss: 12439.3750
+Scaled Contrastive Loss: 68.4683
+Total Loss: 12507.8438
+New best model found at epoch 107
+Epoch: 108
+Recontruction Loss: 16641.1476
+Scaled Contrastive Loss: 6024.4780
+Total Loss: 22665.6259
+Recontruction Loss: 12437.3252
+Scaled Contrastive Loss: 66.1622
+Total Loss: 12503.4873
+New best model found at epoch 108
+Epoch: 109
+Recontruction Loss: 16642.1454
+Scaled Contrastive Loss: 74.5478
+Total Loss: 16716.6934
+Recontruction Loss: 12429.9004
+Scaled Contrastive Loss: 67.4266
+Total Loss: 12497.3271
+New best model found at epoch 109
+Epoch: 110
+Recontruction Loss: 16636.6073
+Scaled Contrastive Loss: 6586.3488
+Total Loss: 23222.9572
+Recontruction Loss: 12431.0996
+Scaled Contrastive Loss: 67.5993
+Total Loss: 12498.6992
+Epoch: 111
+Recontruction Loss: 16636.8718
+Scaled Contrastive Loss: 74.0396
+Total Loss: 16710.9110
+Recontruction Loss: 12457.6699
+Scaled Contrastive Loss: 64.5513
+Total Loss: 12522.2217
+Epoch: 112
+Recontruction Loss: 16658.1890
+Scaled Contrastive Loss: 6144.5012
+Total Loss: 22802.6903
+Recontruction Loss: 12436.7666
+Scaled Contrastive Loss: 65.8779
+Total Loss: 12502.6445
+Epoch: 113
+Recontruction Loss: 16639.1160
+Scaled Contrastive Loss: 6127.1839
+Total Loss: 22766.3002
+Recontruction Loss: 12426.3135
+Scaled Contrastive Loss: 64.2493
+Total Loss: 12490.5625
+New best model found at epoch 113
+Epoch: 114
+Recontruction Loss: 16630.8941
+Scaled Contrastive Loss: 86.0689
+Total Loss: 16716.9634
+Recontruction Loss: 12424.3340
+Scaled Contrastive Loss: 64.6082
+Total Loss: 12488.9424
+New best model found at epoch 114
+Epoch: 115
+Recontruction Loss: 16632.6688
+Scaled Contrastive Loss: 83.7760
+Total Loss: 16716.4444
+Recontruction Loss: 12422.5244
+Scaled Contrastive Loss: 64.4796
+Total Loss: 12487.0039
+New best model found at epoch 115
+Epoch: 116
+Recontruction Loss: 16628.9820
+Scaled Contrastive Loss: 6471.6442
+Total Loss: 23100.6256
+Recontruction Loss: 12420.7080
+Scaled Contrastive Loss: 63.6291
+Total Loss: 12484.3369
+New best model found at epoch 116
+Epoch: 117
+Recontruction Loss: 16625.1752
+Scaled Contrastive Loss: 76.5657
+Total Loss: 16701.7409
+Recontruction Loss: 12420.0439
+Scaled Contrastive Loss: 63.1114
+Total Loss: 12483.1553
+New best model found at epoch 117
+Epoch: 118
+Recontruction Loss: 16623.8246
+Scaled Contrastive Loss: 80.0697
+Total Loss: 16703.8944
+Recontruction Loss: 12419.2656
+Scaled Contrastive Loss: 62.4185
+Total Loss: 12481.6846
+New best model found at epoch 118
+Epoch: 119
+Recontruction Loss: 16624.5452
+Scaled Contrastive Loss: 79.9457
+Total Loss: 16704.4912
+Recontruction Loss: 12420.5361
+Scaled Contrastive Loss: 62.5474
+Total Loss: 12483.0840
+Epoch: 120
+Recontruction Loss: 16622.2390
+Scaled Contrastive Loss: 6707.9983
+Total Loss: 23330.2370
+Recontruction Loss: 12427.1221
+Scaled Contrastive Loss: 61.3036
+Total Loss: 12488.4258
+Epoch: 121
+Recontruction Loss: 16629.2099
+Scaled Contrastive Loss: 67.9040
+Total Loss: 16697.1138
+Recontruction Loss: 12419.2666
+Scaled Contrastive Loss: 62.2270
+Total Loss: 12481.4932
+New best model found at epoch 121
+Epoch: 122
+Recontruction Loss: 16624.9971
+Scaled Contrastive Loss: 73.9126
+Total Loss: 16698.9091
+Recontruction Loss: 12415.4863
+Scaled Contrastive Loss: 60.2786
+Total Loss: 12475.7646
+New best model found at epoch 122
+Epoch: 123
+Recontruction Loss: 16619.0934
+Scaled Contrastive Loss: 6124.6156
+Total Loss: 22743.7088
+Recontruction Loss: 12414.9238
+Scaled Contrastive Loss: 59.4469
+Total Loss: 12474.3711
+New best model found at epoch 123
+Epoch: 124
+Recontruction Loss: 16618.7750
+Scaled Contrastive Loss: 6579.3407
+Total Loss: 23198.1157
+Recontruction Loss: 12416.2559
+Scaled Contrastive Loss: 60.2926
+Total Loss: 12476.5488
+Epoch: 125
+Recontruction Loss: 16616.2476
+Scaled Contrastive Loss: 74.1837
+Total Loss: 16690.4312
+Recontruction Loss: 12414.3936
+Scaled Contrastive Loss: 58.9436
+Total Loss: 12473.3369
+New best model found at epoch 125
+Epoch: 126
+Recontruction Loss: 16617.6550
+Scaled Contrastive Loss: 6112.1874
+Total Loss: 22729.8424
+Recontruction Loss: 12411.1465
+Scaled Contrastive Loss: 59.7156
+Total Loss: 12470.8623
+New best model found at epoch 126
+Epoch: 127
+Recontruction Loss: 16618.4038
+Scaled Contrastive Loss: 69.6790
+Total Loss: 16688.0826
+Recontruction Loss: 12409.3672
+Scaled Contrastive Loss: 58.6818
+Total Loss: 12468.0488
+New best model found at epoch 127
+Epoch: 128
+Recontruction Loss: 16616.0377
+Scaled Contrastive Loss: 78.7630
+Total Loss: 16694.8005
+Recontruction Loss: 12426.0820
+Scaled Contrastive Loss: 57.3604
+Total Loss: 12483.4424
+Epoch: 129
+Recontruction Loss: 16625.2936
+Scaled Contrastive Loss: 62.3304
+Total Loss: 16687.6239
+Recontruction Loss: 12424.5322
+Scaled Contrastive Loss: 59.2834
+Total Loss: 12483.8154
+Epoch: 130
+Recontruction Loss: 16629.6781
+Scaled Contrastive Loss: 6120.8013
+Total Loss: 22750.4795
+Recontruction Loss: 12414.3584
+Scaled Contrastive Loss: 57.4735
+Total Loss: 12471.8320
+Epoch: 131
+Recontruction Loss: 16633.7526
+Scaled Contrastive Loss: 6118.7191
+Total Loss: 22752.4727
+Recontruction Loss: 12412.1318
+Scaled Contrastive Loss: 58.2759
+Total Loss: 12470.4072
+Epoch: 132
+Recontruction Loss: 16641.4353
+Scaled Contrastive Loss: 60.6092
+Total Loss: 16702.0439
+Recontruction Loss: 12405.4414
+Scaled Contrastive Loss: 57.7100
+Total Loss: 12463.1514
+New best model found at epoch 132
+Epoch: 133
+Recontruction Loss: 16629.4989
+Scaled Contrastive Loss: 6581.4462
+Total Loss: 23210.9449
+Recontruction Loss: 12428.9873
+Scaled Contrastive Loss: 55.9314
+Total Loss: 12484.9189
+Epoch: 134
+Recontruction Loss: 16636.9052
+Scaled Contrastive Loss: 6571.2121
+Total Loss: 23208.1164
+Recontruction Loss: 12429.8594
+Scaled Contrastive Loss: 57.7032
+Total Loss: 12487.5625
+Epoch: 135
+Recontruction Loss: 16625.6151
+Scaled Contrastive Loss: 6235.2421
+Total Loss: 22860.8573
+Recontruction Loss: 12426.7080
+Scaled Contrastive Loss: 55.4863
+Total Loss: 12482.1943
+Epoch: 136
+Recontruction Loss: 16643.4207
+Scaled Contrastive Loss: 6000.3193
+Total Loss: 22643.7395
+Recontruction Loss: 12485.3633
+Scaled Contrastive Loss: 58.6728
+Total Loss: 12544.0361
+Epoch: 137
+Recontruction Loss: 16684.7293
+Scaled Contrastive Loss: 6238.3318
+Total Loss: 22923.0617
+Recontruction Loss: 12463.1797
+Scaled Contrastive Loss: 55.1169
+Total Loss: 12518.2969
+Epoch: 138
+Recontruction Loss: 16670.3697
+Scaled Contrastive Loss: 6445.2108
+Total Loss: 23115.5810
+Recontruction Loss: 12459.3174
+Scaled Contrastive Loss: 57.4230
+Total Loss: 12516.7402
+Epoch: 139
+Recontruction Loss: 16663.5869
+Scaled Contrastive Loss: 61.7463
+Total Loss: 16725.3331
+Recontruction Loss: 12453.6914
+Scaled Contrastive Loss: 54.2579
+Total Loss: 12507.9492
+Epoch: 140
+Recontruction Loss: 16643.6502
+Scaled Contrastive Loss: 6103.3379
+Total Loss: 22746.9880
+Recontruction Loss: 12470.5811
+Scaled Contrastive Loss: 57.6025
+Total Loss: 12528.1836
+Epoch: 141
+Recontruction Loss: 16657.3005
+Scaled Contrastive Loss: 6115.2894
+Total Loss: 22772.5898
+Recontruction Loss: 12443.7637
+Scaled Contrastive Loss: 54.1076
+Total Loss: 12497.8711
+Epoch: 142
+Recontruction Loss: 16679.0590
+Scaled Contrastive Loss: 61.3825
+Total Loss: 16740.4415
+Recontruction Loss: 12447.4346
+Scaled Contrastive Loss: 56.6588
+Total Loss: 12504.0938
+Epoch: 143
+Recontruction Loss: 16730.4267
+Scaled Contrastive Loss: 73.8984
+Total Loss: 16804.3248
+Recontruction Loss: 12480.5098
+Scaled Contrastive Loss: 52.9992
+Total Loss: 12533.5088
+Epoch: 144
+Recontruction Loss: 16758.6519
+Scaled Contrastive Loss: 6220.4910
+Total Loss: 22979.1428
+Recontruction Loss: 12402.7246
+Scaled Contrastive Loss: 54.3662
+Total Loss: 12457.0908
+New best model found at epoch 144
+Epoch: 145
+Recontruction Loss: 16675.8900
+Scaled Contrastive Loss: 63.2419
+Total Loss: 16739.1317
+Recontruction Loss: 12407.6104
+Scaled Contrastive Loss: 55.1554
+Total Loss: 12462.7656
+Epoch: 146
+Recontruction Loss: 16657.0424
+Scaled Contrastive Loss: 6001.8500
+Total Loss: 22658.8926
+Recontruction Loss: 12420.7871
+Scaled Contrastive Loss: 54.3898
+Total Loss: 12475.1768
+Epoch: 147
+Recontruction Loss: 16625.5273
+Scaled Contrastive Loss: 64.9114
+Total Loss: 16690.4390
+Recontruction Loss: 12433.4932
+Scaled Contrastive Loss: 56.2271
+Total Loss: 12489.7207
+Epoch: 148
+Recontruction Loss: 16623.6376
+Scaled Contrastive Loss: 6576.3215
+Total Loss: 23199.9591
+Recontruction Loss: 12420.3223
+Scaled Contrastive Loss: 54.2284
+Total Loss: 12474.5508
+Epoch: 149
+Recontruction Loss: 16627.0185
+Scaled Contrastive Loss: 6694.7079
+Total Loss: 23321.7275
+Recontruction Loss: 12401.9639
+Scaled Contrastive Loss: 55.7023
+Total Loss: 12457.6660
+Epoch: 150
+Recontruction Loss: 16619.9784
+Scaled Contrastive Loss: 68.3392
+Total Loss: 16688.3169
+Recontruction Loss: 12396.0684
+Scaled Contrastive Loss: 54.2174
+Total Loss: 12450.2861
+New best model found at epoch 150
+Epoch: 151
+Recontruction Loss: 16613.4557
+Scaled Contrastive Loss: 6000.3889
+Total Loss: 22613.8442
+Recontruction Loss: 12399.2148
+Scaled Contrastive Loss: 53.3741
+Total Loss: 12452.5889
+Epoch: 152
+Recontruction Loss: 16600.8344
+Scaled Contrastive Loss: 62.8504
+Total Loss: 16663.6854
+Recontruction Loss: 12400.1982
+Scaled Contrastive Loss: 53.6630
+Total Loss: 12453.8613
+Epoch: 153
+Recontruction Loss: 16599.1551
+Scaled Contrastive Loss: 54.5191
+Total Loss: 16653.6745
+Recontruction Loss: 12399.0996
+Scaled Contrastive Loss: 52.4703
+Total Loss: 12451.5703
+Epoch: 154
+Recontruction Loss: 16600.1303
+Scaled Contrastive Loss: 63.9184
+Total Loss: 16664.0485
+Recontruction Loss: 12395.8281
+Scaled Contrastive Loss: 53.1396
+Total Loss: 12448.9678
+New best model found at epoch 154
+Epoch: 155
+Recontruction Loss: 16596.4740
+Scaled Contrastive Loss: 6561.8151
+Total Loss: 23158.2889
+Recontruction Loss: 12392.0078
+Scaled Contrastive Loss: 52.5361
+Total Loss: 12444.5439
+New best model found at epoch 155
+Epoch: 156
+Recontruction Loss: 16593.9775
+Scaled Contrastive Loss: 62.3249
+Total Loss: 16656.3029
+Recontruction Loss: 12393.5498
+Scaled Contrastive Loss: 51.7458
+Total Loss: 12445.2959
+Epoch: 157
+Recontruction Loss: 16593.2527
+Scaled Contrastive Loss: 6108.7038
+Total Loss: 22701.9564
+Recontruction Loss: 12394.3125
+Scaled Contrastive Loss: 51.9277
+Total Loss: 12446.2402
+Epoch: 158
+Recontruction Loss: 16592.9703
+Scaled Contrastive Loss: 6108.2385
+Total Loss: 22701.2084
+Recontruction Loss: 12393.4570
+Scaled Contrastive Loss: 51.1364
+Total Loss: 12444.5938
+Epoch: 159
+Recontruction Loss: 16593.0309
+Scaled Contrastive Loss: 6436.1223
+Total Loss: 23029.1532
+Recontruction Loss: 12391.8418
+Scaled Contrastive Loss: 51.1500
+Total Loss: 12442.9922
+New best model found at epoch 159
+Epoch: 160
+Recontruction Loss: 16590.9170
+Scaled Contrastive Loss: 6448.5675
+Total Loss: 23039.4848
+Recontruction Loss: 12390.7998
+Scaled Contrastive Loss: 50.3504
+Total Loss: 12441.1504
+New best model found at epoch 160
+Epoch: 161
+Recontruction Loss: 16591.5611
+Scaled Contrastive Loss: 60.7955
+Total Loss: 16652.3560
+Recontruction Loss: 12389.9336
+Scaled Contrastive Loss: 50.1019
+Total Loss: 12440.0352
+New best model found at epoch 161
+Epoch: 162
+Recontruction Loss: 16590.2036
+Scaled Contrastive Loss: 52.3449
+Total Loss: 16642.5486
+Recontruction Loss: 12389.0195
+Scaled Contrastive Loss: 49.6404
+Total Loss: 12438.6602
+New best model found at epoch 162
+Epoch: 163
+Recontruction Loss: 16589.6884
+Scaled Contrastive Loss: 53.3445
+Total Loss: 16643.0324
+Recontruction Loss: 12389.1084
+Scaled Contrastive Loss: 49.0748
+Total Loss: 12438.1836
+New best model found at epoch 163
+Epoch: 164
+Recontruction Loss: 16588.8876
+Scaled Contrastive Loss: 52.5878
+Total Loss: 16641.4757
+Recontruction Loss: 12388.6514
+Scaled Contrastive Loss: 48.7230
+Total Loss: 12437.3740
+New best model found at epoch 164
+Epoch: 165
+Recontruction Loss: 16588.1829
+Scaled Contrastive Loss: 6440.3102
+Total Loss: 23028.4925
+Recontruction Loss: 12388.7402
+Scaled Contrastive Loss: 47.9183
+Total Loss: 12436.6582
+New best model found at epoch 165
+Epoch: 166
+Recontruction Loss: 16588.0094
+Scaled Contrastive Loss: 48.2215
+Total Loss: 16636.2302
+Recontruction Loss: 12388.2002
+Scaled Contrastive Loss: 47.6745
+Total Loss: 12435.8750
+New best model found at epoch 166
+Epoch: 167
+Recontruction Loss: 16586.9822
+Scaled Contrastive Loss: 54.7661
+Total Loss: 16641.7479
+Recontruction Loss: 12387.8018
+Scaled Contrastive Loss: 46.9200
+Total Loss: 12434.7217
+New best model found at epoch 167
+Epoch: 168
+Recontruction Loss: 16587.2709
+Scaled Contrastive Loss: 53.3216
+Total Loss: 16640.5929
+Recontruction Loss: 12386.9580
+Scaled Contrastive Loss: 46.5428
+Total Loss: 12433.5010
+New best model found at epoch 168
+Epoch: 169
+Recontruction Loss: 16586.2522
+Scaled Contrastive Loss: 6100.8353
+Total Loss: 22687.0867
+Recontruction Loss: 12386.4102
+Scaled Contrastive Loss: 46.1271
+Total Loss: 12432.5371
+New best model found at epoch 169
+Epoch: 170
+Recontruction Loss: 16585.9370
+Scaled Contrastive Loss: 6100.4053
+Total Loss: 22686.3421
+Recontruction Loss: 12386.0186
+Scaled Contrastive Loss: 45.7898
+Total Loss: 12431.8086
+New best model found at epoch 170
+Epoch: 171
+Recontruction Loss: 16585.3496
+Scaled Contrastive Loss: 6689.3911
+Total Loss: 23274.7406
+Recontruction Loss: 12385.5000
+Scaled Contrastive Loss: 45.3962
+Total Loss: 12430.8965
+New best model found at epoch 171
+Epoch: 172
+Recontruction Loss: 16584.9693
+Scaled Contrastive Loss: 49.3520
+Total Loss: 16634.3215
+Recontruction Loss: 12385.2549
+Scaled Contrastive Loss: 44.8447
+Total Loss: 12430.0996
+New best model found at epoch 172
+Epoch: 173
+Recontruction Loss: 16584.3779
+Scaled Contrastive Loss: 6431.3195
+Total Loss: 23015.6977
+Recontruction Loss: 12384.8711
+Scaled Contrastive Loss: 44.5701
+Total Loss: 12429.4414
+New best model found at epoch 173
+Epoch: 174
+Recontruction Loss: 16584.1383
+Scaled Contrastive Loss: 48.4816
+Total Loss: 16632.6199
+Recontruction Loss: 12385.0928
+Scaled Contrastive Loss: 44.0982
+Total Loss: 12429.1914
+New best model found at epoch 174
+Epoch: 175
+Recontruction Loss: 16584.3204
+Scaled Contrastive Loss: 6551.7995
+Total Loss: 23136.1191
+Recontruction Loss: 12384.6250
+Scaled Contrastive Loss: 44.0335
+Total Loss: 12428.6582
+New best model found at epoch 175
+Epoch: 176
+Recontruction Loss: 16583.5673
+Scaled Contrastive Loss: 51.8705
+Total Loss: 16635.4374
+Recontruction Loss: 12384.7314
+Scaled Contrastive Loss: 43.2849
+Total Loss: 12428.0166
+New best model found at epoch 176
+Epoch: 177
+Recontruction Loss: 16583.9668
+Scaled Contrastive Loss: 43.9276
+Total Loss: 16627.8945
+Recontruction Loss: 12383.8965
+Scaled Contrastive Loss: 43.0983
+Total Loss: 12426.9951
+New best model found at epoch 177
+Epoch: 178
+Recontruction Loss: 16582.8492
+Scaled Contrastive Loss: 6429.7646
+Total Loss: 23012.6152
+Recontruction Loss: 12383.3584
+Scaled Contrastive Loss: 42.4927
+Total Loss: 12425.8516
+New best model found at epoch 178
+Epoch: 179
+Recontruction Loss: 16582.5607
+Scaled Contrastive Loss: 48.8608
+Total Loss: 16631.4213
+Recontruction Loss: 12382.9043
+Scaled Contrastive Loss: 42.1156
+Total Loss: 12425.0195
+New best model found at epoch 179
+Epoch: 180
+Recontruction Loss: 16581.9436
+Scaled Contrastive Loss: 6209.4303
+Total Loss: 22791.3741
+Recontruction Loss: 12382.4727
+Scaled Contrastive Loss: 41.5410
+Total Loss: 12424.0137
+New best model found at epoch 180
+Epoch: 181
+Recontruction Loss: 16581.5116
+Scaled Contrastive Loss: 5985.9497
+Total Loss: 22567.4609
+Recontruction Loss: 12381.8291
+Scaled Contrastive Loss: 41.4028
+Total Loss: 12423.2314
+New best model found at epoch 181
+Epoch: 182
+Recontruction Loss: 16580.8741
+Scaled Contrastive Loss: 6426.6146
+Total Loss: 23007.4882
+Recontruction Loss: 12381.5156
+Scaled Contrastive Loss: 40.8637
+Total Loss: 12422.3789
+New best model found at epoch 182
+Epoch: 183
+Recontruction Loss: 16580.6402
+Scaled Contrastive Loss: 6207.6188
+Total Loss: 22788.2600
+Recontruction Loss: 12381.3193
+Scaled Contrastive Loss: 40.3937
+Total Loss: 12421.7129
+New best model found at epoch 183
+Epoch: 184
+Recontruction Loss: 16580.1393
+Scaled Contrastive Loss: 39.6667
+Total Loss: 16619.8060
+Recontruction Loss: 12380.8555
+Scaled Contrastive Loss: 40.2367
+Total Loss: 12421.0918
+New best model found at epoch 184
+Epoch: 185
+Recontruction Loss: 16579.6967
+Scaled Contrastive Loss: 6423.8979
+Total Loss: 23003.5954
+Recontruction Loss: 12380.4072
+Scaled Contrastive Loss: 39.9268
+Total Loss: 12420.3340
+New best model found at epoch 185
+Epoch: 186
+Recontruction Loss: 16579.2167
+Scaled Contrastive Loss: 6426.2535
+Total Loss: 23005.4706
+Recontruction Loss: 12380.2500
+Scaled Contrastive Loss: 39.5157
+Total Loss: 12419.7656
+New best model found at epoch 186
+Epoch: 187
+Recontruction Loss: 16579.0700
+Scaled Contrastive Loss: 6551.1847
+Total Loss: 23130.2540
+Recontruction Loss: 12379.9092
+Scaled Contrastive Loss: 39.2011
+Total Loss: 12419.1104
+New best model found at epoch 187
+Epoch: 188
+Recontruction Loss: 16578.6686
+Scaled Contrastive Loss: 41.2870
+Total Loss: 16619.9557
+Recontruction Loss: 12379.3984
+Scaled Contrastive Loss: 38.9618
+Total Loss: 12418.3604
+New best model found at epoch 188
+Epoch: 189
+Recontruction Loss: 16578.0700
+Scaled Contrastive Loss: 43.5985
+Total Loss: 16621.6685
+Recontruction Loss: 12379.3828
+Scaled Contrastive Loss: 38.5401
+Total Loss: 12417.9229
+New best model found at epoch 189
+Epoch: 190
+Recontruction Loss: 16578.0163
+Scaled Contrastive Loss: 40.4752
+Total Loss: 16618.4911
+Recontruction Loss: 12379.2207
+Scaled Contrastive Loss: 38.2792
+Total Loss: 12417.5000
+New best model found at epoch 190
+Epoch: 191
+Recontruction Loss: 16577.7997
+Scaled Contrastive Loss: 39.4799
+Total Loss: 16617.2798
+Recontruction Loss: 12378.9473
+Scaled Contrastive Loss: 37.9346
+Total Loss: 12416.8818
+New best model found at epoch 191
+Epoch: 192
+Recontruction Loss: 16577.5050
+Scaled Contrastive Loss: 6421.7418
+Total Loss: 22999.2462
+Recontruction Loss: 12378.2607
+Scaled Contrastive Loss: 37.9076
+Total Loss: 12416.1680
+New best model found at epoch 192
+Epoch: 193
+Recontruction Loss: 16577.0549
+Scaled Contrastive Loss: 6426.8238
+Total Loss: 23003.8784
+Recontruction Loss: 12378.0176
+Scaled Contrastive Loss: 37.5757
+Total Loss: 12415.5928
+New best model found at epoch 193
+Epoch: 194
+Recontruction Loss: 16576.6547
+Scaled Contrastive Loss: 40.0490
+Total Loss: 16616.7039
+Recontruction Loss: 12377.9717
+Scaled Contrastive Loss: 37.3661
+Total Loss: 12415.3379
+New best model found at epoch 194
+Epoch: 195
+Recontruction Loss: 16576.6046
+Scaled Contrastive Loss: 39.6306
+Total Loss: 16616.2346
+Recontruction Loss: 12377.7891
+Scaled Contrastive Loss: 36.9936
+Total Loss: 12414.7822
+New best model found at epoch 195
+Epoch: 196
+Recontruction Loss: 16576.0671
+Scaled Contrastive Loss: 38.1882
+Total Loss: 16614.2551
+Recontruction Loss: 12377.2490
+Scaled Contrastive Loss: 36.8726
+Total Loss: 12414.1221
+New best model found at epoch 196
+Epoch: 197
+Recontruction Loss: 16575.6317
+Scaled Contrastive Loss: 6546.3269
+Total Loss: 23121.9589
+Recontruction Loss: 12377.1104
+Scaled Contrastive Loss: 36.4626
+Total Loss: 12413.5732
+New best model found at epoch 197
+Epoch: 198
+Recontruction Loss: 16575.5290
+Scaled Contrastive Loss: 6676.0309
+Total Loss: 23251.5595
+Recontruction Loss: 12376.5146
+Scaled Contrastive Loss: 36.3396
+Total Loss: 12412.8545
+New best model found at epoch 198
+Epoch: 199
+Recontruction Loss: 16574.7950
+Scaled Contrastive Loss: 42.5882
+Total Loss: 16617.3833
+Recontruction Loss: 12376.4951
+Scaled Contrastive Loss: 35.9526
+Total Loss: 12412.4473
+New best model found at epoch 199
+Epoch: 200
+Recontruction Loss: 16574.4682
+Scaled Contrastive Loss: 35.4035
+Total Loss: 16609.8722
+Recontruction Loss: 12375.9014
+Scaled Contrastive Loss: 35.8829
+Total Loss: 12411.7842
+New best model found at epoch 200
+Epoch: 201
+Recontruction Loss: 16574.1534
+Scaled Contrastive Loss: 37.2513
+Total Loss: 16611.4040
+Recontruction Loss: 12375.5488
+Scaled Contrastive Loss: 35.6355
+Total Loss: 12411.1846
+New best model found at epoch 201
+Epoch: 202
+Recontruction Loss: 16573.9805
+Scaled Contrastive Loss: 6422.0005
+Total Loss: 22995.9809

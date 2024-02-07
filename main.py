@@ -69,7 +69,7 @@ def main(args):
         train(epoch, model, optimizer, train_loader, writer, device, args.alpha)
 
         # Validation
-        recon_loss, contrast_loss, total_loss = eval(epoch, model, val_loader, writer, device, 'val')
+        recon_loss, contrast_loss, total_loss = eval(epoch, model, val_loader, writer, device, 'val', args.alpha)
 
         if best_val_loss is None:
             best_val_loss = total_loss
@@ -80,13 +80,13 @@ def main(args):
             best_epoch = epoch + 1
             print(f'New best model found at epoch {best_epoch}')
 
-        state = {
-            'seeg_encoder': model.state_dict(),
-            'optimizer': optimizer.state_dict(),
-            'best_val_loss': best_val_loss,
-            'best_epoch': best_epoch,
-            'epoch': epoch + 1,
-        }
+        # state = {
+        #     'seeg_encoder': model.state_dict(),
+        #     'optimizer': optimizer.state_dict(),
+        #     'best_val_loss': best_val_loss,
+        #     'best_epoch': best_epoch,
+        #     'epoch': epoch + 1,
+        # }
         ckpt_file = os.path.join(ckpt_folder, f'epoch_{epoch + 1}.pth')
        # torch.save(state, ckpt_file)
         torch.save(model.state_dict(), ckpt_file)

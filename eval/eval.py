@@ -3,7 +3,7 @@ from tqdm import tqdm
 from util.loss import recon_loss, general_contrast_loss, agg_loss, contrastive_loss
 
 
-def eval(epoch, model, eval_loader, writer, device, split):
+def eval(epoch, model, eval_loader, writer, device, split, alpha_value):
     model.eval()
 
     embeds = None
@@ -39,7 +39,7 @@ def eval(epoch, model, eval_loader, writer, device, split):
         # Compute similarity
         c_loss = general_contrast_loss(embeds, labels) / len(eval_loader)
 #        c_loss = contrastive_loss(embeds, labels) / len(eval_loader)
-        total_loss = agg_loss(recon_loss_meter.avg, c_loss)
+        total_loss = agg_loss(recon_loss_meter.avg, c_loss, alpha_value)
 
         contrast_loss_meter.update(c_loss, 1)
         total_loss_meter.update(total_loss, 1)

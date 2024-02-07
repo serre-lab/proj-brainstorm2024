@@ -1,0 +1,41 @@
+wandb: Currently logged in as: grassknoted (serrelab). Use `wandb login --relogin` to force relogin
+wandb: Appending key for api.wandb.ai to your netrc file: /users/schen336/.netrc
+/users/schen336/.local/lib/python3.10/site-packages/torch/utils/data/dataloader.py:558: UserWarning: This DataLoader will create 4 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(_create_warning_msg(
+wandb: Tracking run with wandb version 0.16.3
+wandb: Run data is saved locally in /oscar/home/schen336/Desktop/proj-brainstorm2024/wandb/run-20240206_181128-97jxdntz
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run dashing-morning-1
+wandb: ⭐️ View project at https://wandb.ai/serrelab/prj_brainstorm
+wandb: 🚀 View run at https://wandb.ai/serrelab/prj_brainstorm/runs/97jxdntz
+  0%|          | 0/2 [00:00<?, ?it/s]/users/schen336/.local/lib/python3.10/site-packages/torch/utils/data/dataloader.py:558: UserWarning: This DataLoader will create 4 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(_create_warning_msg(
+ 50%|█████     | 1/2 [00:07<00:07,  7.75s/it]100%|██████████| 2/2 [00:08<00:00,  3.34s/it]100%|██████████| 2/2 [00:08<00:00,  4.19s/it]
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:02<00:00,  2.41s/it]100%|██████████| 1/1 [00:02<00:00,  2.79s/it]
+Traceback (most recent call last):
+  File "/oscar/home/schen336/Desktop/proj-brainstorm2024/main.py", line 97, in <module>
+    main(args)
+  File "/oscar/home/schen336/Desktop/proj-brainstorm2024/main.py", line 89, in main
+    torch.save(state, ckpt_file)
+  File "/users/schen336/.local/lib/python3.10/site-packages/torch/serialization.py", line 628, in save
+    with _open_zipfile_writer(f) as opened_zipfile:
+  File "/users/schen336/.local/lib/python3.10/site-packages/torch/serialization.py", line 502, in _open_zipfile_writer
+    return container(name_or_buffer)
+  File "/users/schen336/.local/lib/python3.10/site-packages/torch/serialization.py", line 473, in __init__
+    super().__init__(torch._C.PyTorchFileWriter(self.name))
+RuntimeError: File ./experiments/baseline/ckpt/epoch_1.pth cannot be opened.
+wandb: - 0.006 MB of 0.006 MB uploadedwandb: \ 0.006 MB of 0.006 MB uploadedwandb: | 0.009 MB of 0.016 MB uploadedwandb: / 0.016 MB of 0.016 MB uploadedwandb: 
+wandb: Run history:
+wandb:    contrastive_loss ▁█
+wandb: reconstruction_loss ▁█
+wandb:       training_loss ▁█
+wandb: 
+wandb: Run summary:
+wandb:    contrastive_loss 0.01669
+wandb: reconstruction_loss 55435.0427
+wandb:       training_loss 55435.06008
+wandb: 
+wandb: 🚀 View run dashing-morning-1 at: https://wandb.ai/serrelab/prj_brainstorm/runs/97jxdntz
+wandb: ️⚡ View job at https://wandb.ai/serrelab/prj_brainstorm/jobs/QXJ0aWZhY3RDb2xsZWN0aW9uOjEzNzY5NzI1MQ==/version_details/v0
+wandb: Synced 6 W&B file(s), 0 media file(s), 2 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20240206_181128-97jxdntz/logs

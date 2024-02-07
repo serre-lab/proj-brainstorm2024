@@ -41,6 +41,7 @@ def get_args():
                                                                                      "sEEG encoder")
     arg_parser.add_argument('--dim_feedforward', '-df', type=int, default=2048, help="Hidden dimension for the sEEG "
                                                                                      "encoder")
+    arg_parser.add_argument('--alpha', '-a', type=float, default=1.0, help="Hyperparameter to control the weight of the contrastive loss")
     args = arg_parser.parse_args()
     return args
 

@@ -7,7 +7,9 @@ from model.autoencoder import AutoEncoder
 from train.train import train
 from eval.eval import eval
 from dataset.dataset4individual import Dataset4Individual
+import wandb
 
+wandb.login(key="99528c40ebd16fca6632e963a943b99ac8a5f4b7")
 
 def main(args):
     # Set up the experiment folder
@@ -37,6 +39,9 @@ def main(args):
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers)
 
+    # Initialize WandB
+    wandb.init(project="prj_brainstorm", config={"learning_rate":args.lr, "epochs":args.num_epochs, "alpha":args.alpha, "batch_size":args.batch_size})
+    
     # Define the seeg encoder
     print('Creating sEEG encoder ...')
     model = AutoEncoder().to(device)
@@ -59,7 +64,7 @@ def main(args):
 
     for epoch in range(start_epoch, start_epoch + args.num_epochs):
         # Training
-        train(epoch, model, optimizer, train_loader, writer, device)
+        train(epoch, model, optimizer, train_loader, writer, device, args.alpha)
 
         # Validation
         recon_loss, contrast_loss, total_loss = eval(epoch, model, val_loader, writer, device, 'val')

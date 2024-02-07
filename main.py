@@ -13,7 +13,8 @@ wandb.login(key="99528c40ebd16fca6632e963a943b99ac8a5f4b7")
 
 def main(args):
     # Set up the experiment folder
-    exp_folder = os.path.join('./experiments', args.exp_name)
+    cwd = os.getcwd()
+    exp_folder = os.path.join(cwd, 'experiments', args.exp_name)
     ckpt_folder = os.path.join(exp_folder, 'ckpt')
     log_folder = os.path.join(exp_folder, 'log')
     os.makedirs(exp_folder, exist_ok=True)

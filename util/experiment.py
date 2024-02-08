@@ -42,6 +42,8 @@ def get_args():
     arg_parser.add_argument('--dim_feedforward', '-df', type=int, default=2048, help="Hidden dimension for the sEEG "
                                                                                      "encoder")
     arg_parser.add_argument('--alpha', '-a', type=float, default=1.0, help="Hyperparameter to control the weight of the contrastive loss")
+    arg_parser.add_argument('--step_size', '-ss', type=int, default=30, help="Step size for the learning rate scheduler")
+    arg_parser.add_argument('--gamma', '-g', type=float, default=0.1, help="Gamma for the learning rate scheduler")
     args = arg_parser.parse_args()
     return args
 

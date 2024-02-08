@@ -51,6 +51,9 @@ def main(args):
     # Define the optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
 
+    # Define the rate scheduler
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=args.gamma)
+
     best_val_loss = None
     best_epoch = 0
     start_epoch = 0
@@ -66,7 +69,7 @@ def main(args):
 
     for epoch in range(start_epoch, start_epoch + args.num_epochs):
         # Training
-        train(epoch, model, optimizer, train_loader, writer, device, args.alpha)
+        train(epoch, model, optimizer, scheduler, train_loader, writer, device, args.alpha)
 
         # Validation
         recon_loss, contrast_loss, total_loss = eval(epoch, model, val_loader, writer, device, 'val', args.alpha)

@@ -4,15 +4,13 @@ from util.loss import recon_loss, general_contrast_loss, agg_loss
 import wandb
 
 
-def eval(epoch, model, eval_loader, writer, device, split, alpha_value):
+def val_autoencoder(model, eval_loader, device, alpha_value):
     model.eval()
 
     embeds = None
     labels = None
 
     recon_loss_meter = AverageMeter()
-    contrast_loss_meter = AverageMeter()
-    total_loss_meter = AverageMeter()
 
     with torch.no_grad():
         for seeg, video_idx, phase in tqdm(eval_loader):
@@ -41,18 +39,44 @@ def eval(epoch, model, eval_loader, writer, device, split, alpha_value):
         c_loss = general_contrast_loss(embeds, labels) / len(eval_loader)
         total_loss = agg_loss(recon_loss_meter.avg, c_loss, alpha_value)
 
-        contrast_loss_meter.update(c_loss, 1)
-        total_loss_meter.update(total_loss, 1)
+        wandb.log({"validation_loss": total_loss,
+                   "val_reconstruction_loss": recon_loss_meter.avg,
+                   "val_contrastive_loss": c_loss.item(),
+                   "val_scaled_contrastive_loss": c_loss.item() * alpha_value})
 
-        wandb.log({"validation_loss": total_loss_meter.avg, "val_reconstruction_loss":recon_loss_meter.avg, "val_contrastive_loss": contrast_loss_meter.avg, "val_scaled_contrastive_loss": contrast_loss_meter.avg * alpha_value})
-
-        writer.add_scalar(f'{split}/Avg Reconstruction Loss of Each Epoch', recon_loss_meter.avg, epoch + 1)
-        writer.add_scalar(f'{split}/Avg Contrastive Loss of Each Epoch', contrast_loss_meter.avg, epoch + 1)
-        writer.add_scalar(f'{split}/Avg Total Loss of Each Epoch', total_loss_meter.avg, epoch + 1)
         print(f'Recontruction Loss: {recon_loss_meter.avg:.4f}')
-        print(f'Scaled Contrastive Loss: {contrast_loss_meter.avg*alpha_value:.4f}')
-        print(f'Total Loss: {total_loss_meter.avg:.4f}')
-        return recon_loss_meter.avg, contrast_loss_meter.avg, total_loss_meter.avg
+        print(f'Scaled Contrastive Loss: {c_loss.avg*alpha_value:.4f}')
+        print(f'Total Loss: {total_loss:.4f}')
+        return recon_loss_meter.avg, c_loss, total_loss
+
+
+def val_classifier(autoencoder, classifier, eval_loader, device):
+    autoencoder.eval()
+    classifier.eval()
+
+    preds = None
+    labels = None
+
+    with torch.no_grad():
+        for seeg, video_idx, phase in tqdm(eval_loader):
+            seeg = seeg.to(device)
+            video_idx = video_idx.to(device)
+
+            _, embed = autoencoder(seeg)
+            output = classifier(embed)
+
+            if preds is None:
+                preds = output
+                labels = video_idx
+            else:
+                preds = torch.cat((preds, output), dim=0)
+                labels = torch.cat((labels, video_idx), dim=0)
+
+        acc = (preds.argmax(dim=1) == labels).float().mean().item()
+        wandb.log({"validation_accuracy": acc})
+        print(f'Classification Accuracy: {acc:.4f}')
+        return acc
+
 
 
 class AverageMeter(object):

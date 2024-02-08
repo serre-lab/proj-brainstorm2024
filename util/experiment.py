@@ -51,8 +51,10 @@ def get_args():
     arg_parser.add_argument('--seeg_dir', '-sd', type=str, default='/oscar/data/brainstorm-ws/seeg_data/Memory Task Data/Epilepsy/Monitoring', help="Root of the sEEG data")
     arg_parser.add_argument('--video_dir', '-vd', type=str, default='./data/dev/Movie Clips/',  help="Root of the video"
                                                                                                      " data")
-    arg_parser.add_argument('--lr', '-l', type=float, default=1e-3, help="Learning rate")
-    arg_parser.add_argument('--num_epochs', '-e', type=int, default=2, help="total number of epochs for training")
+    arg_parser.add_argument('--autoencoder_lr', '-al', type=float, default=1e-3, help="Autoencoder learning rate")
+    arg_parser.add_argument('--classifier_lr', '-cl', type=float, default=1e-3, help="Classifier learning rate")
+    arg_parser.add_argument('--autoencoder_epochs', '-ae', type=int, default=1000, help="total number of epochs for autoencoder training")
+    arg_parser.add_argument('--classifier_epochs', '-ce', type=int, default=100, help="total number of epochs for classifier training")
     arg_parser.add_argument('--ckpt', '-c', type=str, default=None, help="path to the checkpoint file")
     arg_parser.add_argument('--batch_size', '-b', type=int, default=30, help="batch size")
     arg_parser.add_argument('--train_ratio', '-tr', type=float, default=0.7,

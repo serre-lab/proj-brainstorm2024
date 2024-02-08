@@ -2,11 +2,11 @@ import os
 import torch
 import wandb
 from util.experiment import set_seeds, get_args
-from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import random_split, DataLoader
 from model.autoencoder import ConvAutoEncoder
-from train.train import train
-from eval.eval import eval
+from model.classifier import LinearClassifier
+from train.train import train_autoencoder, train_classifier
+from eval.eval import val_autoencoder, val_classifier
 from dataset.dataset4individual import Dataset4Individual
 from util.experiment import CustomScheduler
 
@@ -22,9 +22,6 @@ def main(args):
     os.makedirs(exp_folder, exist_ok=True)
     os.makedirs(ckpt_folder, exist_ok=True)
     os.makedirs(log_folder, exist_ok=True)
-
-    # Set up the logger.
-    writer = SummaryWriter(log_dir=log_folder)
 
     # Set up the device.
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -43,19 +40,23 @@ def main(args):
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers)
 
     # Initialize WandB
-    wandb.init(project="prj_brainstorm", config={"learning_rate": args.lr, "epochs": args.num_epochs,
-                                                 "alpha": args.alpha, "batch_size": args.batch_size})
-    
-    # Define the seeg encoder
-    print('Creating sEEG encoder ...')
-    #model = AutoEncoder().to(device)
-    model = ConvAutoEncoder().to(device)
+    wandb.init(project="prj_brainstorm", config={"autoencoder_lr": args.autoencoder_lr,
+                                                 "autoencoder_epochs": args.autoencoder_epochs,
+                                                 "classifier_lr": args.classifier_lr,
+                                                 "classifier_epochs": args.classifier_epochs,
+                                                 "alpha": args.alpha,
+                                                 "batch_size": args.batch_size})
 
-    # Define the optimizer
-    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+    # Define the the autoencoder and classifier
+    autoencoder = ConvAutoEncoder().to(device)
+    classifier = LinearClassifier().to(device)
+
+    # Define the optimizers
+    autoencoder_optimizer = torch.optim.Adam(autoencoder.parameters(), lr=args.autoencoder_lr)
+    classifier_optimizer = torch.optim.Adam(classifier.parameters(), lr=args.classifier_lr)
 
     # Define the lr scheduler
-    lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=args.gamma)
+    lr_scheduler = torch.optim.lr_scheduler.StepLR(autoencoder_optimizer, step_size=args.step_size, gamma=args.gamma)
 
     # Define the alpha scheduler
     alpha_scheduler = CustomScheduler(args.alpha, args.alpha_step_size, args.alpha_gamma)
@@ -67,40 +68,48 @@ def main(args):
     if args.ckpt:
         print(f"Loading checkpoint from {args.ckpt}")
         ckpt_state = torch.load(args.ckpt)
-        model.load_state_dict(ckpt_state['seeg_encoder'])
-        optimizer.load_state_dict(ckpt_state['optimizer'])
+        autoencoder.load_state_dict(ckpt_state['autoencoder'])
+        autoencoder_optimizer.load_state_dict(ckpt_state['optimizer'])
         best_val_loss = ckpt_state['best_val_loss']
         best_epoch = ckpt_state['best_epoch']
         start_epoch = ckpt_state['epoch']
 
-    for epoch in range(start_epoch, start_epoch + args.num_epochs):
+    for epoch in range(start_epoch, start_epoch + args.autoencoder_epochs):
         # Training
-        train(epoch, model, optimizer, lr_scheduler, alpha_scheduler, train_loader, writer, device, args.alpha)
+        train_autoencoder(epoch, autoencoder, autoencoder_optimizer, lr_scheduler, alpha_scheduler, train_loader, device, args.alpha)
 
         # Validation
-        recon_loss, contrast_loss, total_loss = eval(epoch, model, val_loader, writer, device, 'val', args.alpha)
+        recon_loss, contrast_loss, total_loss = val_autoencoder(autoencoder, val_loader, device, args.alpha)
 
-        if best_val_loss is None:
+        if best_val_loss is None or total_loss < best_val_loss:
             best_val_loss = total_loss
             best_epoch = epoch + 1
-            print(f'New best model found at epoch {best_epoch}')
-        elif total_loss < best_val_loss:
-            best_val_loss = total_loss
-            best_epoch = epoch + 1
-            print(f'New best model found at epoch {best_epoch}')
+            print(f'New best autoencoder found at epoch {best_epoch}')
 
-        # state = {
-        #     'seeg_encoder': model.state_dict(),
-        #     'optimizer': optimizer.state_dict(),
-        #     'best_val_loss': best_val_loss,
-        #     'best_epoch': best_epoch,
-        #     'epoch': epoch + 1,
-        # }
-        ckpt_file = os.path.join(ckpt_folder, f'epoch_{epoch + 1}.pth')
-       # torch.save(state, ckpt_file)
-       # torch.save(model.state_dict(), ckpt_file)
+            state = {
+                'autoencoder': autoencoder.state_dict(),
+                'optimizer': autoencoder_optimizer.state_dict(),
+                'best_val_loss': best_val_loss,
+                'best_epoch': best_epoch,
+                'epoch': epoch + 1,
+            }
 
-    writer.close()
+            ckpt_file = os.path.join(ckpt_folder, f'best-autoencoder.pth')
+            torch.save(state, ckpt_file)
+
+    # Train the classifier and test it on the validation set
+    best_acc = None
+    autoencoder.load_state_dict(torch.load(ckpt_file)['autoencoder'])
+    for epoch in range(args.classifier_epochs):
+        train_classifier(epoch, autoencoder, classifier, classifier_optimizer, train_loader, device)
+
+        acc = val_classifier(autoencoder, classifier, val_loader, device)
+        if best_acc is None or acc > best_acc:
+            best_acc = acc
+            print(f'New best classifier found at epoch {epoch + 1} with accuracy {best_acc}')
+
+            ckpt_file = os.path.join(ckpt_folder, f'best-classifier.pth')
+            torch.save(state, ckpt_file)
 
 
 if __name__ == '__main__':

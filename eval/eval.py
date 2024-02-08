@@ -39,10 +39,10 @@ def val_autoencoder(model, eval_loader, device, alpha_value):
         c_loss = general_contrast_loss(embeds, labels) / len(eval_loader)
         total_loss = agg_loss(recon_loss_meter.avg, c_loss, alpha_value)
 
-        wandb.log({"validation_loss": total_loss,
-                   "val_reconstruction_loss": recon_loss_meter.avg,
-                   "val_contrastive_loss": c_loss.item(),
-                   "val_scaled_contrastive_loss": c_loss.item() * alpha_value})
+        wandb.log({"classifier_val_loss": total_loss,
+                   "classifier_val_recon_loss": recon_loss_meter.avg,
+                   "classifier_val_contra_loss": c_loss.item(),
+                   "classifier_val_scaled_contra_loss": c_loss.item() * alpha_value})
 
         print(f'Recontruction Loss: {recon_loss_meter.avg:.4f}')
         print(f'Scaled Contrastive Loss: {c_loss*alpha_value:.4f}')
@@ -73,7 +73,7 @@ def val_classifier(autoencoder, classifier, eval_loader, device):
                 labels = torch.cat((labels, video_idx), dim=0)
 
         acc = (preds.argmax(dim=1) == labels).float().mean().item()
-        wandb.log({"validation_accuracy": acc})
+        wandb.log({"classifier_val_accuracy": acc})
         print(f'Classification Accuracy: {acc:.4f}')
         return acc
 

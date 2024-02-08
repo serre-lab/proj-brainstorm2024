@@ -38,10 +38,10 @@ def train_autoencoder(epoch, autoencoder, autoencoder_optimizer, lr_scheduler, a
             contrast_loss_meter.update(c_loss.item(), batch_size)
             total_loss_meter.update(total_loss.item(), batch_size)
             
-            wandb.log({"training_loss": total_loss_meter.avg,
-                       "train_reconstruction_loss": recon_loss_meter.avg,
-                       "train_contrastive_loss": contrast_loss_meter.avg,
-                       "train_scaled_contrastive_loss": contrast_loss_meter.avg * alpha_value})
+            wandb.log({"autoencoder_train_loss": total_loss_meter.avg,
+                       "autoencoder_train_recon_loss": recon_loss_meter.avg,
+                       "autoencoder_train_contra_loss": contrast_loss_meter.avg,
+                       "autoencoder_train_scaled_contra_loss": contrast_loss_meter.avg * alpha_value})
 
     lr_scheduler.step()
     alpha_scheduler.step()
@@ -79,7 +79,7 @@ def train_classifier(epoch, autoencoder, classifier, classifier_optimizer, train
 
         with torch.no_grad():
             loss_meter.update(loss.item(), batch_size)
-            wandb.log({"training_loss": loss_meter.avg})
+            wandb.log({"classifier_train_loss": loss_meter.avg})
 
     print(f'Epoch: {epoch + 1}')
     print(f'Loss: {loss_meter.avg:.4f}')

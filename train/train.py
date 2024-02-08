@@ -1,10 +1,11 @@
 import torch
 from eval.eval import AverageMeter
 from tqdm import tqdm
-from util.loss import recon_loss, general_contrast_loss, agg_loss, contrastive_loss
+from util.loss import recon_loss, general_contrast_loss, agg_loss
 import wandb
 
-def train(epoch, model, optimizer, train_loader, writer, device, alpha_value):
+
+def train(epoch, model, optimizer, lr_scheduler, alpha_scheduler, train_loader, writer, device, alpha_value):
     model.train()
 
     # Initialize average meters
@@ -26,7 +27,6 @@ def train(epoch, model, optimizer, train_loader, writer, device, alpha_value):
         # Compute loss
         r_loss = recon_loss(seeg, seeg_recon)
         c_loss = general_contrast_loss(embed, video_idx)
-#        c_loss = contrastive_loss(embed, video_idx)
         total_loss = agg_loss(r_loss, c_loss, alpha_value)
 
         total_loss.backward()
@@ -38,7 +38,13 @@ def train(epoch, model, optimizer, train_loader, writer, device, alpha_value):
             contrast_loss_meter.update(c_loss.item(), batch_size)
             total_loss_meter.update(total_loss.item(), batch_size)
             
-        wandb.log({"training_loss": total_loss_meter.avg, "train_reconstruction_loss":recon_loss_meter.avg, "train_contrastive_loss": contrast_loss_meter.avg, "train_scaled_contrastive_loss": contrast_loss_meter.avg * alpha_value})
+        wandb.log({"training_loss": total_loss_meter.avg,
+                   "train_reconstruction_loss": recon_loss_meter.avg,
+                   "train_contrastive_loss": contrast_loss_meter.avg,
+                   "train_scaled_contrastive_loss": contrast_loss_meter.avg * alpha_value})
+
+    lr_scheduler.step()
+    alpha_scheduler.step()
 
     writer.add_scalar(f'Train/Avg Reconstruction Loss of Each Epoch', recon_loss_meter.avg, epoch + 1)
     writer.add_scalar(f'Train/Avg Contrastive Loss of Each Epoch', contrast_loss_meter.avg, epoch + 1)

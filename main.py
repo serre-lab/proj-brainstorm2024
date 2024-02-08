@@ -1,15 +1,17 @@
 import os
 import torch
+import wandb
 from util.experiment import set_seeds, get_args
 from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import random_split, DataLoader
-from model.autoencoder import AutoEncoder,ConvAutoEncoder
+from model.autoencoder import ConvAutoEncoder
 from train.train import train
 from eval.eval import eval
 from dataset.dataset4individual import Dataset4Individual
-import wandb
+from util.experiment import CustomScheduler
 
 wandb.login(key="99528c40ebd16fca6632e963a943b99ac8a5f4b7")
+
 
 def main(args):
     # Set up the experiment folder
@@ -41,15 +43,22 @@ def main(args):
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers)
 
     # Initialize WandB
-    wandb.init(project="prj_brainstorm", config={"learning_rate":args.lr, "epochs":args.num_epochs, "alpha":args.alpha, "batch_size":args.batch_size})
+    wandb.init(project="prj_brainstorm", config={"learning_rate": args.lr, "epochs": args.num_epochs,
+                                                 "alpha": args.alpha, "batch_size": args.batch_size})
     
     # Define the seeg encoder
     print('Creating sEEG encoder ...')
     #model = AutoEncoder().to(device)
-    model= ConvAutoEncoder().to(device)
+    model = ConvAutoEncoder().to(device)
 
     # Define the optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+
+    # Define the lr scheduler
+    lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=args.gamma)
+
+    # Define the alpha scheduler
+    alpha_scheduler = CustomScheduler(args.alpha, args.alpha_step_size, args.alpha_gamma)
 
     best_val_loss = None
     best_epoch = 0
@@ -66,7 +75,7 @@ def main(args):
 
     for epoch in range(start_epoch, start_epoch + args.num_epochs):
         # Training
-        train(epoch, model, optimizer, train_loader, writer, device, args.alpha)
+        train(epoch, model, optimizer, lr_scheduler, alpha_scheduler, train_loader, writer, device, args.alpha)
 
         # Validation
         recon_loss, contrast_loss, total_loss = eval(epoch, model, val_loader, writer, device, 'val', args.alpha)

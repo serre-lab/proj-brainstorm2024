@@ -27,8 +27,8 @@ class Dataset4Individual(Dataset):
                 if not seeg.empty:
                     normalized_seeg = (seeg - seeg.mean()) / seeg.std()
                     normalized_seeg = normalized_seeg.fillna(0)
-                    #self.data.append((normalized_seeg.values, video_idx - 1, self.phases.index(phase)))
-                    self.data.append((seeg.values, video_idx - 1, self.phases.index(phase)))
+                    self.data.append((normalized_seeg.values, video_idx - 1, self.phases.index(phase)))
+                    # self.data.append((seeg.values, video_idx - 1, self.phases.index(phase)))
 
     def __getitem__(self, idx):
         seeg, video_idx, phase = self.data[idx]

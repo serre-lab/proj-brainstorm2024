@@ -45,7 +45,7 @@ def val_autoencoder(model, eval_loader, device, alpha_value):
                    "val_scaled_contrastive_loss": c_loss.item() * alpha_value})
 
         print(f'Recontruction Loss: {recon_loss_meter.avg:.4f}')
-        print(f'Scaled Contrastive Loss: {c_loss.avg*alpha_value:.4f}')
+        print(f'Scaled Contrastive Loss: {c_loss*alpha_value:.4f}')
         print(f'Total Loss: {total_loss:.4f}')
         return recon_loss_meter.avg, c_loss, total_loss
 

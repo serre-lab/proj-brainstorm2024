@@ -46,7 +46,7 @@ def main(args):
     # Define the seeg encoder
     print('Creating sEEG encoder ...')
     #model = AutoEncoder().to(device)
-    model= ConvAutoEncoder().to(device)
+    model = ConvAutoEncoder().to(device)
 
     # Define the optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)

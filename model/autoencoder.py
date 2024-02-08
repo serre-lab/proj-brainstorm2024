@@ -40,57 +40,74 @@ class ConvAutoEncoder(nn.Module):
     def __init__(self):
         super().__init__()
 
-        # Initial 1D convolutions on the temporal dimension
+        # Initial 1D convolutions on the temporal dimension with MaxPooling
         self.initial_conv1d = nn.Sequential(
             nn.Conv1d(in_channels=1, out_channels=16, kernel_size=3, stride=2, padding=1),
             nn.ReLU(True),
+            nn.MaxPool1d(kernel_size=2, stride=2),  # Adding MaxPool1d
             nn.Conv1d(in_channels=16, out_channels=32, kernel_size=3, stride=2, padding=1),
             nn.ReLU(True),
-            # Can add more layers or adjust as needed
+            nn.MaxPool1d(kernel_size=2, stride=2),  # Adding MaxPool1d
         )
 
-        # Encoder 2D convolutions for spatial-temporal features
+        # Encoder 2D convolutions for spatial-temporal features with MaxPooling
         self.encoder_conv2d = nn.Sequential(
-            nn.Conv2d(in_channels=32, out_channels=64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1)),
+            nn.Conv2d(in_channels=32, out_channels=64, kernel_size=(3, 3), stride=(2, 2), padding=(0, 1)),
             nn.ReLU(True),
+            nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2), padding=(1, 0)),  # Adding MaxPool2d
             nn.Conv2d(in_channels=64, out_channels=128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1)),
             nn.ReLU(True),
-            # Additional layers can be added
+            nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2)),  # Adding MaxPool2d
         )
 
-        # Decoder 2D convolutions
+        # Decoder 2D convolutions with Upsampling followed by Convolution
         self.decoder_conv2d = nn.Sequential(
-            nn.ConvTranspose2d(in_channels=128, out_channels=64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), output_padding=(0, 1)),
+            nn.Upsample(scale_factor=(2, 2)),  # Upsampling
+            nn.Conv2d(in_channels=128, out_channels=64, kernel_size=3, padding=1),
             nn.ReLU(True),
-            nn.ConvTranspose2d(in_channels=64, out_channels=32, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), output_padding=(1, 1)),
+            nn.Upsample(scale_factor=(2, 2)),  # Upsampling
+            nn.Conv2d(in_channels=64, out_channels=32, kernel_size=3, padding=1),
             nn.ReLU(True),
-            # Adjust or add layers as needed
+            nn.Upsample(scale_factor=(2, 2)),  # Upsampling
+            nn.Conv2d(in_channels=32, out_channels=16, kernel_size=3, padding=(0, 1)),
+            nn.ReLU(True),
+            nn.Upsample(scale_factor=(2, 2)),  # Upsampling
+            nn.Conv2d(in_channels=16, out_channels=16, kernel_size=3, padding=(0, 1)),
+            nn.ReLU(True),
+
         )
 
-        # Final 1D deconvolutions to restore original temporal dimension
+        # Final 1D deconvolutions to restore original temporal dimension with Upsampling followed by Convolution
         self.final_deconv1d = nn.Sequential(
-            nn.ConvTranspose1d(in_channels=32, out_channels=16, kernel_size=3, stride=2, padding=1, output_padding=1),
+            nn.Upsample(scale_factor=2),  # Upsampling
+            nn.Conv1d(in_channels=16, out_channels=16, kernel_size=3, padding=1),
             nn.ReLU(True),
-            nn.ConvTranspose1d(in_channels=16, out_channels=1, kernel_size=3, stride=2, padding=1, output_padding=1),
+            nn.Upsample(scale_factor=2),  # Upsampling
+            nn.Conv1d(in_channels=16, out_channels=1, kernel_size=3, padding=1),
             nn.ReLU(True),
-            # Adjust output_padding as necessary
+            nn.Upsample(scale_factor=2),  # Upsampling
+            nn.Conv1d(in_channels=1, out_channels=1, kernel_size=3, padding=1),
+            nn.ReLU(True),
+            nn.Upsample(scale_factor=2),  # Upsampling
+            nn.Conv1d(in_channels=1, out_channels=1, kernel_size=3, padding=1),
+            nn.ReLU(True),
         )
 
     def forward(self, x):
-        x = x.unsqueeze(2)
-        # x shape expected to be (batch, 234, 1, 5120)
+        x = x.unsqueeze(2)  # Expecting shape to be (batch, 234, 1, 5120)
         batch_size, electrodes, channels, length = x.size()
 
-        x = x.view(-1, channels, length)  # (batch*234, 1, 5120)
-        x = self.initial_conv1d(x)  # Apply initial 1D convolutions
+        x = x.view(-1, channels, length)  # Flatten to (batch*234, 1, 5120)
+        x = self.initial_conv1d(x)  # Apply initial 1D convolutions with MaxPooling
 
-        x = x.view(batch_size, electrodes, -1, x.size(-1))  # Reshape to (batch, 234, channels, new_length)
-        x = x.permute(0, 2, 1, 3)  # Rearrange to (batch, channels, electrodes, new_length) for 2D conv
-        embed = self.encoder_conv2d(x)  # Apply 2D convolutions
+        # Reshape and permute for 2D convolutions
+        x = x.view(batch_size, electrodes, -1, x.size(-1))
+        x = x.permute(0, 2, 1, 3)
+        embed = self.encoder_conv2d(x)  # Apply 2D convolutions with MaxPooling
 
         x = self.decoder_conv2d(embed)
-        x = x.permute(0, 2, 1, 3)  # Rearrange back to (batch, electrodes, channels, new_length)
-        x = x.reshape(batch_size * electrodes, x.size(2), x.size(-1))  # Flatten batch and electrode dimensions
+        x = x.permute(0, 2, 1, 3)  # Rearrange for decoding
+        x = x.reshape(batch_size * electrodes, x.size(2), x.size(-1))  # Flatten for 1D deconvolutions
 
         x = self.final_deconv1d(x)
         x = x.view(batch_size, electrodes, channels, -1)

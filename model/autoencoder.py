@@ -42,54 +42,42 @@ class ConvAutoEncoder(nn.Module):
 
         # Initial 1D convolutions on the temporal dimension with MaxPooling
         self.initial_conv1d = nn.Sequential(
-            nn.Conv1d(in_channels=1, out_channels=16, kernel_size=3, stride=2, padding=1),
+            nn.Conv1d(in_channels=1, out_channels=16, kernel_size=3, padding=1),
             nn.ReLU(True),
-            nn.MaxPool1d(kernel_size=2, stride=2),  # Adding MaxPool1d
-            nn.Conv1d(in_channels=16, out_channels=32, kernel_size=3, stride=2, padding=1),
+            nn.MaxPool1d(kernel_size=4, stride=4),  # Adding MaxPool1d
+            nn.Conv1d(in_channels=16, out_channels=32, kernel_size=3, padding=1),
             nn.ReLU(True),
-            nn.MaxPool1d(kernel_size=2, stride=2),  # Adding MaxPool1d
+            nn.MaxPool1d(kernel_size=4, stride=4),  # Adding MaxPool1d
         )
 
         # Encoder 2D convolutions for spatial-temporal features with MaxPooling
         self.encoder_conv2d = nn.Sequential(
-            nn.Conv2d(in_channels=32, out_channels=64, kernel_size=(3, 3), stride=(2, 2), padding=(0, 1)),
+            nn.Conv2d(in_channels=32, out_channels=64, kernel_size=(3, 3), padding=1),
             nn.ReLU(True),
-            nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2), padding=(1, 0)),  # Adding MaxPool2d
-            nn.Conv2d(in_channels=64, out_channels=128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1)),
+            nn.MaxPool2d(kernel_size=(4, 4)),  # Adding MaxPool2d
+            nn.Conv2d(in_channels=64, out_channels=128, kernel_size=(3, 3), padding=1),
             nn.ReLU(True),
-            nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2)),  # Adding MaxPool2d
+            nn.MaxPool2d(kernel_size=(4, 4)),  # Adding MaxPool2d
         )
 
         # Decoder 2D convolutions with Upsampling followed by Convolution
         self.decoder_conv2d = nn.Sequential(
-            nn.Upsample(scale_factor=(2, 2)),  # Upsampling
-            nn.Conv2d(in_channels=128, out_channels=64, kernel_size=3, padding=1),
+            nn.Upsample(scale_factor=(4, 4)),  # Upsampling
+            nn.Conv2d(in_channels=128, out_channels=64, kernel_size=3, padding=(2, 1)),
             nn.ReLU(True),
-            nn.Upsample(scale_factor=(2, 2)),  # Upsampling
-            nn.Conv2d(in_channels=64, out_channels=32, kernel_size=3, padding=1),
-            nn.ReLU(True),
-            nn.Upsample(scale_factor=(2, 2)),  # Upsampling
-            nn.Conv2d(in_channels=32, out_channels=16, kernel_size=3, padding=(0, 1)),
-            nn.ReLU(True),
-            nn.Upsample(scale_factor=(2, 2)),  # Upsampling
-            nn.Conv2d(in_channels=16, out_channels=16, kernel_size=3, padding=(0, 1)),
+            nn.Upsample(scale_factor=(4, 4)),  # Upsampling
+            nn.Conv2d(in_channels=64, out_channels=32, kernel_size=3, padding=(2, 1)),
             nn.ReLU(True),
 
         )
 
         # Final 1D deconvolutions to restore original temporal dimension with Upsampling followed by Convolution
         self.final_deconv1d = nn.Sequential(
-            nn.Upsample(scale_factor=2),  # Upsampling
-            nn.Conv1d(in_channels=16, out_channels=16, kernel_size=3, padding=1),
+            nn.Upsample(scale_factor=4),  # Upsampling
+            nn.Conv1d(in_channels=32, out_channels=16, kernel_size=3, padding=1),
             nn.ReLU(True),
-            nn.Upsample(scale_factor=2),  # Upsampling
+            nn.Upsample(scale_factor=4),  # Upsampling
             nn.Conv1d(in_channels=16, out_channels=1, kernel_size=3, padding=1),
-            nn.ReLU(True),
-            nn.Upsample(scale_factor=2),  # Upsampling
-            nn.Conv1d(in_channels=1, out_channels=1, kernel_size=3, padding=1),
-            nn.ReLU(True),
-            nn.Upsample(scale_factor=2),  # Upsampling
-            nn.Conv1d(in_channels=1, out_channels=1, kernel_size=3, padding=1),
             nn.ReLU(True),
         )
 

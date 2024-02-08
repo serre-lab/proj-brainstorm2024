@@ -1,7 +1,8 @@
 import torch
 from tqdm import tqdm
-from util.loss import recon_loss, general_contrast_loss, agg_loss, contrastive_loss
+from util.loss import recon_loss, general_contrast_loss, agg_loss
 import wandb
+
 
 def eval(epoch, model, eval_loader, writer, device, split, alpha_value):
     model.eval()
@@ -38,7 +39,6 @@ def eval(epoch, model, eval_loader, writer, device, split, alpha_value):
 
         # Compute similarity
         c_loss = general_contrast_loss(embeds, labels) / len(eval_loader)
-#        c_loss = contrastive_loss(embeds, labels) / len(eval_loader)
         total_loss = agg_loss(recon_loss_meter.avg, c_loss, alpha_value)
 
         contrast_loss_meter.update(c_loss, 1)

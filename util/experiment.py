@@ -68,8 +68,8 @@ def get_args():
     arg_parser.add_argument('--alpha', '-a', type=float, default=1.0, help="Hyperparameter to control the weight of the contrastive loss")
     arg_parser.add_argument('--step_size', '-ss', type=int, default=30, help="Step size for the learning rate scheduler")
     arg_parser.add_argument('--gamma', '-g', type=float, default=0.1, help="Gamma for the learning rate scheduler")
-    arg_parser.add_argument('alpha_step_size', '-as', type=int, default=200, help="Step size for the alpha scheduler")
-    arg_parser.add_argument('alpha_gamma', '-ag', type=float, default=10, help="Gamma for the alpha scheduler")
+    arg_parser.add_argument('--alpha_step_size', '-as', type=int, default=200, help="Step size for the alpha scheduler")
+    arg_parser.add_argument('--alpha_gamma', '-ag', type=float, default=10, help="Gamma for the alpha scheduler")
     args = arg_parser.parse_args()
     return args
 

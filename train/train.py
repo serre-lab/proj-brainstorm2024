@@ -22,8 +22,9 @@ def train_autoencoder(epoch, autoencoder, autoencoder_optimizer, lr_scheduler, a
         autoencoder_optimizer.zero_grad()
 
         # Forward
-        seeg_recon, embed_before = autoencoder(seeg)
-        embed = embed_before.flatten(start_dim=1) 
+        seeg_recon, embed = autoencoder(seeg)
+        embed = embed.flatten(start_dim=1)
+
         # Compute loss
         r_loss = recon_loss(seeg, seeg_recon)
         c_loss = general_contrast_loss(embed, video_idx)
@@ -38,7 +39,7 @@ def train_autoencoder(epoch, autoencoder, autoencoder_optimizer, lr_scheduler, a
             contrast_loss_meter.update(c_loss.item(), batch_size)
             total_loss_meter.update(total_loss.item(), batch_size)
             
-            wandb.log({"autoencoder_train_loss": total_loss_meter.avg,
+            wandb.log({"autoencoder_train_total_loss": total_loss_meter.avg,
                        "autoencoder_train_recon_loss": recon_loss_meter.avg,
                        "autoencoder_train_contra_loss": contrast_loss_meter.avg,
                        "autoencoder_train_scaled_contra_loss": contrast_loss_meter.avg * alpha_value})
@@ -47,7 +48,8 @@ def train_autoencoder(epoch, autoencoder, autoencoder_optimizer, lr_scheduler, a
     alpha_scheduler.step()
 
     print(f'Epoch: {epoch + 1}')
-    print(f'Recontruction Loss: {recon_loss_meter.avg:.4f}')
+    print(f'Reconstruction Loss: {recon_loss_meter.avg:.4f}')
+    print(f'Contrastive Loss: {contrast_loss_meter.avg:.4f}')
     print(f'Scaled Contrastive Loss: {contrast_loss_meter.avg*alpha_value:.4f}')
     print(f'Total Loss: {total_loss_meter.avg:.4f}')
 

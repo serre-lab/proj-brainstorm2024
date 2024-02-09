@@ -40,14 +40,9 @@ def main(args):
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers)
 
     # Initialize WandB
-    wandb.init(project="prj_brainstorm", config={"autoencoder_lr": args.autoencoder_lr,
-                                                 "autoencoder_epochs": args.autoencoder_epochs,
-                                                 "classifier_lr": args.classifier_lr,
-                                                 "classifier_epochs": args.classifier_epochs,
-                                                 "alpha": args.alpha,
-                                                 "batch_size": args.batch_size})
+    wandb.init(project="prj_brainstorm", config=vars(args))
 
-    # Define the the autoencoder and classifier
+    # Define the autoencoder and classifier
     autoencoder = ConvAutoEncoder().to(device)
     classifier = LinearClassifier().to(device)
 
@@ -56,7 +51,7 @@ def main(args):
     classifier_optimizer = torch.optim.Adam(classifier.parameters(), lr=args.classifier_lr)
 
     # Define the lr scheduler
-    lr_scheduler = torch.optim.lr_scheduler.StepLR(autoencoder_optimizer, step_size=args.step_size, gamma=args.gamma)
+    lr_scheduler = torch.optim.lr_scheduler.StepLR(autoencoder_optimizer, step_size=args.lr_step_size, gamma=args.lr_gamma)
 
     # Define the alpha scheduler
     alpha_scheduler = CustomScheduler(args.alpha, args.alpha_step_size, args.alpha_gamma)
@@ -98,16 +93,15 @@ def main(args):
             torch.save(state, ckpt_file)
 
     # Train the classifier and test it on the validation set
-    best_acc = None
+    best_val_acc = None
     autoencoder.load_state_dict(torch.load(ckpt_file)['autoencoder'])
     for epoch in range(args.classifier_epochs):
         train_classifier(epoch, autoencoder, classifier, classifier_optimizer, train_loader, device)
 
         acc = val_classifier(autoencoder, classifier, val_loader, device)
-        if best_acc is None or acc > best_acc:
-            best_acc = acc
-            print(f'New best classifier found at epoch {epoch + 1} with accuracy {best_acc}')
-
+        if best_val_acc is None or acc > best_val_acc:
+            best_val_acc = acc
+            print(f'New best classifier found at epoch {epoch + 1} with accuracy {best_val_acc}')
             ckpt_file = os.path.join(ckpt_folder, f'best-classifier.pth')
             torch.save(state, ckpt_file)
 

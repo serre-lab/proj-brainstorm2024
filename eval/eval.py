@@ -4,8 +4,8 @@ from util.loss import recon_loss, general_contrast_loss, agg_loss
 import wandb
 
 
-def val_autoencoder(model, eval_loader, device, alpha_value):
-    model.eval()
+def val_autoencoder(autoencoder, eval_loader, device, alpha_value):
+    autoencoder.eval()
 
     embeds = None
     labels = None
@@ -20,8 +20,8 @@ def val_autoencoder(model, eval_loader, device, alpha_value):
             video_idx = video_idx.to(device)
 
             # Forward
-            seeg_recon, embed_before = model(seeg)
-            embed = embed_before.flatten(start_dim=1)
+            seeg_recon, embed = autoencoder(seeg)
+            embed = embed.flatten(start_dim=1)
 
             if embeds is None:
                 embeds = embed
@@ -36,28 +36,29 @@ def val_autoencoder(model, eval_loader, device, alpha_value):
                 recon_loss_meter.update(r_loss.item(), batch_size)
 
         # Compute similarity
-        c_loss = general_contrast_loss(embeds, labels) / len(eval_loader)
+        c_loss = general_contrast_loss(embeds, labels) / embeds.size(0)
         total_loss = agg_loss(recon_loss_meter.avg, c_loss, alpha_value)
 
-        wandb.log({"classifier_val_loss": total_loss,
-                   "classifier_val_recon_loss": recon_loss_meter.avg,
-                   "classifier_val_contra_loss": c_loss.item(),
-                   "classifier_val_scaled_contra_loss": c_loss.item() * alpha_value})
+        wandb.log({"autoencoder_val_total_loss": total_loss,
+                   "autoencoder_val_recon_loss": recon_loss_meter.avg,
+                   "autoencoder_val_contra_loss": c_loss,
+                   "autoencoder_val_scaled_contra_loss": c_loss * alpha_value})
 
-        print(f'Recontruction Loss: {recon_loss_meter.avg:.4f}')
+        print(f'Reconstruction Loss: {recon_loss_meter.avg:.4f}')
+        print(f'Contrastive Loss: {c_loss:.4f}')
         print(f'Scaled Contrastive Loss: {c_loss*alpha_value:.4f}')
         print(f'Total Loss: {total_loss:.4f}')
         return recon_loss_meter.avg, c_loss, total_loss
 
 
 def val_classifier(autoencoder, classifier, eval_loader, device):
-    autoencoder.eval()
-    classifier.eval()
-
-    preds = None
-    labels = None
-
     with torch.no_grad():
+        autoencoder.eval()
+        classifier.eval()
+
+        preds = None
+        labels = None
+
         for seeg, video_idx, phase in tqdm(eval_loader):
             seeg = seeg.to(device)
             video_idx = video_idx.to(device)
@@ -76,7 +77,6 @@ def val_classifier(autoencoder, classifier, eval_loader, device):
         wandb.log({"classifier_val_accuracy": acc})
         print(f'Classification Accuracy: {acc:.4f}')
         return acc
-
 
 
 class AverageMeter(object):

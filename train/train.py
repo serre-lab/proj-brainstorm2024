@@ -30,7 +30,7 @@ def train_autoencoder(epoch, autoencoder, autoencoder_optimizer, lr_scheduler, a
         c_loss = general_contrast_loss(embed, video_idx)
         total_loss = agg_loss(r_loss, c_loss, alpha_value)
 
-        total_loss.backward()
+        c_loss.backward()
         autoencoder_optimizer.step()
 
         # update metric

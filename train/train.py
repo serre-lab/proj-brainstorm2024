@@ -31,6 +31,8 @@ def train_autoencoder(epoch, autoencoder, autoencoder_optimizer, lr_scheduler, a
         total_loss = agg_loss(r_loss, c_loss, alpha_value)
 
         c_loss.backward()
+        # grad clip
+        torch.nn.utils.clip_grad_norm_(autoencoder.parameters(), 1.0)
         autoencoder_optimizer.step()
 
         # update metric

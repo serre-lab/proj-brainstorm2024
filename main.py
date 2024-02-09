@@ -51,10 +51,16 @@ def main(args):
     classifier_optimizer = torch.optim.Adam(classifier.parameters(), lr=args.classifier_lr)
 
     # Define the lr scheduler
-    lr_scheduler = torch.optim.lr_scheduler.StepLR(autoencoder_optimizer, step_size=args.lr_step_size, gamma=args.lr_gamma)
+    if args.use_lr_scheduler:
+        lr_scheduler = torch.optim.lr_scheduler.StepLR(autoencoder_optimizer, step_size=args.lr_step_size, gamma=args.lr_gamma)
+    else:
+        lr_scheduler = None
 
     # Define the alpha scheduler
-    alpha_scheduler = CustomScheduler(args.alpha, args.alpha_step_size, args.alpha_gamma)
+    if args.use_alpha_scheduler:
+        alpha_scheduler = CustomScheduler(args.alpha, args.alpha_step_size, args.alpha_gamma)
+    else:
+        alpha_scheduler = None
 
     best_val_loss = None
     best_epoch = 0

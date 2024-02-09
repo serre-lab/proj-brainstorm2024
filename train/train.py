@@ -44,8 +44,10 @@ def train_autoencoder(epoch, autoencoder, autoencoder_optimizer, lr_scheduler, a
                        "autoencoder_train_contra_loss": contrast_loss_meter.avg,
                        "autoencoder_train_scaled_contra_loss": contrast_loss_meter.avg * alpha_value})
 
-    lr_scheduler.step()
-    alpha_scheduler.step()
+    if lr_scheduler is not None:
+        lr_scheduler.step()
+    if alpha_scheduler is not None:
+        alpha_scheduler.step()
 
     print(f'Epoch: {epoch + 1}')
     print(f'Reconstruction Loss: {recon_loss_meter.avg:.4f}')

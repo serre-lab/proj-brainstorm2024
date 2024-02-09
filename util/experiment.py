@@ -59,6 +59,8 @@ def get_args():
                             help="The ratio of training data. The rest is validation data")
     arg_parser.add_argument('--num_workers', '-w', type=int, default=4, help="Number of workers for dataloader")
     arg_parser.add_argument('--alpha', '-a', type=float, default=1.0, help="Weight of the contrastive loss")
+    arg_parser.add_argument('--use_lr_scheduler', '-uls', action='store_true', help="Use learning rate scheduler")
+    arg_parser.add_argument('--use_alpha_scheduler', '-uas', action='store_true', help="Use alpha scheduler")
     arg_parser.add_argument('--lr_step_size', '-ls', type=int, default=30, help="Step size for the learning rate scheduler")
     arg_parser.add_argument('--lr_gamma', '-lg', type=float, default=0.1, help="Gamma for the learning rate scheduler")
     arg_parser.add_argument('--alpha_step_size', '-as', type=int, default=200, help="Step size for the alpha scheduler")

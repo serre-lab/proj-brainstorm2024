@@ -31,18 +31,16 @@ def val_autoencoder(autoencoder, eval_loader, device, alpha_value):
                 labels = torch.cat((labels, video_idx), dim=0)
 
             r_loss = recon_loss(seeg, seeg_recon)
-
-            with torch.no_grad():
-                recon_loss_meter.update(r_loss.item(), batch_size)
+            recon_loss_meter.update(r_loss.item(), batch_size)
 
         # Compute similarity
-        c_loss = general_contrast_loss(embeds, labels) / embeds.size(0)
+        c_loss = general_contrast_loss(embeds, labels)
         total_loss = agg_loss(recon_loss_meter.avg, c_loss, alpha_value)
 
-        wandb.log({"autoencoder_val_total_loss": total_loss,
-                   "autoencoder_val_recon_loss": recon_loss_meter.avg,
-                   "autoencoder_val_contra_loss": c_loss,
-                   "autoencoder_val_scaled_contra_loss": c_loss * alpha_value})
+        wandb.log({"val_total_loss": total_loss,
+                   "val_recon_loss": recon_loss_meter.avg,
+                   "val_contra_loss": c_loss,
+                   "val_scaled_contra_loss": c_loss * alpha_value})
 
         print(f'Reconstruction Loss: {recon_loss_meter.avg:.4f}')
         print(f'Contrastive Loss: {c_loss:.4f}')
@@ -73,9 +71,12 @@ def val_classifier(autoencoder, classifier, eval_loader, device):
                 preds = torch.cat((preds, output), dim=0)
                 labels = torch.cat((labels, video_idx), dim=0)
 
+        loss = torch.nn.CrossEntropyLoss()(preds, labels)
         acc = (preds.argmax(dim=1) == labels).float().mean().item()
-        wandb.log({"classifier_val_accuracy": acc})
-        print(f'Classification Accuracy: {acc:.4f}')
+        wandb.log({"clf_val_loss": loss})
+        wandb.log({"clf_val_acc": acc})
+        print(f'Classification Loss: {loss:.4f}')
+        print(f'Classification Acc: {acc:.4f}')
         return acc
 
 

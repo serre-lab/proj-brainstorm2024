@@ -39,10 +39,10 @@ def train_autoencoder(epoch, autoencoder, autoencoder_optimizer, lr_scheduler, a
             contrast_loss_meter.update(c_loss.item(), batch_size)
             total_loss_meter.update(total_loss.item(), batch_size)
             
-            wandb.log({"autoencoder_train_total_loss": total_loss_meter.avg,
-                       "autoencoder_train_recon_loss": recon_loss_meter.avg,
-                       "autoencoder_train_contra_loss": contrast_loss_meter.avg,
-                       "autoencoder_train_scaled_contra_loss": contrast_loss_meter.avg * alpha_value})
+            wandb.log({"train_total_loss": total_loss_meter.avg,
+                       "train_recon_loss": recon_loss_meter.avg,
+                       "train_contra_loss": contrast_loss_meter.avg,
+                       "train_scaled_contra_loss": contrast_loss_meter.avg * alpha_value})
 
     if lr_scheduler is not None:
         lr_scheduler.step()
@@ -62,6 +62,7 @@ def train_classifier(epoch, autoencoder, classifier, classifier_optimizer, train
 
     # Initialize average meters
     loss_meter = AverageMeter()
+    acc_meter = AverageMeter()
 
     for seeg, video_idx, phase in tqdm(train_loader):
         batch_size = seeg.shape[0]
@@ -83,7 +84,10 @@ def train_classifier(epoch, autoencoder, classifier, classifier_optimizer, train
 
         with torch.no_grad():
             loss_meter.update(loss.item(), batch_size)
-            wandb.log({"classifier_train_loss": loss_meter.avg})
+            acc_meter.update((output.argmax(dim=1) == video_idx).sum().item() / batch_size)
+            wandb.log({"clf_train_loss": loss_meter.avg})
+            wandb.log({"clf_train_acc": acc_meter.avg})
 
     print(f'Epoch: {epoch + 1}')
     print(f'Loss: {loss_meter.avg:.4f}')
+    print(f'Acc: {acc_meter.avg:.4f}')

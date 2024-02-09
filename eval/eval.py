@@ -1,6 +1,6 @@
 import torch
 from tqdm import tqdm
-from util.loss import recon_loss, general_contrast_loss, agg_loss
+from util.loss import recon_loss, general_contrast_loss, agg_loss, contrastive_loss
 import wandb
 
 
@@ -34,7 +34,7 @@ def val_autoencoder(autoencoder, eval_loader, device, alpha_value):
             recon_loss_meter.update(r_loss.item(), batch_size)
 
         # Compute similarity
-        c_loss = general_contrast_loss(embeds, labels)
+        c_loss = contrastive_loss(embeds, labels)
         total_loss = agg_loss(recon_loss_meter.avg, c_loss, alpha_value)
 
         wandb.log({"val_total_loss": total_loss,

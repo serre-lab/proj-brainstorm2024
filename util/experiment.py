@@ -50,7 +50,7 @@ def get_args():
                             help="The checkpoints and logs will be save in /experiments/$EXP_NAME")
     arg_parser.add_argument('--seeg_dir', '-sd', type=str, default='/oscar/data/brainstorm-ws/seeg_data/Memory Task Data/Epilepsy/Monitoring', help="Root of the sEEG data")
     arg_parser.add_argument('--lr', '-l', type=float, default=1e-3, help="Learning rate")
-    arg_parser.add_argument('--weight_decay', '-wd', type=float, default=1e-4, help="Weight decay")
+    arg_parser.add_argument('--weight_decay', '-d', type=float, default=1e-4, help="Weight decay")
     arg_parser.add_argument('--epochs', '-e', type=int, default=1000, help="Training epochs")
     arg_parser.add_argument('--ckpt', '-c', type=str, default=None, help="Path to the checkpoint file")
     arg_parser.add_argument('--batch_size', '-b', type=int, default=30, help="Batch size")

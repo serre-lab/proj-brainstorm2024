@@ -42,7 +42,7 @@ def main(args):
     wandb.init(project="prj_brainstorm", config=vars(args))
 
     # Define the autoencoder and classifier
-    e2e_classifier = E2eClassifier()
+    e2e_classifier = E2eClassifier().to(device)
 
     # Define the optimizers
     optimizer = torch.optim.Adam(e2e_classifier.parameters(), lr=args.lr)

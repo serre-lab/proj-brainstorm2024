@@ -135,8 +135,8 @@ def train_e2e_classifier(epoch, e2e_classifier, optimizer, lr_scheduler, alpha_s
 
             wandb.log({"train_total_loss": total_loss_meter.avg,
                        "train_recon_loss": recon_loss_meter.avg,
-                       "train_ce_loss": ce_loss_meter.avg,
-                       "train_scaled_contra_loss": ce_loss_meter.avg * alpha_value,
+                       "train_cls_loss": ce_loss_meter.avg,
+                       "train_scaled_cls_loss": ce_loss_meter.avg * alpha_value,
                        "train_cls_acc": cls_acc_meter.avg})
 
     if lr_scheduler is not None:

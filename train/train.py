@@ -91,3 +91,54 @@ def train_classifier(epoch, autoencoder, classifier, classifier_optimizer, train
     print(f'Epoch: {epoch + 1}')
     print(f'Loss: {loss_meter.avg:.4f}')
     print(f'Acc: {acc_meter.avg:.4f}')
+
+
+def train_e2e_classifier(epoch, e2e_classifier, optimizer, lr_scheduler, alpha_scheduler, train_loader,
+                         device, alpha_value):
+    e2e_classifier.train()
+
+    # Initialize average meters
+    recon_loss_meter = AverageMeter()
+    ce_loss_meter = AverageMeter()
+    total_loss_meter = AverageMeter()
+
+    for seeg, video_idx, phase in tqdm(train_loader):
+        batch_size = seeg.shape[0]
+
+        seeg = seeg.to(device)
+        video_idx = video_idx.to(device)
+
+        optimizer.zero_grad()
+
+        # Forward
+        logits, seeg_recon = e2e_classifier(seeg)
+
+        # Compute loss
+        r_loss = recon_loss(seeg, seeg_recon)
+        c_loss = torch.nn.CrossEntropyLoss()(logits, video_idx)
+        total_loss = agg_loss(r_loss, c_loss, alpha_value)
+
+        total_loss.backward()
+        optimizer.step()
+
+        # update metric
+        with torch.no_grad():
+            recon_loss_meter.update(r_loss.item(), batch_size)
+            ce_loss_meter.update(c_loss.item(), batch_size)
+            total_loss_meter.update(total_loss.item(), batch_size)
+
+            wandb.log({"train_total_loss": total_loss_meter.avg,
+                       "train_recon_loss": recon_loss_meter.avg,
+                       "train_ce_loss": ce_loss_meter.avg,
+                       "train_scaled_contra_loss": ce_loss_meter.avg * alpha_value})
+
+    if lr_scheduler is not None:
+        lr_scheduler.step()
+    if alpha_scheduler is not None:
+        alpha_scheduler.step()
+
+    print(f'Epoch: {epoch + 1}')
+    print(f'Reconstruction Loss: {recon_loss_meter.avg:.4f}')
+    print(f'Cross Entropy Loss: {ce_loss_meter.avg:.4f}')
+    print(f'Scaled Cross Entropy Loss: {ce_loss_meter.avg*alpha_value:.4f}')
+    print(f'Total Loss: {total_loss_meter.avg:.4f}')

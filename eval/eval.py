@@ -80,6 +80,38 @@ def val_classifier(autoencoder, classifier, eval_loader, device):
         return acc
 
 
+def val_e2e_classifier(e2e_classifier, eval_loader, device):
+    e2e_classifier.eval()
+
+    recon_loss_meter = AverageMeter()
+    cls_acc_meter = AverageMeter()
+
+    with torch.no_grad():
+        for seeg, video_idx, phase in tqdm(eval_loader):
+            batch_size = seeg.size(0)
+
+            seeg = seeg.to(device)
+            video_idx = video_idx.to(device)
+
+            # Forward
+            logits, seeg_recon = e2e_classifier(seeg)
+
+            # Compute reconstruction loss
+            r_loss = recon_loss(seeg, seeg_recon)
+            recon_loss_meter.update(r_loss.item(), batch_size)
+
+            # Compute classification accuracy
+            cls_acc = (logits.argmax(dim=1) == video_idx).float().mean().item()
+            cls_acc_meter.update(cls_acc, batch_size)
+
+        wandb.log({"val_recon_loss": recon_loss_meter.avg,
+                   "val_cls_acc": cls_acc_meter.avg})
+
+        print(f'Reconstruction Loss: {recon_loss_meter.avg:.4f}')
+        print(f'Classification Acc: {cls_acc_meter.avg:.4f}')
+        return cls_acc_meter.avg
+
+
 class AverageMeter(object):
     def __init__(self):
         self.reset()

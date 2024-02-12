@@ -103,6 +103,7 @@ def train_e2e_classifier(epoch, e2e_classifier, optimizer, lr_scheduler, alpha_s
     recon_loss_meter = AverageMeter()
     ce_loss_meter = AverageMeter()
     total_loss_meter = AverageMeter()
+    cls_acc_meter = AverageMeter()
 
     for seeg, video_idx, phase in tqdm(train_loader):
         batch_size = seeg.shape[0]
@@ -120,6 +121,8 @@ def train_e2e_classifier(epoch, e2e_classifier, optimizer, lr_scheduler, alpha_s
         c_loss = torch.nn.CrossEntropyLoss()(logits, video_idx)
         total_loss = agg_loss(r_loss, c_loss, alpha_value)
 
+        acc = (logits.argmax(dim=1) == video_idx).float().mean().item()
+
         total_loss.backward()
         optimizer.step()
 
@@ -128,11 +131,13 @@ def train_e2e_classifier(epoch, e2e_classifier, optimizer, lr_scheduler, alpha_s
             recon_loss_meter.update(r_loss.item(), batch_size)
             ce_loss_meter.update(c_loss.item(), batch_size)
             total_loss_meter.update(total_loss.item(), batch_size)
+            cls_acc_meter.update(acc, batch_size)
 
             wandb.log({"train_total_loss": total_loss_meter.avg,
                        "train_recon_loss": recon_loss_meter.avg,
                        "train_ce_loss": ce_loss_meter.avg,
-                       "train_scaled_contra_loss": ce_loss_meter.avg * alpha_value})
+                       "train_scaled_contra_loss": ce_loss_meter.avg * alpha_value,
+                       "train_cls_acc": cls_acc_meter.avg})
 
     if lr_scheduler is not None:
         lr_scheduler.step()

@@ -45,7 +45,7 @@ def main(args):
     e2e_classifier = E2eClassifier().to(device)
 
     # Define the optimizers
-    optimizer = torch.optim.Adam(e2e_classifier.parameters(), lr=args.lr)
+    optimizer = torch.optim.AdamW(e2e_classifier.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
     # Define the lr scheduler
     if args.use_lr_scheduler:

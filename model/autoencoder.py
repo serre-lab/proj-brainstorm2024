@@ -36,6 +36,7 @@ class AutoEncoder(nn.Module):
         output = output.view(batch_size, num_channels, -1)
         return output, embedding
 
+
 class ConvAutoEncoder(nn.Module):
     def __init__(self):
         super().__init__()

@@ -1,6 +1,6 @@
 import torch
 from tqdm import tqdm
-from util.loss import recon_loss, general_contrast_loss, agg_loss
+from util.loss import recon_loss, general_contrast_loss, agg_loss, contrastive_loss
 import wandb
 
 

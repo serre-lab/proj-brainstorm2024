@@ -53,44 +53,31 @@ def general_contrast_loss(embeddings, movie_indices, temperature=0.07):
     return c_loss
 
 
-# def contrastive_loss(embeddings, movie_indices, margin=1.0):
-#     """
-#     Calculate the contrastive loss using Euclidean distance for a batch of embeddings.
-#
-#     Parameters:
-#     - embeddings: Tensor of shape (batch_size, feature_dimension) containing the embeddings.
-#     - movie_indices: LongTensor of shape (batch_size,) containing the movie index for each embedding.
-#     - margin: The margin for separating dissimilar pairs. Lower cosine similarity for negative pairs is encouraged.
-#
-#     Returns:
-#     - The contrastive loss for the batch based on cosine similarity.
-#     """
-#
-#     # Calculate cosine similarity matrix
-#     distance_matrix = torch.cdist(embeddings, embeddings, p=2)
-#     distance_matrix.to(embeddings.device)
-#
-#     positive_mask = movie_indices.unsqueeze(1) == movie_indices.unsqueeze(0)
-#     positive_mask.to(embeddings.device)
-#     negative_mask = ~positive_mask
-#
-#     # Mask for excluding self-similarity
-#     eye_mask = torch.eye(embeddings.size(0), device=embeddings.device).bool()
-#
-#     positive_mask.masked_fill_(eye_mask, torch.tensor(0.0, device=embeddings.device))
-#
-#     # Cosine similarity for positive and negative pairs
-#     positive_sim = distance_matrix * positive_mask.float()
-#     negative_sim = distance_matrix * negative_mask.float()
-#
-#     # For positive pairs, maximize cosine similarity
-#     positive_loss = -positive_sim.sum() / positive_mask.float().sum()
-#     # For negative pairs, minimize cosine similarity, using margin
-#     negative_loss = F.relu(negative_sim - margin).sum() / negative_mask.float().sum()
-#
-#     # Combine losses
-#     loss = positive_loss + negative_loss
-#     return loss
+def contrastive_loss(embeddings, movie_indices, margin=0.0):
+    # Normalize embeddings to unit vectors.
+    embeddings = F.normalize(embeddings, p=2, dim=1)
+
+    # Calculate cosine similarity matrix.
+    similarity_matrix = torch.matmul(embeddings, embeddings.T)
+
+    # Create masks for positive and negative pairs.
+    positive_mask = movie_indices.unsqueeze(1) == movie_indices.unsqueeze(0)
+    negative_mask = ~positive_mask
+
+    # Remove self-similarity by setting diagonal to zero.
+    eye_mask = torch.eye(embeddings.size(0), device=embeddings.device).bool()
+    positive_mask.masked_fill_(eye_mask, False)
+
+    # Calculate positive loss (maximize similarity, i.e., minimize negative similarity).
+    positive_loss = -similarity_matrix[positive_mask].mean()
+
+    # Calculate negative loss (ensure similarity is below a threshold, i.e., below margin).
+    negative_similarities = similarity_matrix[negative_mask]
+    negative_loss = F.relu(negative_similarities - margin).mean()
+
+    # Combine losses.
+    loss = positive_loss + negative_loss
+    return loss
 
 
 def agg_loss(r_loss, c_loss, alpha=1.0):

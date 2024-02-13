@@ -37,6 +37,72 @@ class AutoEncoder(nn.Module):
         return output, embedding
 
 
+# class ConvAutoEncoder(nn.Module):
+#     def __init__(self):
+#         super().__init__()
+#
+#         # Initial 1D convolutions on the temporal dimension with MaxPooling
+#         self.initial_conv1d = nn.Sequential(
+#             nn.Conv1d(in_channels=1, out_channels=16, kernel_size=3, padding=1),
+#             nn.ReLU(True),
+#             nn.MaxPool1d(kernel_size=4, stride=4),  # Adding MaxPool1d
+#             nn.Conv1d(in_channels=16, out_channels=32, kernel_size=3, padding=1),
+#             nn.ReLU(True),
+#             nn.MaxPool1d(kernel_size=4, stride=4),  # Adding MaxPool1d
+#         )
+#
+#         # Encoder 2D convolutions for spatial-temporal features with MaxPooling
+#         self.encoder_conv2d = nn.Sequential(
+#             nn.Conv2d(in_channels=32, out_channels=64, kernel_size=(3, 3), padding=1),
+#             nn.ReLU(True),
+#             nn.MaxPool2d(kernel_size=(4, 4)),  # Adding MaxPool2d
+#             nn.Conv2d(in_channels=64, out_channels=128, kernel_size=(3, 3), padding=1),
+#             nn.ReLU(True),
+#             nn.MaxPool2d(kernel_size=(4, 4)),  # Adding MaxPool2d
+#         )
+#
+#         # Decoder 2D convolutions with Upsampling followed by Convolution
+#         self.decoder_conv2d = nn.Sequential(
+#             nn.Upsample(scale_factor=(4, 4)),  # Upsampling
+#             nn.Conv2d(in_channels=128, out_channels=64, kernel_size=3, padding=(2, 1)),
+#             nn.ReLU(True),
+#             nn.Upsample(scale_factor=(4, 4)),  # Upsampling
+#             nn.Conv2d(in_channels=64, out_channels=32, kernel_size=3, padding=(2, 1)),
+#             nn.ReLU(True),
+#
+#         )
+#
+#         # Final 1D deconvolutions to restore original temporal dimension with Upsampling followed by Convolution
+#         self.final_deconv1d = nn.Sequential(
+#             nn.Upsample(scale_factor=4),  # Upsampling
+#             nn.Conv1d(in_channels=32, out_channels=16, kernel_size=3, padding=1),
+#             nn.ReLU(True),
+#             nn.Upsample(scale_factor=4),  # Upsampling
+#             nn.Conv1d(in_channels=16, out_channels=1, kernel_size=3, padding=1),
+#             nn.ReLU(True),
+#         )
+#
+#     def forward(self, x):
+#         x = x.unsqueeze(2)  # Expecting shape to be (batch, 234, 1, 5120)
+#         batch_size, electrodes, channels, length = x.size()
+#
+#         x = x.view(-1, channels, length)  # Flatten to (batch*234, 1, 5120)
+#         x = self.initial_conv1d(x)  # Apply initial 1D convolutions with MaxPooling
+#
+#         # Reshape and permute for 2D convolutions
+#         x = x.view(batch_size, electrodes, -1, x.size(-1))
+#         x = x.permute(0, 2, 1, 3)
+#         embed = self.encoder_conv2d(x)  # Apply 2D convolutions with MaxPooling
+#
+#         x = self.decoder_conv2d(embed)
+#         x = x.permute(0, 2, 1, 3)  # Rearrange for decoding
+#         x = x.reshape(batch_size * electrodes, x.size(2), x.size(-1))  # Flatten for 1D deconvolutions
+#
+#         x = self.final_deconv1d(x)
+#         x = x.view(batch_size, electrodes, channels, -1)
+#
+#         return x.squeeze(), embed
+
 class ConvAutoEncoder(nn.Module):
     def __init__(self):
         super().__init__()
@@ -45,29 +111,41 @@ class ConvAutoEncoder(nn.Module):
         self.initial_conv1d = nn.Sequential(
             nn.Conv1d(in_channels=1, out_channels=16, kernel_size=3, padding=1),
             nn.ReLU(True),
-            nn.MaxPool1d(kernel_size=4, stride=4),  # Adding MaxPool1d
+            nn.MaxPool1d(kernel_size=2, stride=2),
             nn.Conv1d(in_channels=16, out_channels=32, kernel_size=3, padding=1),
             nn.ReLU(True),
-            nn.MaxPool1d(kernel_size=4, stride=4),  # Adding MaxPool1d
+            nn.MaxPool1d(kernel_size=2, stride=2),
+            nn.Conv1d(in_channels=32, out_channels=64, kernel_size=3, padding=1),
+            nn.ReLU(True),
+            nn.MaxPool1d(kernel_size=2, stride=2),
+            nn.Conv1d(in_channels=64, out_channels=128, kernel_size=3, padding=1),
+            nn.ReLU(True),
+            nn.MaxPool1d(kernel_size=2, stride=2),  # Adding MaxPool1d
         )
 
         # Encoder 2D convolutions for spatial-temporal features with MaxPooling
         self.encoder_conv2d = nn.Sequential(
-            nn.Conv2d(in_channels=32, out_channels=64, kernel_size=(3, 3), padding=1),
+            nn.Conv2d(in_channels=128, out_channels=256, kernel_size=(3, 3), padding=1),
             nn.ReLU(True),
-            nn.MaxPool2d(kernel_size=(4, 4)),  # Adding MaxPool2d
-            nn.Conv2d(in_channels=64, out_channels=128, kernel_size=(3, 3), padding=1),
+            nn.MaxPool2d(kernel_size=(2, 2)),
+            nn.Conv2d(in_channels=256, out_channels=256, kernel_size=(3, 3), padding=1),
             nn.ReLU(True),
-            nn.MaxPool2d(kernel_size=(4, 4)),  # Adding MaxPool2d
+            nn.MaxPool2d(kernel_size=(2, 2)),
+            nn.Conv2d(in_channels=256, out_channels=512, kernel_size=(3, 3), padding=1),
+            nn.ReLU(True),
+            nn.MaxPool2d(kernel_size=(2, 2)),
+            nn.Conv2d(in_channels=512, out_channels=512, kernel_size=(3, 3), padding=1),
+            nn.ReLU(True),
+            nn.MaxPool2d(kernel_size=(2, 2)),
         )
 
         # Decoder 2D convolutions with Upsampling followed by Convolution
         self.decoder_conv2d = nn.Sequential(
             nn.Upsample(scale_factor=(4, 4)),  # Upsampling
-            nn.Conv2d(in_channels=128, out_channels=64, kernel_size=3, padding=(2, 1)),
+            nn.Conv2d(in_channels=512, out_channels=128, kernel_size=3, padding=(2, 1)),
             nn.ReLU(True),
             nn.Upsample(scale_factor=(4, 4)),  # Upsampling
-            nn.Conv2d(in_channels=64, out_channels=32, kernel_size=3, padding=(2, 1)),
+            nn.Conv2d(in_channels=128, out_channels=32, kernel_size=3, padding=(2, 1)),
             nn.ReLU(True),
 
         )
@@ -102,7 +180,6 @@ class ConvAutoEncoder(nn.Module):
         x = x.view(batch_size, electrodes, channels, -1)
 
         return x.squeeze(), embed
-
 
 if __name__ == '__main__':
     from util.loss import recon_loss

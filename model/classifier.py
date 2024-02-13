@@ -5,7 +5,9 @@ from model.autoencoder import ConvAutoEncoder
 class LinearClassifier(nn.Module):
     def __init__(self):
         super().__init__()
-        self.linear1 = nn.Linear(128 * 14 * 20, 30)
+        # self.linear1 = nn.Linear(128 * 14 * 20, 30)
+        self.linear1 = nn.Linear(512 * 14 * 20, 30)
+
 
     def forward(self, x):
         batch_size = x.size(0)

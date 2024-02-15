@@ -27,10 +27,10 @@ class Dataset4Individual(Dataset):
             for phase in self.phases:
                 seeg = df[(df['Condition'] == video_idx) & (df['Phase'] == phase)].iloc[:, 4:].astype('float32')
                 if not seeg.empty:
-                    min_val = seeg.min()
-                    max_val = seeg.max()
-                    normalized_seeg = (seeg - min_val) / (max_val - min_val)
-                    self.data.append((normalized_seeg.values, video_idx - 1, self.phases.index(phase)))
+                    min_val = seeg.values.min()
+                    max_val = seeg.values.max()
+                    normalized_seeg = (seeg.values - min_val) / (max_val - min_val)
+                    self.data.append((normalized_seeg, video_idx - 1, self.phases.index(phase)))
 
     def __getitem__(self, idx):
         seeg, video_idx, phase = self.data[idx]

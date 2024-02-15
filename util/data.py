@@ -15,12 +15,8 @@ ID_2_IDX_CHANNEL = {
 }
 
 ID_2_IDX_CHANNEL = {
-    'e0011XQ': (1, 225),
     'e0013LW': (2, 254),
-    'e0015TJ': (3, 156),
     'e0017MC': (4, 234),
-    'e0019VQ': (5, 189),
-    'e0024DV': (7, 253),
 }
 
 # The following function is adapted from the Hugging Face Transformers documentation.

@@ -104,8 +104,10 @@ class AutoEncoder(nn.Module):
 #         return x.squeeze(), embed
 
 class ConvAutoEncoder(nn.Module):
-    def __init__(self):
+    def __init__(self, num_electrodes):
         super().__init__()
+        self.fc1 = nn.ModuleList([nn.Linear(num_electrodes[i], 160) for i in range(len(num_electrodes))])
+        self.fc2 = nn.ModuleList([nn.Linear(160, num_electrodes[i]) for i in range(len(num_electrodes))])
 
         # Initial 1D convolutions on the temporal dimension with MaxPooling
         self.initial_conv1d = nn.Sequential(
@@ -141,26 +143,38 @@ class ConvAutoEncoder(nn.Module):
 
         # Decoder 2D convolutions with Upsampling followed by Convolution
         self.decoder_conv2d = nn.Sequential(
-            nn.Upsample(scale_factor=(4, 4)),  # Upsampling
-            nn.Conv2d(in_channels=512, out_channels=128, kernel_size=3, padding=(2, 1)),
+            nn.Upsample(scale_factor=2),
+            nn.Conv2d(in_channels=512, out_channels=256, kernel_size=3, padding=(1, 1)),
             nn.ReLU(True),
-            nn.Upsample(scale_factor=(4, 4)),  # Upsampling
-            nn.Conv2d(in_channels=128, out_channels=32, kernel_size=3, padding=(2, 1)),
+            nn.Upsample(scale_factor=2),
+            nn.Conv2d(in_channels=256, out_channels=128, kernel_size=3, padding=(1, 1)),
+            nn.ReLU(True),
+            nn.Upsample(scale_factor=2),
+            nn.Conv2d(in_channels=128, out_channels=64, kernel_size=3, padding=(1, 1)),
+            nn.ReLU(True),
+            nn.Upsample(scale_factor=2),
+            nn.Conv2d(in_channels=64, out_channels=32, kernel_size=3, padding=(1, 1)),
             nn.ReLU(True),
 
         )
 
         # Final 1D deconvolutions to restore original temporal dimension with Upsampling followed by Convolution
         self.final_deconv1d = nn.Sequential(
-            nn.Upsample(scale_factor=4),  # Upsampling
+            nn.Upsample(scale_factor=2),
             nn.Conv1d(in_channels=32, out_channels=16, kernel_size=3, padding=1),
             nn.ReLU(True),
-            nn.Upsample(scale_factor=4),  # Upsampling
-            nn.Conv1d(in_channels=16, out_channels=1, kernel_size=3, padding=1),
+            nn.Upsample(scale_factor=2),
+            nn.Conv1d(in_channels=16, out_channels=8, kernel_size=3, padding=1),
+            nn.ReLU(True),
+            nn.Upsample(scale_factor=2),
+            nn.Conv1d(in_channels=8, out_channels=4, kernel_size=3, padding=1),
+            nn.ReLU(True),
+            nn.Upsample(scale_factor=2),
+            nn.Conv1d(in_channels=4, out_channels=1, kernel_size=3, padding=1),
             nn.ReLU(True),
         )
 
-    def forward(self, x):
+    def forward(self, x, id):
         x = x.unsqueeze(2)  # Expecting shape to be (batch, 234, 1, 5120)
         batch_size, electrodes, channels, length = x.size()
 
@@ -169,11 +183,15 @@ class ConvAutoEncoder(nn.Module):
 
         # Reshape and permute for 2D convolutions
         x = x.view(batch_size, electrodes, -1, x.size(-1))
-        x = x.permute(0, 2, 1, 3)
+        x = x.permute(0, 2, 3, 1)
+        x = self.fc1[id](x)
+        x = x.permute(0, 1, 3, 2)
         embed = self.encoder_conv2d(x)  # Apply 2D convolutions with MaxPooling
 
         x = self.decoder_conv2d(embed)
-        x = x.permute(0, 2, 1, 3)  # Rearrange for decoding
+        x = x.permute(0, 1, 3, 2)
+        x = self.fc2[id](x)
+        x = x.permute(0, 3, 1, 2)  # Rearrange for decoding
         x = x.reshape(batch_size * electrodes, x.size(2), x.size(-1))  # Flatten for 1D deconvolutions
 
         x = self.final_deconv1d(x)
@@ -181,18 +199,19 @@ class ConvAutoEncoder(nn.Module):
 
         return x.squeeze(), embed
 
+
 if __name__ == '__main__':
     from util.loss import recon_loss
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     # model = AutoEncoder().to(device)
-    model = ConvAutoEncoder().to(device)
+    model = ConvAutoEncoder(num_electrodes=[234, 233]).to(device)
 
-    input = torch.randn(90, 234, 5120).to(device)
+    input = torch.randn(5, 234, 5120).to(device)
 
     with torch.no_grad():
-        output, embed = model(input)
+        output, embed = model(input, 0)
 
     assert input.size() == output.size()
     # assert embed.size() == (90, 32)

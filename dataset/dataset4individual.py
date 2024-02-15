@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import numpy as np
 from torch.utils.data import Dataset
 from torch.utils.data import random_split, DataLoader
 
@@ -8,7 +9,7 @@ class Dataset4Individual(Dataset):
     def __init__(self, id, phases, seeg_dir):
         self.id = id
         self.phases = phases
-        self.seeg_dir = seeg_dir
+        self.seeg_dir = "data/dev/sEEG/"
 
         assert os.path.exists(os.path.join(self.seeg_dir, f'{self.id}_preprocessed_data.csv'))
         df = pd.read_csv(os.path.join(self.seeg_dir, f'{self.id}_preprocessed_data.csv'))
@@ -16,6 +17,7 @@ class Dataset4Individual(Dataset):
         df = df.sort_values(['Condition', 'Electrode'])
 
         self.video_idxs = df['Condition'].unique()
+        self.video_idxs = np.arange(1, 31, 1)
         self.electrodes = df['Electrode'].unique()
         if self.phases is None:
             self.phases = df['Phase'].unique()

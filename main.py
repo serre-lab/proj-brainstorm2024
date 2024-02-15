@@ -8,6 +8,7 @@ from train.train import train_e2e_classifier
 from eval.eval import val_e2e_classifier
 from dataset.dataset4individual import Dataset4Individual
 from util.experiment import CustomScheduler
+from util.data import ID_2_IDX_CHANNEL
 
 wandb.login(key="99528c40ebd16fca6632e963a943b99ac8a5f4b7")
 
@@ -27,22 +28,29 @@ def main(args):
 
     # Define the datasets and dataloaders
     print('Loading datasets and dataloaders ...')
-    id = 'e0017MC'
-    phase = ['Encoding', 'SameDayRecall', 'NextDayRecall']
     seeg_dir = args.seeg_dir
-    dataset = Dataset4Individual(id, phase, seeg_dir)
-    train_size = int(args.train_ratio * len(dataset))
-    val_size = len(dataset) - train_size
-    print(f'Train size: {train_size}, Val size: {val_size}')
-    train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
-    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
-    val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers)
+    ids = [key for key in sorted(ID_2_IDX_CHANNEL, key=lambda x: ID_2_IDX_CHANNEL[x][0])]
+    phase = ['Encoding', 'SameDayRecall', 'NextDayRecall']
+    train_loaders = []
+    val_loaders = []
+    for id in ids:
+        dataset = Dataset4Individual(id, phase, seeg_dir)
+        train_size = int(args.train_ratio * len(dataset))
+        val_size = len(dataset) - train_size
+        print(f'ID: {id}, Train size: {train_size}, Val size: {val_size}')
+        train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
+        train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
+        val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers)
+        train_loaders.append(train_loader)
+        val_loaders.append(val_loader)
 
     # Initialize WandB
     wandb.init(project="prj_brainstorm", config=vars(args))
 
-    # Define the autoencoder and classifier
-    e2e_classifier = E2eClassifier().to(device)
+    # Define the e2e classifier
+    num_electrodes = [ID_2_IDX_CHANNEL[key][1] for key in
+                      sorted(ID_2_IDX_CHANNEL, key=lambda x: ID_2_IDX_CHANNEL[x][0])]
+    e2e_classifier = E2eClassifier(num_electrodes).to(device)
 
     # Define the optimizers
     optimizer = torch.optim.AdamW(e2e_classifier.parameters(), lr=args.lr, weight_decay=args.weight_decay)
@@ -74,10 +82,10 @@ def main(args):
 
     for epoch in range(start_epoch, start_epoch + args.epochs):
         # Training
-        train_e2e_classifier(epoch, e2e_classifier, optimizer, lr_scheduler, alpha_scheduler, train_loader, device, args.alpha)
+        train_e2e_classifier(epoch, e2e_classifier, optimizer, lr_scheduler, alpha_scheduler, train_loaders, device, args.alpha)
 
         # Validation
-        val_acc = val_e2e_classifier(e2e_classifier, val_loader, device, args.alpha)
+        val_acc = val_e2e_classifier(e2e_classifier, val_loaders, device, args.alpha)
 
         if best_val_acc is None or val_acc < best_val_acc:
             best_val_acc = val_acc

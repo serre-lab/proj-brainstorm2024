@@ -80,7 +80,7 @@ def val_classifier(autoencoder, classifier, eval_loader, device):
         return acc
 
 
-def val_e2e_classifier(e2e_classifier, eval_loader, device, alpha_value):
+def val_e2e_classifier(e2e_classifier, eval_loaders, device, alpha_value):
     e2e_classifier.eval()
 
     recon_loss_meter = AverageMeter()
@@ -88,37 +88,38 @@ def val_e2e_classifier(e2e_classifier, eval_loader, device, alpha_value):
     cls_loss_meter = AverageMeter()
     total_loss_meter = AverageMeter()
 
-    with torch.no_grad():
-        for seeg, video_idx, phase in tqdm(eval_loader):
-            batch_size = seeg.size(0)
+    for id, eval_loader in enumerate(eval_loaders):
+        with torch.no_grad():
+            for seeg, video_idx, phase in tqdm(eval_loader):
+                batch_size = seeg.size(0)
 
-            seeg = seeg.to(device)
-            video_idx = video_idx.to(device)
+                seeg = seeg.to(device)
+                video_idx = video_idx.to(device)
 
-            # Forward
-            logits, seeg_recon = e2e_classifier(seeg)
+                # Forward
+                logits, seeg_recon = e2e_classifier(seeg, id)
 
-            # Compute reconstruction loss
-            r_loss = recon_loss(seeg, seeg_recon)
-            recon_loss_meter.update(r_loss.item(), batch_size)
+                # Compute reconstruction loss
+                r_loss = recon_loss(seeg, seeg_recon)
+                recon_loss_meter.update(r_loss.item(), batch_size)
 
-            # Compute classification accuracy
-            cls_acc = (logits.argmax(dim=1) == video_idx).float().mean().item()
-            cls_acc_meter.update(cls_acc, batch_size)
+                # Compute classification accuracy
+                cls_acc = (logits.argmax(dim=1) == video_idx).float().mean().item()
+                cls_acc_meter.update(cls_acc, batch_size)
 
-            # Compute classification loss
-            cls_loss = torch.nn.CrossEntropyLoss()(logits, video_idx)
-            cls_loss_meter.update(cls_loss.item(), batch_size)
+                # Compute classification loss
+                cls_loss = torch.nn.CrossEntropyLoss()(logits, video_idx)
+                cls_loss_meter.update(cls_loss.item(), batch_size)
 
-            # Compute total loss
-            total_loss = agg_loss(r_loss, cls_loss, alpha_value)
-            total_loss_meter.update(total_loss, batch_size)
+                # Compute total loss
+                total_loss = agg_loss(r_loss, cls_loss, alpha_value)
+                total_loss_meter.update(total_loss, batch_size)
 
-        wandb.log({"val_recon_loss": recon_loss_meter.avg,
-                   "val_cls_acc": cls_acc_meter.avg,
-                   "val_cls_loss": cls_loss_meter.avg,
-                   "val_scaled_cls_loss": cls_loss_meter.avg * alpha_value,
-                   "val_total_loss": total_loss_meter.avg})
+            wandb.log({"val_recon_loss": recon_loss_meter.avg,
+                       "val_cls_acc": cls_acc_meter.avg,
+                       "val_cls_loss": cls_loss_meter.avg,
+                       "val_scaled_cls_loss": cls_loss_meter.avg * alpha_value,
+                       "val_total_loss": total_loss_meter.avg})
 
         print(f'Reconstruction Loss: {recon_loss_meter.avg:.4f}')
         print(f'Classification Acc: {cls_acc_meter.avg:.4f}')

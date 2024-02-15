@@ -8,7 +8,6 @@ class LinearClassifier(nn.Module):
         # self.linear1 = nn.Linear(128 * 14 * 20, 30)
         self.linear1 = nn.Linear(512 * 14 * 20, 30)
 
-
     def forward(self, x):
         batch_size = x.size(0)
         x = x.view(batch_size, -1)
@@ -16,13 +15,13 @@ class LinearClassifier(nn.Module):
 
 
 class E2eClassifier(nn.Module):
-    def __init__(self):
+    def __init__(self, num_electrodes):
         super().__init__()
-        self.autoencoder = ConvAutoEncoder()
+        self.autoencoder = ConvAutoEncoder(num_electrodes)
         self.classifier = LinearClassifier()
 
-    def forward(self, x):
-        recon, embed = self.autoencoder(x)
+    def forward(self, x, id):
+        recon, embed = self.autoencoder(x, id)
         return self.classifier(embed), recon
 
 

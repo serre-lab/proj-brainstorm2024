@@ -3,6 +3,18 @@ import numpy as np
 from transformers import VideoMAEImageProcessor
 
 
+ID_2_IDX_CHANNEL = {
+    'e0010GP': (0, 110),
+    'e0011XQ': (1, 225),
+    'e0013LW': (2, 254),
+    'e0015TJ': (3, 156),
+    'e0017MC': (4, 234),
+    'e0019VQ': (5, 189),
+    'e0020JA': (6, 254),
+    'e0024DV': (7, 253),
+}
+
+
 # The following function is adapted from the Hugging Face Transformers documentation.
 # Source: Transformers: VideoMAEModel Documentation
 # URL: https://huggingface.co/docs/transformers/model_doc/videomae#transformers.VideoMAEModel.forward.example

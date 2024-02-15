@@ -106,8 +106,8 @@ class AutoEncoder(nn.Module):
 class ConvAutoEncoder(nn.Module):
     def __init__(self, num_electrodes):
         super().__init__()
-        self.fc1 = nn.ModuleList([nn.Linear(num_electrodes[i], 160) for i in range(len(num_electrodes))])
-        self.fc2 = nn.ModuleList([nn.Linear(160, num_electrodes[i]) for i in range(len(num_electrodes))])
+        self.fc1 = nn.ModuleList([nn.Linear(num_electrodes[i], 320) for i in range(len(num_electrodes))])
+        self.fc2 = nn.ModuleList([nn.Linear(320, num_electrodes[i]) for i in range(len(num_electrodes))])
 
         # Initial 1D convolutions on the temporal dimension with MaxPooling
         self.initial_conv1d = nn.Sequential(

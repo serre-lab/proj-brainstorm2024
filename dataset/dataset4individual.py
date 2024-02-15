@@ -9,7 +9,7 @@ class Dataset4Individual(Dataset):
     def __init__(self, id, phases, seeg_dir):
         self.id = id
         self.phases = phases
-        self.seeg_dir = "data/dev/sEEG/"
+        self.seeg_dir = seeg_dir
 
         assert os.path.exists(os.path.join(self.seeg_dir, f'{self.id}_preprocessed_data.csv'))
         df = pd.read_csv(os.path.join(self.seeg_dir, f'{self.id}_preprocessed_data.csv'))

@@ -87,7 +87,7 @@ def main(args):
         # Validation
         val_acc = val_e2e_classifier(e2e_classifier, val_loaders, device, args.alpha)
 
-        if best_val_acc is None or val_acc < best_val_acc:
+        if best_val_acc is None or val_acc > best_val_acc:
             best_val_acc = val_acc
             best_epoch = epoch + 1
             print(f'New best e2e classifier found at epoch {best_epoch}')
@@ -102,6 +102,8 @@ def main(args):
 
             ckpt_file = os.path.join(ckpt_folder, f'best-e2e-classifier.pth')
             torch.save(state, ckpt_file)
+
+        torch.save(state, os.path.join(ckpt_folder, f'latest-e2e-classifier.pth'))
 
 
 if __name__ == '__main__':

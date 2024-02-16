@@ -14,7 +14,7 @@ def recon_loss(x, x_recon):
     Returns:
     - loss (torch.Tensor): A scalar tensor containing the reconstruction loss.
     """
-    return nn.MSELoss()(x, x_recon) + nn.CosineEmbeddingLoss(0.5)()(x.flatten(start_dim=1), x_recon.flatten(start_dim=1), torch.ones(x.shape[0]).to(x.device))
+    return nn.MSELoss()(x, x_recon) + nn.CosineEmbeddingLoss(0.5)(x.flatten(start_dim=1), x_recon.flatten(start_dim=1), torch.ones(x.shape[0]).to(x.device))
 
 
 def general_contrast_loss(embeddings, movie_indices, temperature=0.07):

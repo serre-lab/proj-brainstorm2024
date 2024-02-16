@@ -82,6 +82,7 @@ def train_classifier(epoch, autoencoder, classifier, classifier_optimizer, train
         loss = torch.nn.CrossEntropyLoss()(output, video_idx)
 
         loss.backward()
+        
         classifier_optimizer.step()
 
         with torch.no_grad():

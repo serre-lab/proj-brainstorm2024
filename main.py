@@ -52,6 +52,25 @@ def main(args):
                       sorted(ID_2_IDX_CHANNEL, key=lambda x: ID_2_IDX_CHANNEL[x][0])]
     e2e_classifier = E2eClassifier(num_electrodes).to(device)
 
+    print("number of parameters:", sum([p.numel() for p in e2e_classifier.parameters() if p.requires_grad==True]))
+
+    # Gradient Flow
+    def plot_grad_flow(named_parameters):
+        ave_grads = []
+        layers = []
+        for n, p in named_parameters:
+            if(p.requires_grad) and ("bias" not in n):
+                layers.append(n)
+                ave_grads.append(p.grad.abs().mean().cpu().numpy())
+        plt.plot(ave_grads, alpha=0.3, color="b")
+        plt.hlines(0, 0, len(ave_grads)+1, linewidth=1, color="k" )
+        plt.xticks(range(0,len(ave_grads), 1), layers, rotation="vertical")
+        plt.xlim(xmin=0, xmax=len(ave_grads))
+        plt.xlabel("Layers")
+        plt.ylabel("average gradient")
+        plt.title("Gradient flow")
+        plt.grid(True)
+
     # Define the optimizers
     optimizer = torch.optim.AdamW(e2e_classifier.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 

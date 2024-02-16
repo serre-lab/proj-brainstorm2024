@@ -1,6 +1,6 @@
-import av
+# import av
 import numpy as np
-from transformers import VideoMAEImageProcessor
+# from transformers import VideoMAEImageProcessor
 
 
 ID_2_IDX_CHANNEL = {

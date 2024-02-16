@@ -240,8 +240,6 @@ class ConvAutoEncoder(nn.Module):
             nn.BatchNorm1d(1), 
             nn.ReLU(True),
             nn.Dropout1d(p=0.5), 
-        
-
         )
 
         # Final 1D deconvolutions to restore original temporal dimension with Upsampling followed by Convolution

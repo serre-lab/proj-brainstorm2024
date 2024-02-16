@@ -3,7 +3,7 @@ from eval.eval import AverageMeter
 from tqdm import tqdm
 from util.loss import recon_loss, general_contrast_loss, agg_loss, contrastive_loss
 import wandb
-
+import matplotlib.pyplot as plt
 
 def train_autoencoder(epoch, autoencoder, autoencoder_optimizer, lr_scheduler, alpha_scheduler, train_loader, device, alpha_value):
     autoencoder.train()

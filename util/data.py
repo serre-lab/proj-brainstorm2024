@@ -14,6 +14,10 @@ ID_2_IDX_CHANNEL = {
     'e0024DV': (7, 253),
 }
 
+ID_2_IDX_CHANNEL = {
+    'e0013LW': (2, 254),
+    'e0017MC': (4, 234),
+}
 
 # The following function is adapted from the Hugging Face Transformers documentation.
 # Source: Transformers: VideoMAEModel Documentation

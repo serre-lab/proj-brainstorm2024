@@ -103,6 +103,13 @@ def main(args):
             ckpt_file = os.path.join(ckpt_folder, f'best-e2e-classifier.pth')
             torch.save(state, ckpt_file)
 
+        state = {
+            'classifier': e2e_classifier.state_dict(),
+            'optimizer': optimizer.state_dict(),
+            'best_val_acc': val_acc,
+            'best_epoch': best_epoch,
+            'epoch': epoch + 1,
+        }
         torch.save(state, os.path.join(ckpt_folder, f'latest-e2e-classifier.pth'))
 
 

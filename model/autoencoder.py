@@ -203,7 +203,7 @@ class ConvAutoEncoder(nn.Module):
 
 
         # Decoder 2D convolutions with Upsampling followed by Convolution
-      self.decoder_conv2d = nn.Sequential(
+        self.decoder_conv2d = nn.Sequential(
             nn.Upsample(scale_factor=2),
             nn.Conv2d(in_channels=512, out_channels=256, kernel_size=3, padding=(1, 1)),
             nn.BatchNorm2d(256), 

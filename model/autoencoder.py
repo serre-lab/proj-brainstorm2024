@@ -235,7 +235,7 @@ class ConvAutoEncoder(nn.Module):
         x3 = self.Down_1D_5(x)
 
         # Reshape and permute for 2D convolutions
-        x = x.view(batch_size, electrodes, -1, x.size(-1))
+        x = x3.view(batch_size, electrodes, -1, x3.size(-1))
         x = x.permute(0, 2, 3, 1)
         x = self.fc1[id](x)
         x = x.permute(0, 1, 3, 2)

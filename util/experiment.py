@@ -50,7 +50,7 @@ class CustomScheduler:
 
     def step(self):
         """Update the variable based on the current epoch."""
-        if self.epoch % self.step_size == 0:
+        if self.epoch % self.step_size == 0 and self.epoch > 0:
             self.value *= self.gamma
         self.epoch += 1
 

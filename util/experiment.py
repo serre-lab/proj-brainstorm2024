@@ -54,7 +54,7 @@ class CustomScheduler:
             self.value *= self.gamma
         self.epoch += 1
 
-    def get_value(self):
+    def get_alpha(self):
         """Return the current value of the variable."""
         return self.value
 

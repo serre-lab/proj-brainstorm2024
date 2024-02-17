@@ -104,7 +104,8 @@ def main(args):
         train_e2e_classifier(epoch, e2e_classifier, optimizer, lr_scheduler, alpha_scheduler, train_loaders, device, args.alpha)
 
         # Validation
-        val_acc = val_e2e_classifier(e2e_classifier, val_loaders, device, args.alpha)
+        val_alpha = alpha_scheduler.get_alpha() if alpha_scheduler else args.alpha
+        val_acc = val_e2e_classifier(e2e_classifier, val_loaders, device, val_alpha)
 
         if best_val_acc is None or val_acc > best_val_acc:
             best_val_acc = val_acc

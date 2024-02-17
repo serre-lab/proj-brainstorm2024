@@ -20,6 +20,21 @@ def set_seeds(seed=42):
     torch.cuda.manual_seed_all(seed)
 
 
+def print_num_params(model):
+    """
+    Get the number of parameters in a model.
+
+    Parameters:
+        model (`torch.nn.Module`): The model.
+
+    Returns:
+        num_params (`int`): The number of parameters in the model.
+    """
+    num_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    print(f"Number of parameters: {num_params}")
+    return num_params
+
+
 class CustomScheduler:
     def __init__(self, initial_value, step_size, gamma):
         """
@@ -42,6 +57,23 @@ class CustomScheduler:
     def get_value(self):
         """Return the current value of the variable."""
         return self.value
+
+# # Gradient Flow
+# def plot_grad_flow(named_parameters):
+#     ave_grads = []
+#     layers = []
+#     for n, p in named_parameters:
+#         if(p.requires_grad) and ("bias" not in n):
+#             layers.append(n)
+#             ave_grads.append(p.grad.abs().mean().cpu().numpy())
+#     plt.plot(ave_grads, alpha=0.3, color="b")
+#     plt.hlines(0, 0, len(ave_grads)+1, linewidth=1, color="k" )
+#     plt.xticks(range(0,len(ave_grads), 1), layers, rotation="vertical")
+#     plt.xlim(xmin=0, xmax=len(ave_grads))
+#     plt.xlabel("Layers")
+#     plt.ylabel("average gradient")
+#     plt.title("Gradient flow")
+#     plt.grid(True)
 
 
 def get_args():

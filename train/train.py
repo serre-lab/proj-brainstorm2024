@@ -108,6 +108,7 @@ def train_e2e_classifier(epoch, e2e_classifier, optimizer, lr_scheduler, alpha_s
 
     for id, train_loader in enumerate(train_loaders):
         for seeg, video_idx, phase in tqdm(train_loader):
+            alpha_value = alpha_scheduler.get_alpha() if alpha_scheduler else alpha_value
             batch_size = seeg.shape[0]
 
             seeg = seeg.to(device)

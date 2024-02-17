@@ -257,9 +257,9 @@ class ConvAutoEncoder(nn.Module):
         x = self.Up_1D_3(x)
         x = self.Up_1D_4(x)
         x = self.Up_1D_5(x)
-        x = x.view(batch_size, electrodes, channels, -1)
+        x = x.view(batch_size, electrodes, -1)
 
-        return x.squeeze(), torch.cat([x4.flatten(start_dim=1), x5.flatten(start_dim=1), embed.flatten(start_dim=1)], dim=1)
+        return x, torch.cat([x4.flatten(start_dim=1), x5.flatten(start_dim=1), embed.flatten(start_dim=1)], dim=1)
 
 
 if __name__ == '__main__':

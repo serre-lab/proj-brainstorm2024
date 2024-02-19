@@ -15,11 +15,24 @@ class LinearClassifier(nn.Module):
         return self.linear1(x)
 
 
+class GAPClassifier(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.global_avg_pool = nn.AdaptiveAvgPool2d(1)
+        self.linear = nn.Linear(512, 30)
+
+    def forward(self, x):
+        x = self.global_avg_pool(x)
+        x = x.view(x.size(0), -1)
+        return self.linear(x)
+
+
 class E2eClassifier(nn.Module):
     def __init__(self, num_electrodes):
         super().__init__()
         self.autoencoder = ConvAutoEncoder(num_electrodes)
-        self.classifier = LinearClassifier()
+        # self.classifier = LinearClassifier()
+        self.classifier = GAPClassifier()
 
     def forward(self, x, id):
         recon, embed = self.autoencoder(x, id)
@@ -33,9 +46,13 @@ if __name__ == '__main__':
     # output = classifier(input)
     # assert output.size() == (32, 30)
 
-    classifier = E2eClassifier()
-    input = torch.randn(90, 234, 5120)
+    from util.data import ID_2_IDX_CHANNEL
+    num_electrodes = [ID_2_IDX_CHANNEL[key][1] for key in
+                      sorted(ID_2_IDX_CHANNEL, key=lambda x: ID_2_IDX_CHANNEL[x][0])]
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    classifier = E2eClassifier(num_electrodes).to(device)
+    input = torch.randn(2, 234, 5120).to(device)
     with torch.no_grad():
-        logits, recon = classifier(input)
-    # assert logits.size() == (90, 30)
+        logits, recon = classifier(input, 1)
+    assert logits.size() == (2, 30)
     # assert recon.size() == (90, 234, 5120)

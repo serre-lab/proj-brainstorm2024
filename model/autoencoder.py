@@ -211,6 +211,9 @@ class ConvAutoEncoder(nn.Module):
 
         self.lstm = nn.LSTM(input_size=160, hidden_size=256, num_layers=1, batch_first=True)
         self.conv1d = nn.Conv1d(in_channels=1, out_channels=64, kernel_size=1)
+        self.relu = nn.ReLU()
+        self.bn = nn.BatchNorm1d(64)
+
         self.Up_1D_1 = UpConv1d_block(64, 64)
         self.Up_1D_2 = UpConv1d_block(64, 32)
         self.Up_1D_3 = UpConv1d_block(32, 16)
@@ -241,6 +244,8 @@ class ConvAutoEncoder(nn.Module):
         x.unsqueeze_(2) # batch, electrodes, 1, length
         x = x.reshape(batch_size * electrodes, x.size(2), x.size(-1))  # Flatten for 1D deconvolutions
         x = self.conv1d(x)
+        x = self.bn(x)
+        x = self.relu(x)
         x = self.Up_1D_1(x)
         x = self.Up_1D_2(x)
         x = self.Up_1D_3(x)

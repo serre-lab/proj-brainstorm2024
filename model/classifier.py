@@ -31,8 +31,8 @@ class E2eClassifier(nn.Module):
     def __init__(self, num_electrodes):
         super().__init__()
         self.autoencoder = ConvAutoEncoder(num_electrodes)
-        # self.classifier = LinearClassifier()
-        self.classifier = GAPClassifier()
+        self.classifier = LinearClassifier()
+        # self.classifier = GAPClassifier()
 
     def forward(self, x, id):
         recon, embed = self.autoencoder(x, id)

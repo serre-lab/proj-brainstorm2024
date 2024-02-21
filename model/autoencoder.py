@@ -236,6 +236,7 @@ class ConvAutoEncoder(nn.Module):
         x = x.view(batch_size, electrodes, -1, x.size(-1)) # batch, electrode, feature, length
         x = x.permute(0, 2, 3, 1) # batch, feature, length, electrode
         x = self.fc1_1[id](x) # batch, feature, length, PCs
+        x = self.relu(x)
         x = self.fc1_2[id](x) # batch, feature, length, PCs
         x = x.permute(0, 2, 1, 3) # batch, length, feature, PCs
         x = x.reshape(batch_size, x.size(1), -1) # batch, length, feature*PCs

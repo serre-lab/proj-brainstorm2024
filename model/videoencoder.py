@@ -16,7 +16,6 @@ class VideoEncoder(nn.Module):
             nn.GELU(),
             nn.Conv1d(256, 128, kernel_size=3, stride=2, padding=1),
         )
-        # self.
 
     def forward(self, x):
         x = self.model(x).last_hidden_state

@@ -199,7 +199,8 @@ class UpConv2d_block(nn.Module):
 class ConvAutoEncoder(nn.Module):
     def __init__(self, num_electrodes):
         super().__init__()
-        self.fc1 = nn.ModuleList([nn.Linear(num_electrodes[i], 256) for i in range(len(num_electrodes))])
+        self.fc1_1 = nn.ModuleList([nn.Linear(num_electrodes[i], 64) for i in range(len(num_electrodes))])
+        self.fc1_2 = nn.ModuleList([nn.Linear(64, 8) for _ in range(len(num_electrodes))])
         self.fc2 = nn.ModuleList([nn.Linear(256, num_electrodes[i]) for i in range(len(num_electrodes))])
 
         # Initial 1D convolutions on the temporal dimension with MaxPooling
@@ -209,7 +210,7 @@ class ConvAutoEncoder(nn.Module):
         self.Down_1D_4 = DownConv1d_block(32, 64)
         self.Down_1D_5 = DownConv1d_block(64, 64)
 
-        self.lstm = nn.LSTM(input_size=160, hidden_size=256, num_layers=1, batch_first=True)
+        self.lstm = nn.LSTM(input_size=512, hidden_size=256, num_layers=1, batch_first=True)
         self.conv1d = nn.Conv1d(in_channels=1, out_channels=64, kernel_size=1)
         self.relu = nn.ReLU()
         self.bn = nn.BatchNorm1d(64)
@@ -234,7 +235,8 @@ class ConvAutoEncoder(nn.Module):
         # Reshape and permute for 2D convolutions
         x = x.view(batch_size, electrodes, -1, x.size(-1)) # batch, electrode, feature, length
         x = x.permute(0, 2, 3, 1) # batch, feature, length, electrode
-        x = self.fc1[id](x) # batch, feature, length, PCs
+        x = self.fc1_1[id](x) # batch, feature, length, PCs
+        x = self.fc1_2[id](x) # batch, feature, length, PCs
         x = x.permute(0, 2, 1, 3) # batch, length, feature, PCs
         x = x.reshape(batch_size, x.size(1), -1) # batch, length, feature*PCs
         x, (h_n, c_n) = self.lstm(x) # x: batch, length, hidden_size

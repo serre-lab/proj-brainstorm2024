@@ -9,9 +9,21 @@ class VideoEncoder(nn.Module):
         super().__init__()
         self.model = VideoMAEModel.from_pretrained(ckpt)
         self.freeze_parameters()
+        self.compress_layer = nn.Sequential(
+            nn.Conv1d(768, 512, kernel_size=3, stride=2, padding=1),
+            nn.GELU(),
+            nn.Conv1d(512, 256, kernel_size=3, stride=2, padding=1),
+            nn.GELU(),
+            nn.Conv1d(256, 128, kernel_size=3, stride=2, padding=1),
+        )
+        # self.
 
     def forward(self, x):
-        return self.model(x).last_hidden_state
+        x = self.model(x).last_hidden_state
+        x = x.permute(0, 2, 1)
+        x = self.compress_layer(x)
+        x = x.permute(0, 2, 1)
+        return x
 
     def freeze_parameters(self):
         for param in self.model.parameters():
@@ -25,6 +37,8 @@ if __name__ == '__main__':
 
     ckpt = "MCG-NJU/videomae-base"
     model = VideoEncoder(ckpt).to(device)
+    from util.experiment import print_num_params
+    print_num_params(model)
 
     # Process the videos
     num_frame_2_sample = 16
@@ -35,4 +49,4 @@ if __name__ == '__main__':
     with torch.no_grad():
         outputs = model(batched_inputs)
 
-    assert outputs.shape == (len(video_paths), 1568, 768)
+    assert outputs.shape == (len(video_paths), 196, 128)

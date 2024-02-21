@@ -1,12 +1,11 @@
 import torch
-import math
 from eval.eval import AverageMeter, compute_top_k_acc
 from tqdm import tqdm
 import torch.nn.functional as F
 
 
 def train(epoch, video_encoder, seeg_encoder, optimizer, train_loader, writer, device):
-    video_encoder.eval()
+    video_encoder.train()
     seeg_encoder.train()
 
     # Initialize average meters
@@ -14,26 +13,24 @@ def train(epoch, video_encoder, seeg_encoder, optimizer, train_loader, writer, d
     top1_acc_meter = AverageMeter()
     top2_acc_meter = AverageMeter()
 
-    # TODO: Utilize `video_idx` to save memory
-    for seeg, seeg_padding_mask, video, _, _ in tqdm(train_loader):
+    for video, seeg in tqdm(train_loader):
         batch_size = video.shape[0]
 
         video = video.to(device)
         seeg = seeg.to(device)
-        seeg_padding_mask = seeg_padding_mask.to(device)
 
         optimizer.zero_grad()
 
         # Forward
         video_embedding = video_encoder(video)
-        seeg_embedding = seeg_encoder(seeg, seeg_padding_mask)
+        seeg_embedding = seeg_encoder(seeg)
 
         # Flatten the output for later similarity computation
         video_embedding = video_embedding.flatten(1, 2)
         seeg_embedding = seeg_embedding.flatten(1, 2)
 
         # Compute similarity
-        sim = (video_embedding @ seeg_embedding.transpose(1, 0)) * math.e
+        sim = video_embedding @ seeg_embedding.transpose(1, 0)
 
         # Compute loss
         labels = torch.arange(batch_size).to(device)
@@ -44,14 +41,11 @@ def train(epoch, video_encoder, seeg_encoder, optimizer, train_loader, writer, d
 
         # update metric
         with torch.no_grad():
-            loss_meter.update(loss.item(), 1)
+            loss_meter.update(loss.item(), batch_size)
             acc1, acc2 = compute_top_k_acc(sim, labels, top_k=[1, 2])
             top1_acc_meter.update(acc1, batch_size)
             top2_acc_meter.update(acc2, batch_size)
 
-    writer.add_scalar(f'Train/Avg Loss of Each Epoch', loss_meter.avg, epoch + 1)
-    writer.add_scalar(f'Train/Avg Acc@1 of Each Epoch', top1_acc_meter.avg, epoch + 1)
-    writer.add_scalar(f'Train/Avg Acc@2 of Each Epoch', top2_acc_meter.avg, epoch + 1)
     print(f'Epoch: {epoch + 1}')
     print(f'Average Train Loss {loss_meter.avg:.4f}')
     print(f'Average Train Acc@1 {top1_acc_meter.avg:.4f}%')

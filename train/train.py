@@ -1,10 +1,11 @@
 import torch
+import math
+import torch.nn.functional as F
 from eval.eval import AverageMeter, compute_top_k_acc
 from tqdm import tqdm
-import torch.nn.functional as F
 
 
-def train(epoch, video_encoder, seeg_encoder, optimizer, train_loader, writer, device):
+def train(video_encoder, seeg_encoder, optimizer, train_loader, writer, device):
     video_encoder.train()
     seeg_encoder.train()
 
@@ -30,7 +31,7 @@ def train(epoch, video_encoder, seeg_encoder, optimizer, train_loader, writer, d
         seeg_embedding = seeg_embedding.flatten(1, 2)
 
         # Compute similarity
-        sim = video_embedding @ seeg_embedding.transpose(1, 0)
+        sim = (video_embedding @ seeg_embedding.transpose(1, 0)) * math.e
 
         # Compute loss
         labels = torch.arange(batch_size).to(device)
@@ -46,7 +47,6 @@ def train(epoch, video_encoder, seeg_encoder, optimizer, train_loader, writer, d
             top1_acc_meter.update(acc1, batch_size)
             top2_acc_meter.update(acc2, batch_size)
 
-    print(f'Epoch: {epoch + 1}')
-    print(f'Average Train Loss {loss_meter.avg:.4f}')
-    print(f'Average Train Acc@1 {top1_acc_meter.avg:.4f}%')
-    print(f'Average Train Acc@2 {top2_acc_meter.avg:.4f}%')
+    print(f'Train/Loss {loss_meter.avg:.4f}')
+    print(f'Train/Acc@1 {top1_acc_meter.avg:.4f}%')
+    print(f'Train/Acc@2 {top2_acc_meter.avg:.4f}%')

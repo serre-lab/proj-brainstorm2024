@@ -1,9 +1,10 @@
 import torch
 import math
+import torch.nn.functional as F
 from tqdm import tqdm
 
 
-def eval(epoch, video_encoder, seeg_encoder, eval_loader, writer, device, split):
+def eval(video_encoder, seeg_encoder, eval_loader, device, split):
     video_encoder.eval()
     seeg_encoder.eval()
 
@@ -11,15 +12,13 @@ def eval(epoch, video_encoder, seeg_encoder, eval_loader, writer, device, split)
     seeg_embeddings = None
 
     with torch.no_grad():
-        # TODO: Utilize `video_idx` to save memory
-        for seeg, seeg_padding_mask, video, _, _ in tqdm(eval_loader):
+        for video, seeg in tqdm(eval_loader):
             video = video.to(device)
             seeg = seeg.to(device)
-            seeg_padding_mask = seeg_padding_mask.to(device)
 
             # Forward
             video_embedding = video_encoder(video)
-            seeg_embedding = seeg_encoder(seeg, seeg_padding_mask)
+            seeg_embedding = seeg_encoder(seeg)
 
             # Flatten the output for later similarity computation
             video_embedding = video_embedding.flatten(1, 2)
@@ -37,13 +36,13 @@ def eval(epoch, video_encoder, seeg_encoder, eval_loader, writer, device, split)
         labels = torch.arange(video_embeddings.shape[0]).to(device)
 
         # Compute accuracy
+        loss = F.cross_entropy(sim, labels) / video_embeddings.shape[0]
         acc1, acc2 = compute_top_k_acc(sim, labels, top_k=[1, 2])
 
-        writer.add_scalar(f'Val/Acc@1 of Each Epoch', acc1, epoch + 1)
-        writer.add_scalar(f'Val/Acc@2 of Each Epoch', acc2, epoch + 1)
-        print(f'Val Acc@1 {acc1:.4f}%')
-        print(f'Val Acc@2 {acc2:.4f}%')
-        return acc1, acc2
+        print(f'{split}/Loss {loss:.4f}')
+        print(f'{split}/Acc@1 {acc1:.4f}%')
+        print(f'{split}/Acc@2 {acc2:.4f}%')
+        return loss, acc1, acc2
 
 
 class AverageMeter(object):

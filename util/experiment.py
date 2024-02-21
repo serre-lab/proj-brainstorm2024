@@ -45,3 +45,18 @@ def get_args():
     return args
 
 
+def print_num_params(model):
+    """
+    Get the number of parameters in a model.
+
+    Parameters:
+        model (`torch.nn.Module`): The model.
+
+    Returns:
+        num_params (`int`): The number of parameters in the model.
+    """
+    num_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    print(f"Number of parameters: {num_params}")
+    return num_params
+
+

@@ -16,24 +16,28 @@ class SEEGEncoder(nn.Module):
     - dim_feedforward (int): The dimension of the feedforward network in the transformer.
     """
 
-    def __init__(self, num_input_channels=84, num_output_channels=128, input_length=5120, output_length=196,
-                 num_heads=2, num_encoder_layers=6, dim_feedforward=2048):
+    def __init__(self, num_heads=2, num_encoder_layers=6, dim_feedforward=2048):
         super().__init__()
 
+        self.num_input_channels = 84
+        self.num_output_channels = 128
+        self.input_length = 5120
+        self.output_length = 196
+
         # Positional encoding
-        positional_encoding = gen_pos_encoding(input_length, num_input_channels)
+        positional_encoding = gen_pos_encoding(self.input_length, self.num_input_channels)
         self.register_buffer('positional_encoding', positional_encoding)
 
         # Transformer encoder
-        encoder_layer = nn.TransformerEncoderLayer(d_model=num_input_channels, nhead=num_heads,
+        encoder_layer = nn.TransformerEncoderLayer(d_model=self.num_input_channels, nhead=num_heads,
                                                    dim_feedforward=dim_feedforward, batch_first=True)
         self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=num_encoder_layers)
 
         # Length matching layer
-        self.length_matching_layer = nn.Linear(input_length, output_length)
+        self.length_matching_layer = nn.Linear(self.input_length, self.output_length)
 
         # Channel matching layer
-        self.channel_matching_layer = nn.Linear(num_input_channels, num_output_channels)
+        self.channel_matching_layer = nn.Linear(self.num_input_channels, self.num_output_channels)
 
     def forward(self, x):
         """
@@ -58,19 +62,14 @@ class SEEGEncoder(nn.Module):
 if __name__ == '__main__':
     import torch
 
-    num_input_channels = 84
-    num_output_channels = 128
-    input_length = 5120
-    output_length = 196
     num_heads = 2
     num_encoder_layers = 6
     dim_feedforward = 2048
 
-    model = SEEGEncoder(num_input_channels, num_output_channels, input_length, output_length, num_heads,
-                        num_encoder_layers, dim_feedforward)
+    model = SEEGEncoder(num_heads, num_encoder_layers, dim_feedforward)
 
-    seegs = torch.randn(2, num_input_channels, input_length)
+    seegs = torch.randn(2, 84, 5120)
 
     output = model(seegs)
 
-    assert output.shape == (2, output_length, num_output_channels)
+    assert output.shape == (2, 196, 128)

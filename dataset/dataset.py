@@ -26,6 +26,7 @@ class CustomDataset(Dataset):
             video = self.sample_frames(video)
             self.video_data.append(video)
         self.video_data = np.array(self.video_data)
+        assert self.seeg_data.shape[0] == self.video_data.shape[0]
 
         self.total_num = len(self.video_data)
 

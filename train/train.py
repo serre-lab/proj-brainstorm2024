@@ -5,7 +5,7 @@ from eval.eval import AverageMeter, compute_top_k_acc
 from tqdm import tqdm
 
 
-def train(video_encoder, seeg_encoder, optimizer, train_loader, writer, device):
+def train(video_encoder, seeg_encoder, optimizer, train_loader, device):
     video_encoder.train()
     seeg_encoder.train()
 

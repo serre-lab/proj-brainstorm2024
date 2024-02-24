@@ -20,9 +20,9 @@ class SEEGEncoder(nn.Module):
         super().__init__()
 
         self.num_input_channels = 84
-        self.num_output_channels = 128
+        self.num_output_channels = 768
         self.input_length = 5120
-        self.output_length = 196
+        self.output_length = 1
 
         # Positional encoding
         positional_encoding = gen_pos_encoding(self.input_length, self.num_input_channels)
@@ -34,10 +34,15 @@ class SEEGEncoder(nn.Module):
         self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=num_encoder_layers)
 
         # Length matching layer
-        self.length_matching_layer = nn.Linear(self.input_length, self.output_length)
+        self.time_compress_block = nn.Sequential(
+            nn.Conv1d(in_channels=self.input_length, out_channels=512, kernel_size=1, stride=1),
+            nn.BatchNorm1d(512),
+            nn.GELU(),
+            nn.Conv1d(in_channels=512, out_channels=1, kernel_size=1, stride=1),
+            nn.GELU(),
+        )
 
-        # Channel matching layer
-        self.channel_matching_layer = nn.Linear(self.num_input_channels, self.num_output_channels)
+        self.length_matching_layer = nn.Linear(self.num_input_channels, self.num_output_channels)
 
     def forward(self, x):
         """
@@ -52,10 +57,9 @@ class SEEGEncoder(nn.Module):
 
         x += self.positional_encoding
         x = self.transformer_encoder(x)
-        x = self.channel_matching_layer(x)
-        x = x.permute(0, 2, 1)
+        x = self.time_compress_block(x)
+        x = x.squeeze(1)
         x = self.length_matching_layer(x)
-        x = x.permute(0, 2, 1)
         return x
 
 
@@ -72,4 +76,4 @@ if __name__ == '__main__':
 
     output = model(seegs)
 
-    assert output.shape == (2, 196, 128)
+    assert output.shape == (2, 768)

@@ -1,5 +1,6 @@
 import torch
 import math
+import wandb
 import torch.nn.functional as F
 from tqdm import tqdm
 
@@ -35,6 +36,9 @@ def eval(video_encoder, seeg_encoder, eval_loader, device, split):
         loss = F.cross_entropy(sim, labels) / video_embeddings.shape[0]
         acc1, acc2 = compute_top_k_acc(sim, labels, top_k=[1, 2])
 
+        wandb.log({f'{split}/Loss': loss,
+                   f'{split}/Acc@1': acc1,
+                   f'{split}/Acc@2': acc2})
         print(f'{split}/Loss {loss:.4f}')
         print(f'{split}/Acc@1 {acc1:.4f}%')
         print(f'{split}/Acc@2 {acc2:.4f}%')

@@ -1,5 +1,6 @@
 import os
 import torch
+import wandb
 from util.experiment import set_seeds, get_args
 from torch.utils.data import random_split, DataLoader
 from model.videoencoder import VideoEncoder
@@ -7,6 +8,8 @@ from model.seegencoder import SEEGEncoder
 from train.train import train
 from eval.eval import eval
 from dataset.dataset import CustomDataset
+
+wandb.login(key="99528c40ebd16fca6632e963a943b99ac8a5f4b7")
 
 
 def main(args):
@@ -17,6 +20,9 @@ def main(args):
     os.makedirs(exp_folder, exist_ok=True)
     os.makedirs(ckpt_folder, exist_ok=True)
     os.makedirs(log_folder, exist_ok=True)
+
+    # Initialize WandB
+    wandb.init(project="prj_brainstorm", config=vars(args))
 
     # Set up the device.
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')

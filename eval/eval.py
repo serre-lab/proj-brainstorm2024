@@ -20,10 +20,6 @@ def eval(video_encoder, seeg_encoder, eval_loader, device, split):
             video_embedding = video_encoder(video)
             seeg_embedding = seeg_encoder(seeg)
 
-            # Flatten the output for later similarity computation
-            video_embedding = video_embedding.flatten(1, 2)
-            seeg_embedding = seeg_embedding.flatten(1, 2)
-
             if video_embeddings is None:
                 video_embeddings = video_embedding
                 seeg_embeddings = seeg_embedding

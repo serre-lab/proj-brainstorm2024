@@ -26,10 +26,6 @@ def train(video_encoder, seeg_encoder, optimizer, train_loader, device):
         video_embedding = video_encoder(video)
         seeg_embedding = seeg_encoder(seeg)
 
-        # Flatten the output for later similarity computation
-        video_embedding = video_embedding.flatten(1, 2)
-        seeg_embedding = seeg_embedding.flatten(1, 2)
-
         # Compute similarity
         sim = (video_embedding @ seeg_embedding.transpose(1, 0)) * math.e
 

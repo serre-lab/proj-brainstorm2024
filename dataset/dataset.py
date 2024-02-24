@@ -14,7 +14,7 @@ class CustomDataset(Dataset):
     def __init__(self, seeg_file, video_dir, num_frame_2_sample=16):
         super(CustomDataset).__init__()
         # Load the sEEG
-        self.seeg_data = np.array(np.load(seeg_file, allow_pickle=True).item()['seeg'])
+        self.seeg_data = np.array(np.load(seeg_file, allow_pickle=True).item()['seeg'], dtype=np.float32)
 
         # Load and process the video data
         self.video_data = []
@@ -25,7 +25,7 @@ class CustomDataset(Dataset):
             video = np.load(video_file, allow_pickle=True)
             video = self.sample_frames(video)
             self.video_data.append(video)
-        self.video_data = np.array(self.video_data)
+        self.video_data = np.array(self.video_data, dtype=np.float32)
         assert self.seeg_data.shape[0] == self.video_data.shape[0]
 
         self.total_num = len(self.video_data)

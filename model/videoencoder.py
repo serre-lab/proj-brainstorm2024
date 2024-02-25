@@ -9,18 +9,9 @@ class VideoEncoder(nn.Module):
         super().__init__()
         self.model = VideoMAEModel.from_pretrained(ckpt)
         self.freeze_parameters()
-        self.compress_layer = nn.Sequential(
-            nn.Conv1d(1568, 128, kernel_size=1, stride=1),
-            nn.BatchNorm1d(128),
-            nn.GELU(),
-            nn.Conv1d(128, 1, kernel_size=1, stride=1),
-            nn.GELU(),
-        )
 
     def forward(self, x):
         x = self.model(x).last_hidden_state
-        x = self.compress_layer(x)
-        x = x.squeeze(1)
         return x
 
     def freeze_parameters(self):
@@ -47,4 +38,4 @@ if __name__ == '__main__':
     with torch.no_grad():
         outputs = model(batched_inputs)
 
-    assert outputs.shape == (len(video_paths), 768)
+    assert outputs.shape == (len(video_paths), 1568, 768)

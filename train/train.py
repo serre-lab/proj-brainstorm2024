@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 
 def train(video_encoder, seeg_encoder, optimizer, train_loader, device):
-    video_encoder.train()
+    video_encoder.eval()
     seeg_encoder.train()
 
     # Initialize average meters

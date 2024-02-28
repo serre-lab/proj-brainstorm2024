@@ -47,9 +47,11 @@ def train(video_encoder, seeg_encoder, optimizer, train_loader, device):
             acc1, acc2 = compute_top_k_acc(sim, labels, top_k=[1, 2])
             top1_acc_meter.update(acc1, batch_size)
             top2_acc_meter.update(acc2, batch_size)
-            wandb.log({'Train/Loss': loss_meter.avg,
-                       'Train/Acc@1': top1_acc_meter.avg,
-                       'Train/Acc@2': top2_acc_meter.avg})
+
+    with torch.no_grad():
+        wandb.log({'Train/Loss': loss_meter.avg,
+                   'Train/Acc@1': top1_acc_meter.avg,
+                   'Train/Acc@2': top2_acc_meter.avg})
 
     print(f'Train/Loss {loss_meter.avg:.4f}')
     print(f'Train/Acc@1 {top1_acc_meter.avg:.4f}%')

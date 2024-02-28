@@ -29,7 +29,7 @@ def train(video_encoder, seeg_encoder, optimizer, train_loader, device):
 
         # Flatten video and seeg embeddings
         video_embedding = video_embedding.view(batch_size, -1)
-        seeg_embedding = seeg_embedding.view(batch_size, -1)
+        seeg_embedding = seeg_embedding.reshape(batch_size, -1)
 
         # Normalize embeddings
         video_embedding = F.normalize(video_embedding, p=2, dim=1)

@@ -30,7 +30,7 @@ def eval(video_encoder, seeg_encoder, eval_loader, device, split):
 
         # Flatten video and seeg embeddings
         video_embeddings = video_embeddings.view(video_embeddings.shape[0], -1)
-        seeg_embeddings = seeg_embeddings.view(seeg_embeddings.shape[0], -1)
+        seeg_embeddings = seeg_embeddings.reshape(seeg_embeddings.shape[0], -1)
 
         # Normalize embeddings
         video_embeddings = F.normalize(video_embeddings, p=2, dim=1)

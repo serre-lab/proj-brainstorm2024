@@ -32,6 +32,10 @@ def eval(video_encoder, seeg_encoder, eval_loader, device, split):
         video_embeddings = video_embeddings.view(video_embeddings.shape[0], -1)
         seeg_embeddings = seeg_embeddings.view(seeg_embeddings.shape[0], -1)
 
+        # Normalize embeddings
+        video_embeddings = F.normalize(video_embeddings, p=2, dim=1)
+        seeg_embeddings = F.normalize(seeg_embeddings, p=2, dim=1)
+
         # Compute similarity
         sim = (video_embeddings @ seeg_embeddings.transpose(1, 0)) * math.e
         labels = torch.arange(video_embeddings.shape[0]).to(device)

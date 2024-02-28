@@ -31,6 +31,10 @@ def train(video_encoder, seeg_encoder, optimizer, train_loader, device):
         video_embedding = video_embedding.view(batch_size, -1)
         seeg_embedding = seeg_embedding.view(batch_size, -1)
 
+        # Normalize embeddings
+        video_embedding = F.normalize(video_embedding, p=2, dim=1)
+        seeg_embedding = F.normalize(seeg_embedding, p=2, dim=1)
+
         # Compute similarity
         sim = (video_embedding @ seeg_embedding.transpose(1, 0)) * math.e
 

@@ -56,7 +56,7 @@ class SEEGEncoder(nn.Module):
         x = self.batch_norm2(x)
         x = x.permute(0, 2, 1)
         x = self.relu(x)
-        x += self.positional_encoding
+        x = x + self.positional_encoding
         x = self.transformer_encoder(x)
         return x
 

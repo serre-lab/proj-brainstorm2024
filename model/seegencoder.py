@@ -25,7 +25,7 @@ class SEEGEncoder(nn.Module):
         self.output_length = 1568
 
         # Positional encoding
-        positional_encoding = gen_pos_encoding(self.input_length, self.num_output_channels)
+        positional_encoding = gen_pos_encoding(self.output_length, self.num_output_channels)
         self.register_buffer('positional_encoding', positional_encoding)
 
         # Transformer encoder
@@ -46,14 +46,11 @@ class SEEGEncoder(nn.Module):
         - x (torch.Tensor): A (batch_size, output_length, num_output_channels) tensor containing the output
         sequence.
         """
+        x = self.length_matching_layer(x)
         x = x.permute(0, 2, 1)
-
         x = self.channel_matching_layer(x)
         x += self.positional_encoding
         x = self.transformer_encoder(x)
-        x = x.permute(0, 2, 1)
-        x = self.length_matching_layer(x)
-        x = x.permute(0, 2, 1)
         return x
 
 

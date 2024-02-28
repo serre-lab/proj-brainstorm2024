@@ -25,11 +25,11 @@ class SEEGEncoder(nn.Module):
         self.output_length = 1568
 
         # Positional encoding
-        positional_encoding = gen_pos_encoding(self.input_length, self.num_input_channels)
+        positional_encoding = gen_pos_encoding(self.input_length, self.num_output_channels)
         self.register_buffer('positional_encoding', positional_encoding)
 
         # Transformer encoder
-        encoder_layer = nn.TransformerEncoderLayer(d_model=self.num_input_channels, nhead=num_heads,
+        encoder_layer = nn.TransformerEncoderLayer(d_model=self.num_output_channels, nhead=num_heads,
                                                    dim_feedforward=dim_feedforward, batch_first=True)
         self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=num_encoder_layers)
 
@@ -48,12 +48,12 @@ class SEEGEncoder(nn.Module):
         """
         x = x.permute(0, 2, 1)
 
+        x = self.channel_matching_layer(x)
         x += self.positional_encoding
         x = self.transformer_encoder(x)
         x = x.permute(0, 2, 1)
         x = self.length_matching_layer(x)
         x = x.permute(0, 2, 1)
-        x = self.channel_matching_layer(x)
         return x
 
 

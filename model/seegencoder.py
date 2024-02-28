@@ -5,7 +5,6 @@ from util.model import gen_pos_encoding
 class SEEGEncoder(nn.Module):
     """
     A Transformer Encoder for sEEG data.
-
     Parameters:
     - num_input_channels (int): The number of input channels in the sEEG data.
     - num_output_channels (int): The number of output channels.
@@ -15,7 +14,6 @@ class SEEGEncoder(nn.Module):
     - num_encoder_layers (int): The number of encoder layers in the transformer.
     - dim_feedforward (int): The dimension of the feedforward network in the transformer.
     """
-
     def __init__(self, num_heads=2, num_encoder_layers=6, dim_feedforward=2048):
         super().__init__()
 
@@ -45,7 +43,6 @@ class SEEGEncoder(nn.Module):
         """
         Parameters:
         - x (torch.Tensor): A (batch_size, num_input_channels, input_length) tensor containing the input sEEG data.
-
         Returns:
         - x (torch.Tensor): A (batch_size, output_length, num_output_channels) tensor containing the output
         sequence.

@@ -37,7 +37,7 @@ def eval(video_encoder, seeg_encoder, eval_loader, device, split):
         labels = torch.arange(video_embeddings.shape[0]).to(device)
 
         # Compute accuracy
-        loss = F.cross_entropy(sim, labels) / video_embeddings.shape[0]
+        loss = F.cross_entropy(sim, labels)
         acc1, acc2 = compute_top_k_acc(sim, labels, top_k=[1, 2])
 
         wandb.log({f'{split}/Loss': loss,

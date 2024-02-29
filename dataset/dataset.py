@@ -17,24 +17,18 @@ class CustomDataset(Dataset):
         self.seeg_data = []
         seeg_files = glob.glob(seeg_dir + '/*.npy')
         seeg_files.sort(key=lambda x: int(x.split('/')[-1].split('.')[0][5:]))
-        for seeg_file in seeg_files:
-            seeg = np.load(seeg_file, allow_pickle=True)
-            self.seeg_data.append(seeg)
-        self.seeg_data = np.array(self.seeg_data, dtype=np.float32)
+        self.seeg_files = seeg_files
 
         # Load and process the video data
         self.video_data = []
         self.num_frame_2_sample = num_frame_2_sample
         video_files = glob.glob(video_dir + '/*.npy')
         video_files.sort(key=lambda x: int(x.split('/')[-1].split('.')[0][19:]))
-        for video_file in video_files:
-            video = np.load(video_file, allow_pickle=True)
-            video = self.sample_frames(video)
-            self.video_data.append(video)
-        self.video_data = np.array(self.video_data, dtype=np.float32)
-        assert self.seeg_data.shape[0] == self.video_data.shape[0]
+        self.video_files = video_files
 
-        self.total_num = len(self.video_data)
+        assert len(self.seeg_files) == len(self.video_files)
+
+        self.total_num = len(self.video_files)
 
     def __getitem__(self, index):
         """
@@ -46,8 +40,11 @@ class CustomDataset(Dataset):
         - seeg (torch.Tensor): the sEEG data of shape (num_channels, 5120)
         """
         # Load and process the audio data
-        video = self.video_data[index]
-        seeg = self.seeg_data[index]
+        video_file = self.video_files[index]
+        video = np.load(video_file, allow_pickle=True, dtype=np.float32)
+        video = self.sample_frames(video)
+        see_file = self.seeg_files[index]
+        seeg = np.load(see_file, allow_pickle=True, dtype=np.float32)
         return video, seeg
 
     def __len__(self):

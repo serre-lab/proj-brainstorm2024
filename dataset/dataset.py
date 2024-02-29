@@ -59,7 +59,8 @@ class CustomDataset(Dataset):
         Returns:
         - video (np.ndarray): the sampled video data of shape (num_frame_2_sample, 3, 224, 224)
         """
-        indices = np.linspace(0, video_array.shape[0] - 1, num=self.num_frame_2_sample).astype(int)
+        offset = np.random.randint(0, 10)
+        indices = np.linspace(offset, video_array.shape[0] - 1, num=self.num_frame_2_sample).astype(int)
         return video_array[indices]
 
 

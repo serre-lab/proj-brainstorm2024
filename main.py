@@ -67,7 +67,7 @@ def main(args):
         seeg_encoder.load_state_dict(ckpt_state['seeg_encoder'])
         video_encoder.load_state_dict(ckpt_state['video_encoder'])
         optimizer.load_state_dict(ckpt_state['optimizer'])
-        best_val_acc1 = ckpt_state['best_val_loss']
+        best_val_loss = ckpt_state['best_val_loss']
         best_epoch = ckpt_state['best_epoch']
         start_epoch = ckpt_state['epoch']
 

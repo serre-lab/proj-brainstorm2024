@@ -31,9 +31,9 @@ def main(args):
 
     # Define the datasets and dataloaders
     print('Loading datasets and dataloaders ...')
-    seeg_file = args.seeg_file
+    seeg_dir = args.seeg_dir
     video_dir = args.video_dir
-    dataset = CustomDataset(seeg_file, video_dir)
+    dataset = CustomDataset(seeg_dir, video_dir)
     num_train = int(len(dataset) * args.train_ratio)
     num_val = (len(dataset) - num_train) // 2
     num_test = len(dataset) - num_train - num_val

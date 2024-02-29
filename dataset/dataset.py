@@ -8,19 +8,24 @@ class CustomDataset(Dataset):
     Custom dataset for the audio and SEEG data
 
     Parameters:
-    - seeg_file (str): path to the sEEG data file
+    - seeg_dir (str): path to the directory containing the sEEG data
     - video_dir (str): path to the directory containing the video data
     """
-    def __init__(self, seeg_file, video_dir, num_frame_2_sample=16):
+    def __init__(self, seeg_dir, video_dir, num_frame_2_sample=16):
         super(CustomDataset).__init__()
         # Load the sEEG
-        self.seeg_data = np.array(np.load(seeg_file, allow_pickle=True).item()['seeg'], dtype=np.float32)
+        self.seeg_data = []
+        seeg_files = glob.glob(seeg_dir + '/*.npy')
+        seeg_files.sort(key=lambda x: int(x.split('/')[-1].split('.')[0][5:]))
+        for seeg_file in seeg_files:
+            seeg = np.load(seeg_file, allow_pickle=True)
+            self.seeg_data.append(seeg)
 
         # Load and process the video data
         self.video_data = []
         self.num_frame_2_sample = num_frame_2_sample
         video_files = glob.glob(video_dir + '/*.npy')
-        video_files.sort(key=lambda x: int(x.split('/')[-1].split('.')[0][2:]))
+        video_files.sort(key=lambda x: int(x.split('/')[-1].split('.')[0][19:]))
         for video_file in video_files:
             video = np.load(video_file, allow_pickle=True)
             video = self.sample_frames(video)
@@ -58,3 +63,11 @@ class CustomDataset(Dataset):
         """
         indices = np.linspace(0, video_array.shape[0] - 1, num=self.num_frame_2_sample).astype(int)
         return video_array[indices]
+
+
+if __name__ == '__main__':
+    from util.experiment import get_args
+    args = get_args()
+    seeg_dir = args.seeg_dir
+    video_dir = args.video_dir
+    dataset = CustomDataset(seeg_dir, video_dir)

@@ -24,8 +24,8 @@ def get_args():
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument('--exp_name', '-n', type=str, default='baseline',
                             help="The checkpoints and logs will be save in /experiments/$EXP_NAME")
-    arg_parser.add_argument('--seeg_file', '-sf', type=str, default='/gpfs/data/tserre/Shared/Brainstorm_2024/data_segmented.npy', help="Path to the sEEG data file")
-    arg_parser.add_argument('--video_dir', '-vd', type=str, default='/gpfs/data/tserre/Shared/Brainstorm_2024/raw_movie', help="Path to the video frames directory")
+    arg_parser.add_argument('--seeg_dir', '-sd', type=str, default='/gpfs/data/tserre/Shared/Brainstorm_2024/seeg', help="Path to the sEEG data directory")
+    arg_parser.add_argument('--video_dir', '-vd', type=str, default='/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_videomae', help="Path to the video frames directory")
     arg_parser.add_argument('--lr', '-l', type=float, default=1e-3, help="Learning rate")
     arg_parser.add_argument('--num_epochs', '-e', type=int, default=20, help="total number of epochs for training")
     arg_parser.add_argument('--ckpt', '-c', type=str, default=None, help="path to the checkpoint file")

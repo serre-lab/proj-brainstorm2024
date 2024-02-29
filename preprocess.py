@@ -5,6 +5,7 @@ from transformers import AutoImageProcessor, AutoModel
 import torch
 from torchvision import transforms
 from PIL import Image
+import os
 
 
 def get_frames(file_path):
@@ -17,7 +18,7 @@ def videomae_preprocess(avi_path, ckpt="MCG-NJU/videomae-base"):
     image_processor = VideoMAEImageProcessor.from_pretrained(ckpt)
     # load avi files from greenbook_01 to greenbook_19
     video_data = []
-    for i in range(1, 3):
+    for i in range(1, 20):
         file_path = avi_path + f'/greenbook_{i:02d}.avi'
         video = get_frames(file_path)
         video_videomae = image_processor(list(video), return_tensors="pt")['pixel_values'][0]
@@ -31,9 +32,14 @@ def videomae_preprocess(avi_path, ckpt="MCG-NJU/videomae-base"):
     n_windows = int(video_data.shape[0] // window_size)
     video_data = video_data[:n_windows * window_size]
     video_data = np.split(video_data, n_windows, axis=0)
-    video_data = np.array(video_data)
-    print(video_data.shape)
-    np.save('greenbook_videomae.npy', video_data)
+
+    # save each element in the video_data list as a separate file
+    # first make a folder called greenbook_videomae
+    os.makedirs('greenbook_videomae', exist_ok=True)
+    for i, window in enumerate(video_data):
+        np.save(f'greenbook_videomae/greenbook_videomae_{i:02d}.npy', window)
+
+
 
 
 def seeg_preprocess(seeg_path):
@@ -43,9 +49,12 @@ def seeg_preprocess(seeg_path):
     window_size = int(5 * seeg_sr)
     n_windows = int(seeg_contacts.shape[1] // window_size)
     seeg_windows = np.split(seeg_contacts[:, :n_windows * window_size], n_windows, axis=1)
-    seeg_windows = np.stack(seeg_windows)
-    print(seeg_windows.shape)
-    np.save('seeg_split.npy', seeg_windows)
+
+    # save each element in the seeg_windows list as a separate file
+    # first make a folder called seeg
+    os.makedirs('seeg', exist_ok=True)
+    for i, window in enumerate(seeg_windows):
+        np.save(f'seeg/seeg_{i:02d}.npy', window)
 
 
 def dinos_preprocess(avi_path):
@@ -62,7 +71,7 @@ def dinos_preprocess(avi_path):
     model.eval()
 
     # load avi files from greenbook_01 to greenbook_19
-    for i in range(1, 3):
+    for i in range(1, 20):
         file_path = avi_path + f'/greenbook_{i:02d}.avi'
         container = av.open(file_path)
         container.seek(0)
@@ -79,9 +88,12 @@ def dinos_preprocess(avi_path):
     n_windows = int(frame_embeddings.shape[0] // window_size)
     frame_embeddings = frame_embeddings[:n_windows * window_size]
     frame_embeddings = frame_embeddings.split(window_size, dim=0)
-    frame_embeddings = torch.stack(frame_embeddings)
-    print(frame_embeddings.shape)
-    torch.save(frame_embeddings, 'greenbook_dino.pt')
+
+    # save each element in the video_data list as a separate file
+    # first make a folder called greenbook_dinos
+    os.makedirs('greenbook_dinos', exist_ok=True)
+    for i, window in enumerate(frame_embeddings):
+        torch.save(window, f'greenbook_dinos/greenbook_dinos_{i:02d}.pt')
 
 
 if __name__ == "__main__":

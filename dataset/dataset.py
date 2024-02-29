@@ -20,6 +20,7 @@ class CustomDataset(Dataset):
         for seeg_file in seeg_files:
             seeg = np.load(seeg_file, allow_pickle=True)
             self.seeg_data.append(seeg)
+        self.seeg_data = np.array(self.seeg_data, dtype=np.float32)
 
         # Load and process the video data
         self.video_data = []

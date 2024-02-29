@@ -17,21 +17,21 @@ def videomae_preprocess(avi_path, ckpt="MCG-NJU/videomae-base"):
     image_processor = VideoMAEImageProcessor.from_pretrained(ckpt)
     # load avi files from greenbook_01 to greenbook_19
     video_data = []
-    for i in range(1, 20):
+    for i in range(1, 3):
         file_path = avi_path + f'/greenbook_{i:02d}.avi'
         video = get_frames(file_path)
         video_videomae = image_processor(list(video), return_tensors="pt")['pixel_values'][0]
         video_data.append(video_videomae.numpy())
         print(f'greenbook_{i:02d}.avi: {video_videomae.shape}')
-    video_data = np.stack(video_data)
+    video_data = np.concatenate(video_data,axis=0)
 
     # split into 5s windows, drop the last window if it's less than 5s
     video_sr = 30.0
     window_size = int(5 * video_sr)
-    n_windows = int(video_data.shape[1] // window_size)
-    video_data = video_data[:, :n_windows * window_size]
-    video_data = np.split(video_data, n_windows, axis=1)
-    video_data = np.stack(video_data)
+    n_windows = int(video_data.shape[0] // window_size)
+    video_data = video_data[:n_windows * window_size]
+    video_data = np.split(video_data, n_windows, axis=0)
+    video_data = np.array(video_data)
     print(video_data.shape)
     np.save('greenbook_videomae.npy', video_data)
 
@@ -62,7 +62,7 @@ def dinos_preprocess(avi_path):
     model.eval()
 
     # load avi files from greenbook_01 to greenbook_19
-    for i in range(1, 20):
+    for i in range(1, 3):
         file_path = avi_path + f'/greenbook_{i:02d}.avi'
         container = av.open(file_path)
         container.seek(0)
@@ -72,7 +72,7 @@ def dinos_preprocess(avi_path):
             with torch.no_grad():
                 frame_embedding = model(frame_preprocessed)
             frame_embeddings.append(frame_embedding)
-    frame_embeddings = torch.stack(frame_embeddings)
+    frame_embeddings = torch.stack(frame_embeddings).squeeze()
     # split into 5s windows, drop the last window if it's less than 5s
     video_sr = 30.0
     window_size = int(5 * video_sr)

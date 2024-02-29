@@ -17,7 +17,7 @@ def videomae_preprocess(avi_path, ckpt="MCG-NJU/videomae-base"):
     # load avi files from greenbook_01 to greenbook_19
     video_data = []
     for i in range(1, 20):
-        file_path = avi_path + f'\greenbook_{i:02d}.avi'
+        file_path = avi_path + f'/greenbook_{i:02d}.avi'
         video = get_frames(file_path)
         video_videomae = image_processor(list(video), return_tensors="pt")['pixel_values'][0]
         video_data.append(video_videomae.numpy())
@@ -61,7 +61,7 @@ def dinos_preprocess(avi_path):
 
     # load avi files from greenbook_01 to greenbook_19
     for i in range(1, 20):
-        file_path = avi_path + f'\greenbook_{i:02d}.avi'
+        file_path = avi_path + f'/greenbook_{i:02d}.avi'
         container = av.open(file_path)
         container.seek(0)
         for i, frame in enumerate(container.decode(video=0)):
@@ -82,10 +82,7 @@ def dinos_preprocess(avi_path):
     torch.save(frame_embeddings, 'greenbook_dino.pt')
 
 
-
 if __name__ == "__main__":
-    videomae_preprocess(
-        r'C:\Users\ycheng70\OneDrive - Brown University\Documents\proj-subtitles-decoding\data\green_book')
-    seeg_preprocess(
-        r'C:\Users\ycheng70\OneDrive - Brown University\Documents\proj-subtitles-decoding\data\seeg_contacts.npy')
-    dinos_preprocess(r'C:\Users\ycheng70\OneDrive - Brown University\Documents\proj-subtitles-decoding\data\green_book')
+    videomae_preprocess('/users/ycheng70/data/ycheng70/proj-brainstorm2024/data/green_book')
+    seeg_preprocess('/users/ycheng70/data/ycheng70/proj-brainstorm2024/data/seeg_contacts.npy')
+    dinos_preprocess('/users/ycheng70/data/ycheng70/proj-brainstorm2024/data/green_book')

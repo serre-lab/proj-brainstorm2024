@@ -41,11 +41,11 @@ class CustomDataset(Dataset):
         """
         # Load and process the audio data
         video_file = self.video_files[index]
-        video = np.load(video_file, allow_pickle=True, dtype=np.float32)
+        video = np.load(video_file, allow_pickle=True)
         video = self.sample_frames(video)
         see_file = self.seeg_files[index]
-        seeg = np.load(see_file, allow_pickle=True, dtype=np.float32)
-        return video, seeg
+        seeg = np.load(see_file, allow_pickle=True)
+        return video.astype('float32'), seeg.astype('float32')
 
     def __len__(self):
         return self.total_num

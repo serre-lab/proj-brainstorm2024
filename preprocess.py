@@ -6,6 +6,7 @@ import torch
 from torchvision import transforms
 from PIL import Image
 
+
 def get_frames(file_path):
     container = av.open(file_path)
     container.seek(0)
@@ -49,7 +50,8 @@ def seeg_preprocess(seeg_path):
 
 def dinos_preprocess(avi_path):
     transform = transforms.Compose([
-        transforms.Resize((224, 224)),  # Resize the image
+        transforms.Resize(256, interpolation=transforms.InterpolationMode.BICUBIC),  # Resize the image
+        transforms.CenterCrop(224),  # Crop the center of the image
         transforms.ToTensor(),  # Convert the image to a tensor and scale to [0, 1]
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # Normalize
     ])

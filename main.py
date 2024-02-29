@@ -4,7 +4,7 @@ import wandb
 from util.experiment import set_seeds, get_args
 from torch.utils.data import random_split, DataLoader
 from model.videoencoder import VideoEncoder
-from model.seegencoder import SEEGEncoder
+from model.seegencoder import SEEGEncoder, SEEGEncoderChaFirst, SEEGEncoderLenChaFirst
 from train.train import train
 from eval.eval import eval
 from dataset.dataset import CustomDataset
@@ -52,7 +52,13 @@ def main(args):
     num_heads = args.num_heads
     num_encoder_layers = args.num_encoder_layers
     dim_feedforward = args.dim_feedforward
-    seeg_encoder = SEEGEncoder(num_heads, num_encoder_layers, dim_feedforward).to(device)
+    model_type = args.model
+    if model_type == 'orig':
+        seeg_encoder = SEEGEncoder(num_heads, num_encoder_layers, dim_feedforward).to(device)
+    elif model_type == 'cha-first':
+        seeg_encoder = SEEGEncoderChaFirst(num_heads, num_encoder_layers, dim_feedforward).to(device)
+    elif model_type == 'len-cha-first':
+        seeg_encoder = SEEGEncoderLenChaFirst(num_heads, num_encoder_layers, dim_feedforward).to(device)
 
     # Define the optimizer
     optimizer = torch.optim.Adam(seeg_encoder.parameters(), lr=args.lr)

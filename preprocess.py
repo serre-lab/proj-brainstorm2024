@@ -23,7 +23,7 @@ def videomae_preprocess(avi_path, ckpt="MCG-NJU/videomae-base"):
         video_videomae = image_processor(list(video), return_tensors="pt")['pixel_values'][0]
         video_data.append(video_videomae.numpy())
         print(f'greenbook_{i:02d}.avi: {video_videomae.shape}')
-    video_data = np.array(video_data, dtype=np.float32)
+    video_data = np.stack(video_data)
 
     # split into 5s windows, drop the last window if it's less than 5s
     video_sr = 30.0

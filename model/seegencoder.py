@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 from util.model import gen_pos_encoding
 

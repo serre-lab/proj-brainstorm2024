@@ -36,7 +36,7 @@ def main(args):
     num_val = (len(dataset) - num_train) // 2
     num_test = len(dataset) - num_train - num_val
     train_dataset, val_dataset, test_dataset = random_split(dataset, [num_train, num_val, num_test])
-    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
+    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers, drop_last=True)
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers)
     test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers)
 

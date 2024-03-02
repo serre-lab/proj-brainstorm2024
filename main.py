@@ -70,7 +70,7 @@ def main(args):
     else:
         optimizer = torch.optim.Adam(seeg_encoder.parameters(), lr=args.lr)
 
-    t = args.temperture
+    t = args.temperature
 
     best_val_acc1 = None
     best_epoch = 0

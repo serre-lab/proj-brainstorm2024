@@ -39,7 +39,7 @@ def get_args():
                                                                                      "sEEG encoder")
     arg_parser.add_argument('--dim_feedforward', '-df', type=int, default=2048, help="Hidden dimension for the sEEG "
                                                                                      "encoder")
-    arg_parser.add_argument('--temperture', '-t', type=float, default=0.07, help="Temperature for the loss function")
+    arg_parser.add_argument('--temperature', '-t', type=float, default=0.07, help="Temperature for the loss function")
     args = arg_parser.parse_args()
     return args
 

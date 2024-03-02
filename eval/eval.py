@@ -1,11 +1,11 @@
 import torch
-import math
+import numpy as np
 import wandb
 import torch.nn.functional as F
 from tqdm import tqdm
 
 
-def eval(video_encoder, seeg_encoder, eval_loader, device, split):
+def eval(video_encoder, seeg_encoder, eval_loader, device, split, t):
     video_encoder.eval()
     seeg_encoder.eval()
 
@@ -29,28 +29,31 @@ def eval(video_encoder, seeg_encoder, eval_loader, device, split):
                 seeg_embeddings = torch.cat((seeg_embeddings, seeg_embedding), dim=0)
 
         # Flatten video and seeg embeddings
-        video_embeddings = video_embeddings.view(video_embeddings.shape[0], -1)
-        seeg_embeddings = seeg_embeddings.reshape(seeg_embeddings.shape[0], -1)
+        if len(video_embedding.shape) > 2:
+            video_embeddings = video_embeddings.view(video_embeddings.shape[0], -1)
+            seeg_embeddings = seeg_embeddings.reshape(seeg_embeddings.shape[0], -1)
 
         # Normalize embeddings
         video_embeddings = F.normalize(video_embeddings, p=2, dim=1)
         seeg_embeddings = F.normalize(seeg_embeddings, p=2, dim=1)
 
         # Compute similarity
-        sim = (video_embeddings @ seeg_embeddings.transpose(1, 0)) * math.e
+        sim = (video_embeddings @ seeg_embeddings.transpose(1, 0)) * np.exp(t)
         labels = torch.arange(video_embeddings.shape[0]).to(device)
 
         # Compute accuracy
-        loss = F.cross_entropy(sim, labels)
-        acc1, acc2 = compute_top_k_acc(sim, labels, top_k=[1, 2])
+        loss_1 = F.cross_entropy(sim, labels)
+        loss_2 = F.cross_entropy(sim.transpose(1, 0), labels)
+        loss = (loss_1 + loss_2) / 2
+        acc1, acc5 = compute_top_k_acc(sim, labels, top_k=[1, 5])
 
         wandb.log({f'{split}/Loss': loss,
                    f'{split}/Acc@1': acc1,
-                   f'{split}/Acc@2': acc2})
+                   f'{split}/Acc@5': acc5})
         print(f'{split}/Loss {loss:.4f}')
         print(f'{split}/Acc@1 {acc1:.4f}%')
-        print(f'{split}/Acc@2 {acc2:.4f}%')
-        return loss, acc1, acc2
+        print(f'{split}/Acc@5 {acc5:.4f}%')
+        return loss, acc1, acc5
 
 
 class AverageMeter(object):

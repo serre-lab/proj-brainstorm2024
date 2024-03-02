@@ -3,8 +3,8 @@ import torch
 import wandb
 from util.experiment import set_seeds, get_args
 from torch.utils.data import random_split, DataLoader
-from model.videoencoder import VideoEncoder
-from model.seegencoder import SEEGEncoder, SEEGEncoderChaFirst, SEEGEncoderLenChaFirst
+from model.videoencoder import VideoEncoder, VideoEncoderProj
+from model.seegencoder import SEEGEncoder, SEEGEncoderChaFirst, SEEGEncoderLenChaFirst, SEEGEncoderProj
 from train.train import train
 from eval.eval import eval
 from dataset.dataset import CustomDataset
@@ -27,8 +27,6 @@ def main(args):
     # Set up the device.
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    # Set up the pretrained version of the video encoder and the video processor.
-
     # Define the datasets and dataloaders
     print('Loading datasets and dataloaders ...')
     seeg_dir = args.seeg_dir
@@ -42,28 +40,39 @@ def main(args):
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers)
     test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers)
 
+    model_type = args.model
+
     # Define the video encoder
     print('Creating video encoder ...')
     ckpt = "MCG-NJU/videomae-base"
-    video_encoder = VideoEncoder(ckpt).to(device)
+    if model_type != 'proj':
+        video_encoder = VideoEncoder(ckpt).to(device)
+    else:
+        video_encoder = VideoEncoderProj(ckpt).to(device)
 
     # Define the seeg encoder
     print('Creating sEEG encoder ...')
     num_heads = args.num_heads
     num_encoder_layers = args.num_encoder_layers
     dim_feedforward = args.dim_feedforward
-    model_type = args.model
     if model_type == 'orig':
         seeg_encoder = SEEGEncoder(num_heads, num_encoder_layers, dim_feedforward).to(device)
     elif model_type == 'cha-first':
         seeg_encoder = SEEGEncoderChaFirst(num_heads, num_encoder_layers, dim_feedforward).to(device)
     elif model_type == 'len-cha-first':
         seeg_encoder = SEEGEncoderLenChaFirst(num_heads, num_encoder_layers, dim_feedforward).to(device)
+    elif model_type == 'proj':
+        seeg_encoder = SEEGEncoderProj(num_heads, num_encoder_layers, dim_feedforward).to(device)
 
     # Define the optimizer
-    optimizer = torch.optim.Adam(seeg_encoder.parameters(), lr=args.lr)
+    if any(p.requires_grad for p in video_encoder.parameters()):
+        optimizer = torch.optim.Adam(list(video_encoder.parameters()) + list(seeg_encoder.parameters()), lr=args.lr)
+    else:
+        optimizer = torch.optim.Adam(seeg_encoder.parameters(), lr=args.lr)
 
-    best_val_loss = None
+    t = args.temperture
+
+    best_val_acc1 = None
     best_epoch = 0
     start_epoch = 0
 
@@ -73,7 +82,7 @@ def main(args):
         seeg_encoder.load_state_dict(ckpt_state['seeg_encoder'])
         video_encoder.load_state_dict(ckpt_state['video_encoder'])
         optimizer.load_state_dict(ckpt_state['optimizer'])
-        best_val_loss = ckpt_state['best_val_loss']
+        best_val_acc1 = ckpt_state['best_val_acc1']
         best_epoch = ckpt_state['best_epoch']
         start_epoch = ckpt_state['epoch']
 
@@ -81,20 +90,20 @@ def main(args):
         print(f'Epoch: {epoch + 1}')
 
         # Training
-        train(video_encoder, seeg_encoder, optimizer, train_loader, device)
+        train(video_encoder, seeg_encoder, optimizer, train_loader, device, t)
 
         # Validation
-        loss, acc1, acc2 = eval(video_encoder, seeg_encoder, val_loader, device, 'val')
+        loss, acc1, acc5 = eval(video_encoder, seeg_encoder, val_loader, device, 'val', t)
 
-        if best_val_loss is None or loss < best_val_loss:
-            best_val_loss = loss
+        if best_val_acc1 is None or acc1 > best_val_acc1:
+            best_val_acc1 = acc1
             best_epoch = epoch + 1
             print(f'New best model found at epoch {best_epoch}')
             state = {
                 'seeg_encoder': seeg_encoder.state_dict(),
                 'video_encoder': video_encoder.state_dict(),
                 'optimizer': optimizer.state_dict(),
-                'best_val_loss': best_val_loss,
+                'best_val_acc1': best_val_acc1,
                 'best_epoch': best_epoch,
                 'epoch': epoch + 1,
             }
@@ -105,7 +114,7 @@ def main(args):
             'seeg_encoder': seeg_encoder.state_dict(),
             'video_encoder': video_encoder.state_dict(),
             'optimizer': optimizer.state_dict(),
-            'best_val_loss': best_val_loss,
+            'best_val_acc1': best_val_acc1,
             'best_epoch': best_epoch,
             'epoch': epoch + 1,
         }
@@ -118,7 +127,7 @@ def main(args):
     ckpt_state = torch.load(ckpt_file)
     seeg_encoder.load_state_dict(ckpt_state['seeg_encoder'])
     video_encoder.load_state_dict(ckpt_state['video_encoder'])
-    test_loss, test_acc1, test_acc2 = eval(video_encoder, seeg_encoder, test_loader, device, 'test')
+    test_loss, test_acc1, test_acc5 = eval(video_encoder, seeg_encoder, test_loader, device, 'test')
 
 
 if __name__ == '__main__':

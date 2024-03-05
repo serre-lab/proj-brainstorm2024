@@ -127,7 +127,7 @@ def main(args):
     ckpt_state = torch.load(ckpt_file)
     seeg_encoder.load_state_dict(ckpt_state['seeg_encoder'])
     video_encoder.load_state_dict(ckpt_state['video_encoder'])
-    test_loss, test_acc1, test_acc5 = eval(video_encoder, seeg_encoder, test_loader, device, 'test')
+    test_loss, test_acc1, test_acc5 = eval(video_encoder, seeg_encoder, test_loader, device, 'test', t)
 
 
 if __name__ == '__main__':

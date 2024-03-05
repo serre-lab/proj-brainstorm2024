@@ -23,6 +23,9 @@ def eval(video_encoder, seeg_encoder, eval_loader, device, split, t):
 
             # Forward
             video_embedding = video_encoder(video)
+
+            print(f'GPU memory in use: {torch.cuda.memory_allocated() / 1e9:.2f} GB')
+
             seeg_embedding = seeg_encoder(seeg)
 
             print(f'GPU memory in use: {torch.cuda.memory_allocated() / 1e9:.2f} GB')

@@ -4,8 +4,10 @@ import numpy as np
 import torch.nn.functional as F
 from eval.eval import AverageMeter, compute_top_k_acc
 from tqdm import tqdm
+from memory_profiler import profile
 
 
+@profile
 def train(video_encoder, seeg_encoder, optimizer, train_loader, device, t):
     video_encoder.train()
     seeg_encoder.train()

@@ -77,7 +77,7 @@ class CustomDataset(Dataset):
         Returns:
         - video (np.ndarray): The sampled video data of shape (num_frames, 3, 224, 224).
         """
-        max_start_index = video_array.shape[0] - stride * (num_frames - 1)
+        max_start_index = video_array.shape[0] - stride * (self.num_frame_2_sample - 1)
         if max_start_index <= 0:
             # If the video is too short, return the original video array or handle appropriately
             print("Warning: Video is too short to sample with the given stride and number of frames.")

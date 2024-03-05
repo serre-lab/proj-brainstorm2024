@@ -35,4 +35,4 @@ conda activate /users/schen336/.conda/envs/myenv
 nvidia-smi
 lscpu
 #python -u main.py 
-python dataset/dataset4individual_Clean.py
+python main.py

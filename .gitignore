@@ -162,3 +162,8 @@ cython_debug/
 /ckpt
 /data
 /experiments
+/wandb
+
+*.sh
+*.err
+*.out

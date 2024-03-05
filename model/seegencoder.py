@@ -240,9 +240,9 @@ if __name__ == '__main__':
     num_encoder_layers = 6
     dim_feedforward = 2048
 
-    # model = SEEGEncoder(num_heads, num_encoder_layers, dim_feedforward)
-    # print_num_params(model)
-    #
+    model = SEEGEncoder(num_heads, num_encoder_layers, dim_feedforward)
+    print_num_params(model)
+
     seegs = torch.randn(2, 84, 5120)
     #
     # output = model(seegs)
@@ -255,13 +255,14 @@ if __name__ == '__main__':
     #
     # assert output.shape == (2, 1568, 768)
     #
-    # model = SEEGEncoderLenChaFirst(num_heads, num_encoder_layers, dim_feedforward)
-    #
+    model = SEEGEncoderLenChaFirst(num_heads, num_encoder_layers, dim_feedforward)
+    print_num_params(model)
+
     # output = model(seegs)
     #
     # assert output.shape == (2, 1568, 768)
 
-    model = SEEGEncoderProj(num_heads, num_encoder_layers, dim_feedforward)
-    print_num_params(model)
-    output = model(seegs)
-    assert output.shape == (2, 768)
+    # model = SEEGEncoderProj(num_heads, num_encoder_layers, dim_feedforward)
+    # print_num_params(model)
+    # output = model(seegs)
+    # assert output.shape == (2, 768)

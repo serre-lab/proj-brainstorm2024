@@ -95,8 +95,19 @@ def dinos_preprocess(avi_path):
     for i, window in enumerate(frame_embeddings):
         torch.save(window, f'greenbook_dinos/greenbook_dinos_{i:02d}.pt')
 
+def dino_reprocess(avi_path):
+    # load back each embedding
+    # from greenbook_dinos_00.pt to greenbook_dinos_1468.pt
+    # save each embedding as a separate file into numpy
+    os.makedirs('greenbook_dinos', exist_ok=True)
+    for i in range(1469):
+        file_path = avi_path + f'/greenbook_dinos/greenbook_dinos_{i:02d}.pt'
+        frame_embedding = torch.load(file_path)
+        frame_embedding = frame_embedding.numpy()
+        np.save(f'greenbook_dinos/greenbook_dinos_{i:02d}.npy', frame_embedding)
 
 if __name__ == "__main__":
-    videomae_preprocess('/users/ycheng70/data/ycheng70/proj-brainstorm2024/data/green_book')
-    seeg_preprocess('/users/ycheng70/data/ycheng70/proj-brainstorm2024/data/seeg_contacts.npy')
-    dinos_preprocess('/users/ycheng70/data/ycheng70/proj-brainstorm2024/data/green_book')
+    # videomae_preprocess('/users/ycheng70/data/ycheng70/proj-brainstorm2024/data/green_book')
+    # seeg_preprocess('/users/ycheng70/data/ycheng70/proj-brainstorm2024/data/seeg_contacts.npy')
+    # dinos_preprocess('/users/ycheng70/data/ycheng70/proj-brainstorm2024/data/green_book')
+    dino_reprocess('/users/ycheng70/data/ycheng70/proj-brainstorm2024/data/green_book')

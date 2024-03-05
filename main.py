@@ -8,7 +8,6 @@ from model.seegencoder import SEEGEncoder
 from train.train import train
 from eval.eval import eval
 from dataset.dataset import CustomDataset
-from memory_profiler import profile
 
 wandb.login(key="99528c40ebd16fca6632e963a943b99ac8a5f4b7")
 

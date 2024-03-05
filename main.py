@@ -116,7 +116,4 @@ def main(args):
 if __name__ == '__main__':
     args = get_args()
     set_seeds(42)
-    args.seeg_dir = 'data/seeg'
-    args.video_dir = 'data/greenbook_dinos'
-    args.batch_size = 2
     main(args)

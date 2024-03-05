@@ -12,21 +12,30 @@ def eval(video_encoder, seeg_encoder, eval_loader, device, split, t):
     video_embeddings = None
     seeg_embeddings = None
 
+    print(f'GPU memory in use: {torch.cuda.memory_allocated() / 1e9:.2f} GB')
+
     with torch.no_grad():
         for video, seeg in tqdm(eval_loader):
             video = video.to(device)
             seeg = seeg.to(device)
 
+            print(f'GPU memory in use: {torch.cuda.memory_allocated() / 1e9:.2f} GB')
+
             # Forward
             video_embedding = video_encoder(video)
             seeg_embedding = seeg_encoder(seeg)
 
+            print(f'GPU memory in use: {torch.cuda.memory_allocated() / 1e9:.2f} GB')
+
             if video_embeddings is None:
                 video_embeddings = video_embedding
                 seeg_embeddings = seeg_embedding
+                print(f'GPU memory in use: {torch.cuda.memory_allocated() / 1e9:.2f} GB')
+
             else:
                 video_embeddings = torch.cat((video_embeddings, video_embedding), dim=0)
                 seeg_embeddings = torch.cat((seeg_embeddings, seeg_embedding), dim=0)
+                print(f'GPU memory in use: {torch.cuda.memory_allocated() / 1e9:.2f} GB')
 
         # Flatten video and seeg embeddings
         # print gpu memory in use (in GB) for debugging

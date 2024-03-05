@@ -71,7 +71,6 @@ class CustomDataset(Dataset):
         
         Parameters:
         - video_array (np.ndarray): The video data of shape (num_frames, 3, 224, 224).
-        - num_frames (int): Number of frames to sample. Default is 16.
         - stride (int): Temporal stride between frames. Default is 4.
         - dense (bool): If True, sample densely. This parameter is kept for compatibility.
     

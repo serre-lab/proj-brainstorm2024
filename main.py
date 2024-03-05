@@ -3,8 +3,8 @@ import torch
 import wandb
 from util.experiment import set_seeds, get_args
 from torch.utils.data import random_split, DataLoader
-from model.videoencoder import VideoEncoder, VideoEncoderProj
-from model.seegencoder import SEEGEncoder, SEEGEncoderChaFirst, SEEGEncoderLenChaFirst, SEEGEncoderProj
+from model.videoencoder import VideoEncoder
+from model.seegencoder import SEEGEncoder
 from train.train import train
 from eval.eval import eval
 from dataset.dataset import CustomDataset
@@ -22,7 +22,7 @@ def main(args):
     os.makedirs(log_folder, exist_ok=True)
 
     # Initialize WandB
-    wandb.init(project="prj_brainstorm", config=vars(args))
+    wandb.init(project="prj_brainstorm", config=vars(args), mode='disabled')
 
     # Set up the device.
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -40,29 +40,12 @@ def main(args):
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers)
     test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers)
 
-    model_type = args.model
-
-    # Define the video encoder
-    print('Creating video encoder ...')
-    ckpt = "MCG-NJU/videomae-base"
-    if model_type != 'proj':
-        video_encoder = VideoEncoder(ckpt).to(device)
-    else:
-        video_encoder = VideoEncoderProj(ckpt).to(device)
-
-    # Define the seeg encoder
-    print('Creating sEEG encoder ...')
     num_heads = args.num_heads
     num_encoder_layers = args.num_encoder_layers
     dim_feedforward = args.dim_feedforward
-    if model_type == 'orig':
-        seeg_encoder = SEEGEncoder(num_heads, num_encoder_layers, dim_feedforward).to(device)
-    elif model_type == 'cha-first':
-        seeg_encoder = SEEGEncoderChaFirst(num_heads, num_encoder_layers, dim_feedforward).to(device)
-    elif model_type == 'len-cha-first':
-        seeg_encoder = SEEGEncoderLenChaFirst(num_heads, num_encoder_layers, dim_feedforward).to(device)
-    elif model_type == 'proj':
-        seeg_encoder = SEEGEncoderProj(num_heads, num_encoder_layers, dim_feedforward).to(device)
+
+    seeg_encoder = SEEGEncoder(num_heads, num_encoder_layers, dim_feedforward).to(device)
+    video_encoder = VideoEncoder().to(device)
 
     # Define the optimizer
     if any(p.requires_grad for p in video_encoder.parameters()):
@@ -127,10 +110,13 @@ def main(args):
     ckpt_state = torch.load(ckpt_file)
     seeg_encoder.load_state_dict(ckpt_state['seeg_encoder'])
     video_encoder.load_state_dict(ckpt_state['video_encoder'])
-    test_loss, test_acc1, test_acc5 = eval(video_encoder, seeg_encoder, test_loader, device, 'test')
+    test_loss, test_acc1, test_acc5 = eval(video_encoder, seeg_encoder, test_loader, device, 'test', t)
 
 
 if __name__ == '__main__':
     args = get_args()
     set_seeds(42)
+    args.seeg_dir = 'data/seeg'
+    args.video_dir = 'data/greenbook_dinos'
+    args.batch_size = 2
     main(args)

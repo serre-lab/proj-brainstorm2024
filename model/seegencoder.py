@@ -21,7 +21,7 @@ class SEEGEncoder(nn.Module):
         self.num_input_channels = 84
         self.num_output_channels = 768
         self.input_length = 5120
-        self.output_length = 1568
+        self.output_length = 1
 
         # Positional encoding
         positional_encoding = gen_pos_encoding(self.input_length, self.num_input_channels)
@@ -37,9 +37,6 @@ class SEEGEncoder(nn.Module):
         self.channel_matching_layer = nn.Linear(self.num_input_channels, self.num_output_channels)
 
         self.relu = nn.ReLU()
-        self.layer_norm_1 = nn.LayerNorm(self.input_length)
-        self.layer_norm_2 = nn.LayerNorm(self.output_length)
-        self.layer_norm_3 = nn.LayerNorm(self.output_length)
 
     def forward(self, x):
         """
@@ -53,16 +50,9 @@ class SEEGEncoder(nn.Module):
         x += self.positional_encoding
         x = self.transformer_encoder(x)
         x = x.permute(0, 2, 1)
-        x = self.layer_norm_1(x)
-        x = self.relu(x)
         x = self.length_matching_layer(x)
-        x = self.layer_norm_2(x)
-        x = self.relu(x)
         x = x.permute(0, 2, 1)
         x = self.channel_matching_layer(x)
-        x = x.permute(0, 2, 1)
-        x = self.layer_norm_3(x)
-        x = x.permute(0, 2, 1)
         return x
 
 

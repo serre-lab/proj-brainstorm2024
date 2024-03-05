@@ -27,7 +27,7 @@ def get_args():
     arg_parser.add_argument('--seeg_dir', '-sd', type=str, default='/gpfs/data/tserre/Shared/Brainstorm_2024/seeg', help="Path to the sEEG data directory")
     arg_parser.add_argument('--video_dir', '-vd', type=str, default='/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_videomae', help="Path to the video frames directory")
     arg_parser.add_argument('--lr', '-l', type=float, default=1e-5, help="Learning rate")
-    arg_parser.add_argument('--num_epochs', '-e', type=int, default=20, help="total number of epochs for training")
+    arg_parser.add_argument('--num_epochs', '-e', type=int, default=1000, help="total number of epochs for training")
     arg_parser.add_argument('--ckpt', '-c', type=str, default=None, help="path to the checkpoint file")
     arg_parser.add_argument('--batch_size', '-b', type=int, default=10, help="batch size")
     arg_parser.add_argument('--train_ratio', '-tr', type=float, default=0.7,
@@ -37,7 +37,7 @@ def get_args():
     arg_parser.add_argument('--num_heads', '-nh', type=int, default=6, help="Number of heads for the sEEG encoder")
     arg_parser.add_argument('--num_encoder_layers', '-ne', type=int, default=6, help="number of encoder layers for the "
                                                                                      "sEEG encoder")
-    arg_parser.add_argument('--dim_feedforward', '-df', type=int, default=2048, help="Hidden dimension for the sEEG "
+    arg_parser.add_argument('--dim_feedforward', '-df', type=int, default=1024, help="Hidden dimension for the sEEG "
                                                                                      "encoder")
     arg_parser.add_argument('--temperature', '-t', type=float, default=0.07, help="Temperature for the loss function")
     args = arg_parser.parse_args()

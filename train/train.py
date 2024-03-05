@@ -14,6 +14,8 @@ def train(video_encoder, seeg_encoder, optimizer, train_loader, device, t):
     top1_acc_meter = AverageMeter()
     top5_acc_meter = AverageMeter()
 
+    print(f'GPU memory in use: {torch.cuda.memory_allocated() / 1e9:.2f} GB')
+
     for video_embedding, seeg_embedding in tqdm(train_loader):
         batch_size = video_embedding.shape[0]
 
@@ -43,8 +45,15 @@ def train(video_encoder, seeg_encoder, optimizer, train_loader, device, t):
         loss_2 = F.cross_entropy(sim.transpose(1, 0), labels)
         loss = (loss_1 + loss_2) / 2
 
+        print(f'GPU memory in use: {torch.cuda.memory_allocated() / 1e9:.2f} GB')
+
         loss.backward()
+
+        print(f'GPU memory in use: {torch.cuda.memory_allocated() / 1e9:.2f} GB')
+
         optimizer.step()
+
+        print(f'GPU memory in use: {torch.cuda.memory_allocated() / 1e9:.2f} GB')
 
         # update metric
         with torch.no_grad():

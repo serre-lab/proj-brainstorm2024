@@ -15,16 +15,16 @@ def train(video_encoder, seeg_encoder, optimizer, train_loader, device, t):
     top1_acc_meter = AverageMeter()
     top5_acc_meter = AverageMeter()
 
-    for video, seeg in tqdm(train_loader):
-        batch_size = video.shape[0]
+    for video_embedding, seeg_embedding in tqdm(train_loader):
+        batch_size = video_embedding.shape[0]
 
-        video = video.to(device)
-        seeg = seeg.to(device)
+        video_embedding = video_embedding.to(device)
+        seeg_embedding = seeg_embedding.to(device)
 
         optimizer.zero_grad()
         # Forward
-        video_embedding = video_encoder(video)
-        seeg_embedding = seeg_encoder(seeg)
+        video_embedding = video_encoder(video_embedding)
+        seeg_embedding = seeg_encoder(seeg_embedding)
 
         # Flatten video and seeg embeddings
         if len(video_embedding.shape) > 2:

@@ -21,7 +21,6 @@ class CustomDataset(Dataset):
 
         # Load and process the video data
         self.video_data = []
-        self.num_frame_2_sample = num_frame_2_sample
         video_files = glob.glob(video_dir + '/*.pt')
         video_files.sort(key=lambda x: int(x.replace('\\', '/').split('/')[-1].split('.')[0][16:]))
         self.video_files = video_files
@@ -61,4 +60,5 @@ if __name__ == '__main__':
     # test the dataset
     for i in range(10):
         video, seeg = dataset[i]
+        # print the memory usage of video and seeg in GB
         print(video.shape, seeg.shape)

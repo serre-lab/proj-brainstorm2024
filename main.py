@@ -22,7 +22,7 @@ def main(args):
     os.makedirs(log_folder, exist_ok=True)
 
     # Initialize WandB
-    wandb.init(project="prj_brainstorm", config=vars(args), mode='disabled')
+    wandb.init(project="prj_brainstorm", config=vars(args))
 
     # Set up the device.
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')

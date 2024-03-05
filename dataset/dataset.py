@@ -21,7 +21,7 @@ class CustomDataset(Dataset):
 
         # Load and process the video data
         self.video_data = []
-        video_files = glob.glob(video_dir + '/*.pt')
+        video_files = glob.glob(video_dir + '/*.npy')
         video_files.sort(key=lambda x: int(x.replace('\\', '/').split('/')[-1].split('.')[0][16:]))
         self.video_files = video_files
 
@@ -40,7 +40,7 @@ class CustomDataset(Dataset):
         """
         # Load and process the audio data
         video_file = self.video_files[index]
-        video = torch.load(video_file, map_location='cpu').float()
+        video = np.load(video_file, allow_pickle=True).astype(np.float32)
         see_file = self.seeg_files[index]
         seeg = np.load(see_file, allow_pickle=True).astype(np.float32)
         return video, seeg

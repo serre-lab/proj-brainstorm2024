@@ -29,6 +29,9 @@ def eval(video_encoder, seeg_encoder, eval_loader, device, split, t):
                 seeg_embeddings = torch.cat((seeg_embeddings, seeg_embedding), dim=0)
 
         # Flatten video and seeg embeddings
+        # print gpu memory in use (in GB) for debugging
+        print(f'GPU memory in use: {torch.cuda.memory_allocated() / 1e9:.2f} GB')
+
         if len(video_embedding.shape) > 2:
             video_embeddings = video_embeddings.view(video_embeddings.shape[0], -1)
             seeg_embeddings = seeg_embeddings.reshape(seeg_embeddings.shape[0], -1)
@@ -38,13 +41,14 @@ def eval(video_encoder, seeg_encoder, eval_loader, device, split, t):
         seeg_embeddings = F.normalize(seeg_embeddings, p=2, dim=1)
 
         # Compute similarity
+        print(f'GPU memory in use: {torch.cuda.memory_allocated() / 1e9:.2f} GB')
+
         sim = (video_embeddings @ seeg_embeddings.transpose(1, 0)) * np.exp(t)
         labels = torch.arange(video_embeddings.shape[0]).to(device)
 
         # Compute accuracy
-        loss_1 = F.cross_entropy(sim, labels)
-        loss_2 = F.cross_entropy(sim.transpose(1, 0), labels)
-        loss = (loss_1 + loss_2) / 2
+        print(f'GPU memory in use: {torch.cuda.memory_allocated() / 1e9:.2f} GB')
+        loss = (F.cross_entropy(sim, labels) + F.cross_entropy(sim.transpose(1, 0), labels)) / 2
         acc1, acc5 = compute_top_k_acc(sim, labels, top_k=[1, 5])
 
         wandb.log({f'{split}/Loss': loss,

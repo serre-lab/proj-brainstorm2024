@@ -110,4 +110,4 @@ if __name__ == "__main__":
     # videomae_preprocess('/users/ycheng70/data/ycheng70/proj-brainstorm2024/data/green_book')
     # seeg_preprocess('/users/ycheng70/data/ycheng70/proj-brainstorm2024/data/seeg_contacts.npy')
     # dinos_preprocess('/users/ycheng70/data/ycheng70/proj-brainstorm2024/data/green_book')
-    dino_reprocess('/users/ycheng70/data/ycheng70/proj-brainstorm2024/data/green_book')
+    dino_reprocess('/users/ycheng70/data/ycheng70/proj-brainstorm2024/')

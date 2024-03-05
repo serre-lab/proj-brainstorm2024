@@ -41,7 +41,7 @@ class CustomDataset(Dataset):
         """
         # Load and process the audio data
         video_file = self.video_files[index]
-        video = torch.load(video_file).float()
+        video = torch.load(video_file, map_location='cpu').float()
         see_file = self.seeg_files[index]
         seeg = np.load(see_file, allow_pickle=True).astype(np.float32)
         return video, seeg

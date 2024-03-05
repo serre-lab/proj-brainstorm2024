@@ -55,7 +55,8 @@ if __name__ == '__main__':
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    ckpt = "MCG-NJU/videomae-base"
+    #ckpt = "MCG-NJU/videomae-base"
+    ckpt="nateraw/videomae-base-finetuned-ucf101-subset"
     model = VideoEncoder(ckpt).to(device)
     from util.experiment import print_num_params
     print_num_params(model)

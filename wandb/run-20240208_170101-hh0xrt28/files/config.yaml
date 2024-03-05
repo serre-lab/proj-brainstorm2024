@@ -1,0 +1,46 @@
+wandb_version: 1
+
+autoencoder_lr:
+  desc: null
+  value: 0.001
+autoencoder_epochs:
+  desc: null
+  value: 1000
+classifier_lr:
+  desc: null
+  value: 0.001
+classifier_epochs:
+  desc: null
+  value: 100
+alpha:
+  desc: null
+  value: 1.0
+batch_size:
+  desc: null
+  value: 30
+_wandb:
+  desc: null
+  value:
+    python_version: 3.9.18
+    cli_version: 0.16.3
+    framework: huggingface
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    start_time: 1707429661.740158
+    t:
+      1:
+      - 1
+      - 55
+      2:
+      - 1
+      - 11
+      - 49
+      - 55
+      3:
+      - 16
+      - 23
+      4: 3.9.18
+      5: 0.16.3
+      8:
+      - 5
+      13: linux-x86_64

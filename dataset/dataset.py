@@ -50,18 +50,44 @@ class CustomDataset(Dataset):
     def __len__(self):
         return self.total_num
 
-    def sample_frames(self, video_array):
-        """
-        Sample a given number of frames from the video array evenly.
-        Parameters:
-        - video_array (np.ndarray): the video data of shape (num_frames, 3, 224, 224)
+    # def sample_frames(self, video_array,dense=False):
+    #     """
+    #     Sample a given number of frames from the video array evenly.
+    #     Parameters:
+    #     - video_array (np.ndarray): the video data of shape (num_frames, 3, 224, 224)
 
-        Returns:
-        - video (np.ndarray): the sampled video data of shape (num_frame_2_sample, 3, 224, 224)
+    #     Returns:
+    #     - video (np.ndarray): the sampled video data of shape (num_frame_2_sample, 3, 224, 224)
+    #     """
+    #     offset = np.random.randint(0, 10)
+    #     indices = np.linspace(offset, video_array.shape[0] - 10 + offset, num=self.num_frame_2_sample).astype(int)
+    #     return video_array[indices]
+
+
+
+    def sample_frames(self, video_array, stride=4, dense=False):
         """
-        offset = np.random.randint(0, 10)
-        indices = np.linspace(offset, video_array.shape[0] - 10 + offset, num=self.num_frame_2_sample).astype(int)
+        Randomly selects `num_frames` from the video array with a temporal stride of `stride`.
+        
+        Parameters:
+        - video_array (np.ndarray): The video data of shape (num_frames, 3, 224, 224).
+        - num_frames (int): Number of frames to sample. Default is 16.
+        - stride (int): Temporal stride between frames. Default is 4.
+        - dense (bool): If True, sample densely. This parameter is kept for compatibility.
+    
+        Returns:
+        - video (np.ndarray): The sampled video data of shape (num_frames, 3, 224, 224).
+        """
+        max_start_index = video_array.shape[0] - stride * (num_frames - 1)
+        if max_start_index <= 0:
+            # If the video is too short, return the original video array or handle appropriately
+            print("Warning: Video is too short to sample with the given stride and number of frames.")
+            return video_array
+    
+        start_index = np.random.randint(0, max_start_index)
+        indices = np.arange(start_index, start_index + stride * self.num_frame_2_sample, stride)
         return video_array[indices]
+
 
 
 if __name__ == '__main__':

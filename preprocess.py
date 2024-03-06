@@ -7,6 +7,8 @@ from torchvision import transforms
 from PIL import Image
 import os
 
+from scipy import signal
+from scipy.signal import iirnotch, filtfilt, butter
 
 def get_frames(file_path):
     container = av.open(file_path)
@@ -42,6 +44,8 @@ def videomae_preprocess(avi_path, ckpt="MCG-NJU/videomae-base"):
 
 
 
+
+
 def seeg_preprocess(seeg_path):
     seeg_contacts = np.load(seeg_path)
     seeg_sr = 1024.0
@@ -56,6 +60,61 @@ def seeg_preprocess(seeg_path):
     for i, window in enumerate(seeg_windows):
         np.save(f'seeg/seeg_{i:02d}.npy', window)
 
+
+def apply_filters(data, fs, notch_freq=60.0, quality_factor=30, lowcut=0.1, highcut=50.0):
+    """
+    Apply notch and bandpass filters to the data.
+
+    Parameters:
+    - data: numpy array containing the SEEG data.
+    - fs: Sampling frequency in Hz.
+    - notch_freq: Frequency to be notched out.
+    - quality_factor: Quality factor for the notch filter.
+    - lowcut: Lower frequency bound for the bandpass filter.
+    - highcut: Upper frequency bound for the bandpass filter.
+
+    Returns:
+    - filtered_data: The filtered SEEG data.
+    """
+
+    # Notch filter
+    b_notch, a_notch = iirnotch(notch_freq, quality_factor, fs)
+    data = filtfilt(b_notch, a_notch, data)
+
+    # Bandpass filter
+    b_bandpass, a_bandpass = butter(N=4, Wn=[lowcut, highcut], btype='band', fs=fs)
+    filtered_data = filtfilt(b_bandpass, a_bandpass, data)
+
+    return filtered_data
+
+# Function to apply the filters to each channel of the data
+def filter_all_channels(data, fs):
+    # Assuming data shape is (channels, samples)
+    filtered_data = np.zeros_like(data)
+    for i in range(data.shape[0]):
+        filtered_data[i] = apply_filters(data[i], fs)
+    return filtered_data
+
+def filter_all_seeg(directory,new_directory):
+    files = os.listdir(directory)  # List all files in the directory
+    
+    filtered_seeg_array = []  # This list will hold the filtered data arrays if needed
+    
+    for file in files:
+        if file.endswith('.npy'):  # Ensure we're processing .npy files
+            file_path = os.path.join(directory, file)
+            data = np.load(file_path)
+            
+            fs = 1024  # Sampling frequency
+            filtered_seeg_data = apply_filters(data, fs)
+            
+            filtered_seeg_array.append(filtered_seeg_data)  # Optional: collect filtered data
+            
+            # Generate a new filename for the filtered data
+            filtered_file_path = os.path.join(new_directory, 'filtered_' + file)
+            
+            # Save the filtered data with the new filename
+            np.save(filtered_file_path, filtered_seeg_data)
 
 def dinos_preprocess(avi_path):
     transform = transforms.Compose([
@@ -100,3 +159,11 @@ if __name__ == "__main__":
     videomae_preprocess('/users/ycheng70/data/ycheng70/proj-brainstorm2024/data/green_book')
     seeg_preprocess('/users/ycheng70/data/ycheng70/proj-brainstorm2024/data/seeg_contacts.npy')
     dinos_preprocess('/users/ycheng70/data/ycheng70/proj-brainstorm2024/data/green_book')
+
+    directory = '/gpfs/data/tserre/Shared/Brainstorm_2024/seeg/' 
+    new_directory = '/gpfs/data/tserre/Shared/Brainstorm_2024/cleaned_seeg/'
+    filter_all_seeg(directory,new_directory)
+
+   
+    
+

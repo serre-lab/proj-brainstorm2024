@@ -17,14 +17,24 @@ class VideoEncoder(nn.Module):
     def freeze_parameters(self):
         for param in self.model.parameters():
             param.requires_grad = False
-# class VideoEncoder(nn.Module):
-#     def __init__(self):
-#         super().__init__()
-#         self.linear = nn.Linear(150, 1)
 
-#     def forward(self, x):
-#         x = self.linear(x.permute(0, 2, 1))
-#         return x
+
+class VideoEncoderLin(VideoEncoder):
+    def __init__(self, ckpt):
+        super().__init__(ckpt)
+        self.linear = nn.Linear(1568, 1)
+
+    def forward(self, x):
+        x = self.model(x).last_hidden_state
+        x = x.permute(0, 2, 1)
+        x = self.linear(x)
+        x = x.permute(0, 2, 1)
+        return x
+
+    def freeze_parameters(self):
+        for param in self.model.parameters():
+            param.requires_grad = False
+
 
 class VideoEncoderProj(nn.Module):
     def __init__(self, ckpt, num_heads=6, num_encoder_layers=6, dim_feedforward=2048):

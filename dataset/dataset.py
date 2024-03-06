@@ -3,6 +3,7 @@ import glob
 from torch.utils.data import Dataset
 import torch
 
+
 class CustomDataset(Dataset):
     """
     Custom dataset for the video frame embeddings and SEEG data
@@ -35,7 +36,7 @@ class CustomDataset(Dataset):
         - index (int): index of the data to retrieve
 
         Returns:
-        - video (torch.Tensor): the video emebdding data of shape(150, 768)
+        - video (torch.Tensor): the video embedding data of shape(150, 768)
         - seeg (torch.Tensor): the sEEG data of shape (num_channels, 5120)
         """
         # Load and process the audio data
@@ -47,6 +48,68 @@ class CustomDataset(Dataset):
 
     def __len__(self):
         return self.total_num
+
+    def sample(self, source, num_2_sample, mode='even', **kwargs):
+        """
+        Sample num_2_sample units from the source
+        Parameters:
+        - source (list): the source to sample from
+        - num_2_sample (int): the number of units to sample
+        - mode (str): the sampling mode, either 'even' or 'dense'
+        - kwargs (dict): additional arguments for the sampling mode
+        Returns:
+        - sample (list): the sampled units
+        """
+        if mode == 'even':
+            return self._sample_even(source, num_2_sample)
+        elif mode == 'dense':
+            interval = kwargs.get('interval', None)
+            if interval is None:
+                raise ValueError("Interval must be provided for dense sampling")
+            return self._sample_dense(source, num_2_sample, interval)
+
+    def _sample_even(self, source, num_2_sample):
+        """
+        Sample num_2_sample units from the source evenly. Random offsets are used to sample the units if
+        len(source) % num_2_sample != 0
+        Parameters:
+        - source (np.ndarray): the source to sample from
+        - num_2_sample (int): the number of units to sample
+        Returns:
+        - sample (np.ndarray): the sampled units
+        """
+        total_len = source.shape[0]
+        dof = total_len % num_2_sample
+
+        if dof == 0:
+            offsets = 0
+        else:
+            offsets = np.random.randint(0, dof)
+        idxs = np.linspace(offsets, total_len - dof + offsets - 1, num_2_sample).astype(int)
+        return source[idxs]
+
+    def _sample_dense(self, source, num_2_sample, interval):
+        """
+        Sample num_2_sample units from the source densely. Random offsets are used to sample the units if
+        len(source) - interval * (num_2_sample - 1) > 0
+        Parameters:
+        - source (np.ndarray): the source to sample from
+        - num_2_sample (int): the number of units to sample
+        - interval (int): the interval between the sampled units
+        Returns:
+        - sample (np.ndarray): the sampled units
+        """
+        total_len = source.shape[0]
+        dof = total_len - interval * (num_2_sample - 1)
+        if dof < 0:
+            raise ValueError("The interval is too large for the number of units to sample")
+
+        if dof == 0:
+            offsets = 0
+        else:
+            offsets = np.random.randint(0, dof)
+        idxs = np.arange(offsets, offsets + interval * (num_2_sample - 1) + 1, interval)
+        return source[idxs]
 
 
 if __name__ == '__main__':

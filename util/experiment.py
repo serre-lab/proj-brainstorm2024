@@ -32,7 +32,8 @@ def get_args():
     arg_parser.add_argument('--batch_size', '-b', type=int, default=10, help="batch size")
     arg_parser.add_argument('--train_ratio', '-tr', type=float, default=0.7,
                             help="the ratio of training data to all data. The rest is validation data")
-    arg_parser.add_argument('--model', '-m', type=str, default='orig', help="the model to use, can be 'orig' or 'cha-first' or 'len-char-first' or 'proj'")
+    arg_parser.add_argument('--seeg_version', '-sv', type=str, default='orig', help="the seeg version to use, can be 'orig' or 'cha-first' or 'len-char-first' or 'proj'")
+    arg_parser.add_argument('--video_version', '-vv', type=str, default='orig', help="the video version to use, can be 'orig', 'lin', or 'proj'")
     arg_parser.add_argument('--num_workers', '-w', type=int, default=4, help="Number of workers for dataloader")
     arg_parser.add_argument('--num_heads', '-nh', type=int, default=6, help="Number of heads for the sEEG encoder")
     arg_parser.add_argument('--num_encoder_layers', '-ne', type=int, default=6, help="number of encoder layers for the "

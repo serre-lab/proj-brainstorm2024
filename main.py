@@ -3,7 +3,7 @@ import torch
 import wandb
 from util.experiment import set_seeds, get_args
 from torch.utils.data import random_split, DataLoader
-from model.videoencoder import VideoEncoder, VideoEncoderProj
+from model.videoencoder import VideoEncoder, VideoEncoderProj, VideoEncoderLin
 from model.seegencoder import SEEGEncoder, SEEGEncoderChaFirst, SEEGEncoderLenChaFirst, SEEGEncoderProj
 from train.train import train
 from eval.eval import eval
@@ -40,28 +40,30 @@ def main(args):
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers)
     test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers)
 
-    model_type = args.model
-
     # Define the video encoder
     print('Creating video encoder ...')
-    ckpt = "MCG-NJU/videomae-base"
-    if model_type != 'proj':
+    video_encoder_ver = args.video_version
+    ckpt = "nateraw/videomae-base-finetuned-ucf101-subset"
+    if video_encoder_ver == 'orig':
         video_encoder = VideoEncoder(ckpt).to(device)
-    else:
+    elif video_encoder_ver == 'lin':
+        video_encoder = VideoEncoderLin(ckpt).to(device)
+    elif video_encoder_ver == 'proj':
         video_encoder = VideoEncoderProj(ckpt).to(device)
 
     # Define the seeg encoder
     print('Creating sEEG encoder ...')
+    seeg_encoder_ver = args.seeg_version
     num_heads = args.num_heads
     num_encoder_layers = args.num_encoder_layers
     dim_feedforward = args.dim_feedforward
-    if model_type == 'orig':
+    if seeg_encoder_ver == 'orig':
         seeg_encoder = SEEGEncoder(num_heads, num_encoder_layers, dim_feedforward).to(device)
-    elif model_type == 'cha-first':
+    elif seeg_encoder_ver == 'cha-first':
         seeg_encoder = SEEGEncoderChaFirst(num_heads, num_encoder_layers, dim_feedforward).to(device)
-    elif model_type == 'len-cha-first':
+    elif seeg_encoder_ver == 'len-cha-first':
         seeg_encoder = SEEGEncoderLenChaFirst(num_heads, num_encoder_layers, dim_feedforward).to(device)
-    elif model_type == 'proj':
+    elif seeg_encoder_ver == 'proj':
         seeg_encoder = SEEGEncoderProj(num_heads, num_encoder_layers, dim_feedforward).to(device)
 
     # Define the optimizer

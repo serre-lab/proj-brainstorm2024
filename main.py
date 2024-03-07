@@ -3,7 +3,7 @@ import torch
 import wandb
 from util.experiment import set_seeds, get_args
 from torch.utils.data import random_split, DataLoader
-from model.videoencoder import VideoEncoder, VideoEncoderProj, VideoEncoderLin
+from model.videoencoder import VideoEncoderCls, VideoEncoderProj, VideoEncoder
 from model.seegencoder import SEEGEncoder, SEEGEncoderChaFirst, SEEGEncoderLenChaFirst, SEEGEncoderProj
 from train.train import train
 from eval.eval import eval
@@ -46,8 +46,8 @@ def main(args):
     ckpt = "nateraw/videomae-base-finetuned-ucf101-subset"
     if video_encoder_ver == 'orig':
         video_encoder = VideoEncoder(ckpt).to(device)
-    elif video_encoder_ver == 'lin':
-        video_encoder = VideoEncoderLin(ckpt).to(device)
+    elif video_encoder_ver == 'cls':
+        video_encoder = VideoEncoderCls(ckpt).to(device)
     elif video_encoder_ver == 'proj':
         video_encoder = VideoEncoderProj(ckpt).to(device)
 

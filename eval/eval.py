@@ -22,7 +22,7 @@ def eval(video_encoder, seeg_encoder, eval_loader, device, split, t):
     video_embeddings = None
     seeg_embeddings = None
 
-    print(f'GPU memory in use: {torch.cuda.memory_allocated() / 1e9:.2f} GB')
+    print_gpu_memory_usage()
 
     with torch.no_grad():
         for video, seeg in tqdm(eval_loader):

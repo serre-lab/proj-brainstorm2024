@@ -84,5 +84,5 @@ if __name__ == '__main__':
     videomae_dataset = VideoMAEDataset(seeg_file, videomae_dir, time_window)
     for i in range(10):
         video, seeg = videomae_dataset[i]
-        assert video.shape == (768)
+        assert video.shape == (768, )
         assert seeg.shape == (84, 2048)

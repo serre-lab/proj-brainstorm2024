@@ -51,7 +51,7 @@ class DinoDataset(BaseDataset):
     """
     def __init__(self, seeg_file, video_dir, time_window):
         dino_file_prefix = 'greenbook_dinos_'
-        super(DinoDataset).__init__(seeg_file, video_dir, len(dino_file_prefix), time_window)
+        super().__init__(seeg_file, video_dir, len(dino_file_prefix), time_window)
 
 
 class VideoMAEDataset(BaseDataset):
@@ -64,7 +64,7 @@ class VideoMAEDataset(BaseDataset):
     """
     def __init__(self, seeg_file, video_dir, time_window):
         videomae_file_prefix = 'greenbook_videomae_'
-        super(VideoMAEDataset).__init__(seeg_file, video_dir, len(videomae_file_prefix), time_window)
+        super().__init__(seeg_file, video_dir, len(videomae_file_prefix), time_window)
 
 
 if __name__ == '__main__':

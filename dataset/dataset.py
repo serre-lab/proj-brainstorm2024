@@ -6,8 +6,9 @@ from torch.utils.data import Dataset
 class BaseDataset(Dataset):
     def __init__(self, seeg_file, video_dir, video_file_prefix_len, time_window):
         # Load the sEEG data
-        self.seeg_data = np.load(seeg_file)[:, :seeg.shape[1] // (time_window * 1024) * (time_window * 1024)].\
-            reshape(84, -1, time_window * 1024).transpose(1, 0, 2).astype(np.float32)
+        self.seeg_data = np.load(seeg_file)
+        self.seeg_data = self.seeg_data[:, :self.seeg_data.shape[1] // (time_window * 1024) * (time_window * 1024)]\
+            .reshape(84, -1, time_window * 1024).transpose(1, 0, 2).astype(np.float32)
 
         # Load the video embeddings
         video_files = glob.glob(video_dir + '/*.npy')

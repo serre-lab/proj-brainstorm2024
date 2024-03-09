@@ -12,6 +12,7 @@ def eval(video_encoder, seeg_encoder, eval_loader, device, split, t):
     video_embeddings = None
     seeg_embeddings = None
 
+
     with torch.no_grad():
         for video, seeg in tqdm(eval_loader):
             video = video.to(device)
@@ -19,6 +20,7 @@ def eval(video_encoder, seeg_encoder, eval_loader, device, split, t):
 
             # Forward
             video_embedding = video_encoder(video)
+
             seeg_embedding = seeg_encoder(seeg)
 
             if video_embeddings is None:
@@ -31,7 +33,8 @@ def eval(video_encoder, seeg_encoder, eval_loader, device, split, t):
         # Flatten video and seeg embeddings
         if len(video_embedding.shape) > 2:
             video_embeddings = video_embeddings.view(video_embeddings.shape[0], -1)
-            seeg_embeddings = seeg_embeddings.reshape(seeg_embeddings.shape[0], -1)
+        if len(seeg_embedding.shape) > 2:
+            seeg_embeddings = seeg_embeddings.view(seeg_embeddings.shape[0], -1)
 
         # Normalize embeddings
         video_embeddings = F.normalize(video_embeddings, p=2, dim=1)

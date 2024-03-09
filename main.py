@@ -3,11 +3,11 @@ import torch
 import wandb
 from util.experiment import set_seeds, get_args
 from torch.utils.data import random_split, DataLoader
-from model.videoencoder import VideoEncoderCls, VideoEncoderProj, VideoEncoder
-from model.seegencoder import SEEGEncoder, SEEGEncoderChaFirst, SEEGEncoderLenChaFirst, SEEGEncoderProj
+from model.videoencoder import VideoEncoderVdFt, VideoEncoderDino
+from model.seegencoder import SEEGEncoder, SEEGEncoderProj
 from train.train import train
 from eval.eval import eval
-from dataset.dataset import CustomDataset
+from dataset.dataset import DinoDataset, VideoMAEDataset
 
 wandb.login(key="99528c40ebd16fca6632e963a943b99ac8a5f4b7")
 
@@ -29,9 +29,14 @@ def main(args):
 
     # Define the datasets and dataloaders
     print('Loading datasets and dataloaders ...')
-    seeg_dir = args.seeg_dir
+    seeg_file = args.seeg_file
     video_dir = args.video_dir
-    dataset = CustomDataset(seeg_dir, video_dir)
+    if 'dino' in video_dir:
+        dataset = DinoDataset(seeg_file, video_dir, 5)
+    elif 'videomae' in video_dir:
+        dataset = VideoMAEDataset(seeg_file, video_dir, 2)
+    else:
+        raise ValueError("The video directory must contain either 'dino' or 'videomae'")
     num_train = int(len(dataset) * args.train_ratio)
     num_val = (len(dataset) - num_train) // 2
     num_test = len(dataset) - num_train - num_val
@@ -42,35 +47,29 @@ def main(args):
 
     # Define the video encoder
     print('Creating video encoder ...')
-    video_encoder_ver = args.video_version
-    ckpt = "nateraw/videomae-base-finetuned-ucf101-subset"
-    if video_encoder_ver == 'orig':
-        video_encoder = VideoEncoder(ckpt).to(device)
-    elif video_encoder_ver == 'cls':
-        video_encoder = VideoEncoderCls(ckpt).to(device)
-    elif video_encoder_ver == 'proj':
-        video_encoder = VideoEncoderProj(ckpt).to(device)
+    video_encoder_ver = args.video_encoder_version
+    if video_encoder_ver == 'vdft':
+        video_encoder = VideoEncoderVdFt().to(device)
+    elif video_encoder_ver == 'dino':
+        video_encoder = VideoEncoderDino().to(device)
+    else:
+        raise ValueError("The video encoder version must be either 'vdft' or 'dino'")
 
     # Define the seeg encoder
     print('Creating sEEG encoder ...')
-    seeg_encoder_ver = args.seeg_version
+    seeg_encoder_ver = args.seeg_encoder_version
     num_heads = args.num_heads
     num_encoder_layers = args.num_encoder_layers
     dim_feedforward = args.dim_feedforward
     if seeg_encoder_ver == 'orig':
         seeg_encoder = SEEGEncoder(num_heads, num_encoder_layers, dim_feedforward).to(device)
-    elif seeg_encoder_ver == 'cha-first':
-        seeg_encoder = SEEGEncoderChaFirst(num_heads, num_encoder_layers, dim_feedforward).to(device)
-    elif seeg_encoder_ver == 'len-cha-first':
-        seeg_encoder = SEEGEncoderLenChaFirst(num_heads, num_encoder_layers, dim_feedforward).to(device)
     elif seeg_encoder_ver == 'proj':
         seeg_encoder = SEEGEncoderProj(num_heads, num_encoder_layers, dim_feedforward).to(device)
+    else:
+        raise ValueError("The sEEG encoder version must be either 'orig' or 'proj'")
 
     # Define the optimizer
-    if any(p.requires_grad for p in video_encoder.parameters()):
-        optimizer = torch.optim.Adam(list(video_encoder.parameters()) + list(seeg_encoder.parameters()), lr=args.lr)
-    else:
-        optimizer = torch.optim.Adam(seeg_encoder.parameters(), lr=args.lr)
+    optimizer = torch.optim.Adam(list(video_encoder.parameters()) + list(seeg_encoder.parameters()), lr=args.lr)
 
     t = args.temperature
 

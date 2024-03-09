@@ -3,32 +3,25 @@ import glob
 from torch.utils.data import Dataset
 
 
-class CustomDataset(Dataset):
-    """
-    Custom dataset for the audio and SEEG data
+class BaseDataset(Dataset):
+    def __init__(self, seeg_file, video_dir, video_file_prefix_len, time_window):
+        # Load the sEEG data
+        self.seeg_data = np.load(seeg_file).reshape(84, -1, time_window * 1024).transpose(1, 0, 2).astype(np.float32)
 
-    Parameters:
-    - seeg_dir (str): path to the directory containing the sEEG data
-    - video_dir (str): path to the directory containing the video data
-    """
-    def __init__(self, seeg_dir, video_dir, num_frame_2_sample=16):
-        super(CustomDataset).__init__()
-        # Load the sEEG
-        self.seeg_data = []
-        seeg_files = glob.glob(seeg_dir + '/*.npy')
-        seeg_files.sort(key=lambda x: int(x.split('/')[-1].split('.')[0][5:]))
-        self.seeg_files = seeg_files
-
-        # Load and process the video data
-        self.video_data = []
-        self.num_frame_2_sample = num_frame_2_sample
+        # Load the video embeddings
         video_files = glob.glob(video_dir + '/*.npy')
-        video_files.sort(key=lambda x: int(x.split('/')[-1].split('.')[0][19:]))
-        self.video_files = video_files
+        video_files.sort(key=lambda x: int(x.replace('\\', '/').split('/')[-1].split('.')[0][video_file_prefix_len:]))
+        for video_file in video_files:
+            video = np.load(video_file).astype(np.float32)
+            self.video_data = video[None, :] if not hasattr(self, 'video_data') \
+                else np.concatenate([self.video_data, video[None, :]], axis=0)
 
-        assert len(self.seeg_files) == len(self.video_files)
+        min_len = min(self.seeg_data.shape[0], self.video_data.shape[0])
+        self.seeg_data = self.seeg_data[:min_len]
+        self.video_data = self.video_data[:min_len]
+        print(f'Initialized dataset with {min_len} samples')
 
-        self.total_num = len(self.video_files)
+        self.total_num = min_len
 
     def __getitem__(self, index):
         """
@@ -36,62 +29,58 @@ class CustomDataset(Dataset):
         - index (int): index of the data to retrieve
 
         Returns:
-        - video (torch.Tensor): the video data of shape (self.num_frame_2_sample, 3, 224, 224)
+        - video (torch.Tensor): the video embedding data of shape(150, 768)
         - seeg (torch.Tensor): the sEEG data of shape (num_channels, 5120)
         """
         # Load and process the audio data
-        video_file = self.video_files[index]
-        video = np.load(video_file, allow_pickle=True)
-        video = self.sample_frames(video)
-        see_file = self.seeg_files[index]
-        seeg = np.load(see_file, allow_pickle=True)
-        return video.astype('float32'), seeg.astype('float32')
+        video = self.video_data[index]
+        seeg = self.seeg_data[index]
+        return video, seeg
 
     def __len__(self):
         return self.total_num
 
-    # def sample_frames(self, video_array,dense=False):
-    #     """
-    #     Sample a given number of frames from the video array evenly.
-    #     Parameters:
-    #     - video_array (np.ndarray): the video data of shape (num_frames, 3, 224, 224)
 
-    #     Returns:
-    #     - video (np.ndarray): the sampled video data of shape (num_frame_2_sample, 3, 224, 224)
-    #     """
-    #     offset = np.random.randint(0, 10)
-    #     indices = np.linspace(offset, video_array.shape[0] - 10 + offset, num=self.num_frame_2_sample).astype(int)
-    #     return video_array[indices]
+class DinoDataset(BaseDataset):
+    """
+    Custom dataset for the Dino embeddings and sEEG data
+
+    Parameters:
+    - seeg_file (str): path to the sEEG data file
+    - video_dir (str): path to the directory containing the Dino embeddings
+    """
+    def __init__(self, seeg_file, video_dir, time_window):
+        dino_file_prefix = 'greenbook_dinos_'
+        super(DinoDataset).__init__(seeg_file, video_dir, len(dino_file_prefix), time_window)
 
 
+class VideoMAEDataset(BaseDataset):
+    """
+    Custom dataset for the VideoMAE embeddings and sEEG data
 
-    def sample_frames(self, video_array, stride=4, dense=False):
-        """
-        Randomly selects `num_frames` from the video array with a temporal stride of `stride`.
-        
-        Parameters:
-        - video_array (np.ndarray): The video data of shape (num_frames, 3, 224, 224).
-        - stride (int): Temporal stride between frames. Default is 4.
-        - dense (bool): If True, sample densely. This parameter is kept for compatibility.
-    
-        Returns:
-        - video (np.ndarray): The sampled video data of shape (num_frames, 3, 224, 224).
-        """
-        max_start_index = video_array.shape[0] - stride * (self.num_frame_2_sample - 1)
-        if max_start_index <= 0:
-            # If the video is too short, return the original video array or handle appropriately
-            print("Warning: Video is too short to sample with the given stride and number of frames.")
-            return video_array
-    
-        start_index = np.random.randint(0, max_start_index)
-        indices = np.arange(start_index, start_index + stride * self.num_frame_2_sample, stride)
-        return video_array[indices]
-
+    Parameters:
+    - seeg_file (str): path to the sEEG data file
+    - video_dir (str): path to the directory containing the VideoMAE embeddings
+    """
+    def __init__(self, seeg_file, video_dir, time_window):
+        videomae_file_prefix = 'greenbook_videomae_'
+        super(VideoMAEDataset).__init__(seeg_file, video_dir, len(videomae_file_prefix), time_window)
 
 
 if __name__ == '__main__':
-    from util.experiment import get_args
-    args = get_args()
-    seeg_dir = args.seeg_dir
-    video_dir = args.video_dir
-    dataset = CustomDataset(seeg_dir, video_dir)
+    seeg_file = '/gpfs/data/tserre/Shared/Brainstorm_2024/all_seeg_data.npy'
+    dino_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_dinos'
+    time_window = 5
+    dino_dataset = DinoDataset(seeg_file, dino_dir, time_window)
+    for i in range(10):
+        video, seeg = dino_dataset[i]
+        assert video.shape == (150, 768)
+        assert seeg.shape == (84, 5120)
+
+    videomae_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_videomae_features_2s'
+    time_window = 2
+    videomae_dataset = VideoMAEDataset(seeg_file, videomae_dir, time_window)
+    for i in range(10):
+        video, seeg = videomae_dataset[i]
+        assert video.shape == (768)
+        assert seeg.shape == (84, 2048)

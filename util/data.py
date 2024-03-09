@@ -1,104 +1,129 @@
 import av
+import torch
+import glob
+import os
+from tqdm import tqdm
 import numpy as np
-from transformers import VideoMAEImageProcessor
+from util.model import VideoMAECls
 
 
-# The following function is adapted from the Hugging Face Transformers documentation.
-# Source: Transformers: VideoMAEModel Documentation
-# URL: https://huggingface.co/docs/transformers/model_doc/videomae#transformers.VideoMAEModel.forward.example
-def get_frames(container, indices):
+def extract_videomae_features(frame_dir, output_dir, num_frame_2_sample=16, interval=1):
     """
-    Get frames of given indices from a PyAV container.
-
+    Extract VideoMAE features from the preprocessed video frames
     Parameters:
-    - container (`av.container.input.InputContainer`): PyAV container.
-    - indices (`List[int]`): List of frame indices to decode.
-
+    - frame_dir (str): the directory containing the preprocessed video frames
+    - output_dir (str): the directory to save the extracted features
+    - num_frame_2_sample (int): the number of frames to sample from each video
+    - interval (int): the interval between the sampled frames
     Returns:
-        result (`np.ndarray`): np array of decoded frames of shape (num_frames, height, width, 3).
+    - features (np.ndarray): the extracted features
     """
-    frames = []
-    container.seek(0)
-    end_index = indices[-1]
-    for i, frame in enumerate(container.decode(video=0)):
-        if i > end_index:
-            break
-        if i in indices:
-            frames.append(frame)
-    return np.stack([x.to_ndarray(format="rgb24") for x in frames])
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = VideoMAECls.from_pretrained("sayakpaul/videomae-base-finetuned-kinetics-finetuned-ucf101-subset").to(device)
+    frame_file_prefix = 'greenbook_videomae_'
+    frame_files = glob.glob(frame_dir + '/*.npy')
+    frame_files.sort(key=lambda x: int(x.replace('\\', '/').split('/')[-1].split('.')[0][len(frame_file_prefix):]))
+
+    counter = 0
+    for i in tqdm(range(len(frame_files))):
+        if i % 2 != 0:
+            continue
+        if i + 1 >= len(frame_files):
+            frames = np.load(frame_files[i])[:120].reshape(2, 60, 3, 224, 224)
+        else:
+            frames_1 = np.load(frame_files[i])
+            frames_2 = np.load(frame_files[i + 1])
+            frames = np.concatenate([frames_1, frames_2], axis=0).reshape(5, 60, 3, 224, 224)
+
+        inputs = None
+        for input in frames:
+            # Sample the middlemost frames
+            input = Sampler.sample(input, num_frame_2_sample, mode='dense', interval=interval,
+                                   start_idx=30 - num_frame_2_sample // 2)
+            inputs = input[None, :] if inputs is None else np.concatenate([inputs, input[None, :]], axis=0)
+
+        inputs = torch.tensor(inputs).to(device)
+        with torch.no_grad():
+            features = model(inputs).cpu().numpy()
+
+        for feature in features:
+            np.save(os.path.join(output_dir, f'greenbook_videomae_{counter}.npy'), feature)
+            counter += 1
 
 
-# The following function is adapted from the Hugging Face Transformers documentation.
-# Source: Transformers: VideoMAEModel Documentation
-# URL: https://huggingface.co/docs/transformers/model_doc/videomae#transformers.VideoMAEModel.forward.example
-def sample_frame_indices(num_frame_2_sample, frame_sample_rate, max_end_frame_idx):
-    """
-    Sample a given number of frame indices.
+class Sampler:
+    @staticmethod
+    def sample(source, num_2_sample, mode='even', **kwargs):
+        """
+        Sample num_2_sample units from the source
+        Parameters:
+        - source (list): the source to sample from
+        - num_2_sample (int): the number of units to sample
+        - mode (str): the sampling mode, either 'even' or 'dense'
+        - kwargs (dict): additional arguments for the sampling mode
+        Returns:
+        - sample (list): the sampled units
+        """
+        if mode == 'even':
+            return Sampler._sample_even(source, num_2_sample)
+        elif mode == 'dense':
+            interval = kwargs.get('interval', None)
+            if interval is None:
+                raise ValueError("Interval must be provided for dense sampling")
+            start_idx = kwargs.get('start_idx', None)
+            return Sampler._sample_dense(source, num_2_sample, interval, start_idx)
 
-    Parameters:
-        num_frame_2_sample (`int`): Total number of frames to sample.
-        frame_sample_rate (`int`): Sample every n-th frame.
-        max_end_frame_idx (`int`): Maximum allowed index of sample's last frame.
+    @staticmethod
+    def _sample_even(source, num_2_sample):
+        """
+        Sample num_2_sample units from the source evenly. Random offsets are used to sample the units if
+        len(source) % num_2_sample != 0
+        Parameters:
+        - source (np.ndarray): the source to sample from
+        - num_2_sample (int): the number of units to sample
+        Returns:
+        - sample (np.ndarray): the sampled units
+        """
+        total_len = source.shape[0]
+        dof = total_len % num_2_sample
 
-    Returns:
-        indices (`List[int]`): List of sampled frame indices.
-    """
-    total_num_frame = int(num_frame_2_sample * frame_sample_rate)
-    end_idx = np.random.randint(total_num_frame, max_end_frame_idx)
-    start_idx = end_idx - total_num_frame
-    indices = np.linspace(start_idx, end_idx - 1, num=num_frame_2_sample).astype(int)
-    return indices
+        if dof == 0:
+            offsets = 0
+        else:
+            offsets = np.random.randint(0, dof)
+        idxs = np.linspace(offsets, total_len - dof + offsets - 1, num_2_sample).astype(int)
+        return source[idxs]
 
+    @staticmethod
+    def _sample_dense(source, num_2_sample, interval, start_idx=None):
+        """
+        Sample num_2_sample units from the source densely. Random offsets are used to sample the units if
+        len(source) - interval * (num_2_sample - 1) > 0
+        Parameters:
+        - source (np.ndarray): the source to sample from
+        - num_2_sample (int): the number of units to sample
+        - interval (int): the interval between the sampled units
+        - start_idx (int): the starting index of the sampling, optional
+        Returns:
+        - sample (np.ndarray): the sampled units
+        """
+        total_len = source.shape[0]
+        dof = total_len - interval * (num_2_sample - 1)
+        if dof < 0:
+            raise ValueError("The interval is too large for the number of units to sample")
 
-def sample_frames_indices_adaptive(num_total_frame, num_frame_2_sample):
-    """
-    Sample a given number of frame indices adaptively to the video length.
-
-    Parameters:
-        num_total_frame (`int`): Total number of frames in the video.
-        num_frame_2_sample (`int`): Total number of frames to sample.
-
-    Returns:
-        indices (`List[int]`): List of sampled frame indices.
-    """
-    indices = np.linspace(0, num_total_frame - 1, num=num_frame_2_sample).astype(int)
-    return indices
-
-
-def process_video(file_path, ckpt, num_frame_2_sample=16):
-    """
-    Process a video file and return a processed video(i.e. frames) for VideoMAEModel.
-
-    Parameters:
-        file_path (`str`): Path to the video file.
-        ckpt (`str`): The checkpoint of VideoMAEImageProcessor to use.
-
-    Returns:
-        input torch.Tensor: Processed video for VideoMAEModel, which is a tensor of shape
-        (num_frame_2_sample, 3, 224, 224)
-    """
-    container = av.open(file_path)
-
-    # Get `num_frame_2_sample` frame indices
-    indices = sample_frames_indices_adaptive(num_total_frame=container.streams.video[0].frames,
-                                             num_frame_2_sample=num_frame_2_sample)
-
-    # Get frames of given indices
-    frames = get_frames(container, indices)
-
-    # Process frames and return the input dict
-    image_processor = VideoMAEImageProcessor.from_pretrained(ckpt)
-    video = image_processor(list(frames), return_tensors="pt")['pixel_values'][0]
-    return video
+        if start_idx:
+            offsets = start_idx
+        else:
+            if dof == 0:
+                offsets = 0
+            else:
+                offsets = np.random.randint(0, dof)
+        idxs = np.arange(offsets, offsets + interval * (num_2_sample - 1) + 1, interval)
+        return source[idxs]
 
 
 if __name__ == '__main__':
-    import torch
-    import glob
-
-    ckpt = "MCG-NJU/videomae-base"
-    num_frame_2_sample = 16
-    video_paths = glob.glob('../data/dev/Movie Clips/*.avi')
-    inputs = [process_video(video_path, ckpt, num_frame_2_sample) for video_path in video_paths]
-    batched_inputs = torch.stack(inputs, dim=0)
-    assert batched_inputs.shape == (len(video_paths), num_frame_2_sample, 3, 224, 224)
+    frame_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_videomae_preprocessed_frames'
+    output_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_videomae_features_2s'
+    extract_videomae_features(frame_dir, output_dir, num_frame_2_sample=16, interval=1)

@@ -1,14 +1,12 @@
 import av
 import numpy as np
 from transformers import VideoMAEImageProcessor
-from transformers import AutoImageProcessor, AutoModel
 import torch
 from torchvision import transforms
 from PIL import Image
 import os
-
-from scipy import signal
 from scipy.signal import iirnotch, filtfilt, butter
+
 
 def get_frames(file_path):
     container = av.open(file_path)
@@ -40,10 +38,6 @@ def videomae_preprocess(avi_path, ckpt="MCG-NJU/videomae-base"):
     os.makedirs('greenbook_videomae', exist_ok=True)
     for i, window in enumerate(video_data):
         np.save(f'greenbook_videomae/greenbook_videomae_{i:02d}.npy', window)
-
-
-
-
 
 
 def seeg_preprocess(seeg_path):
@@ -87,6 +81,7 @@ def apply_filters(data, fs, notch_freq=60.0, quality_factor=30, lowcut=0.1, high
 
     return filtered_data
 
+
 # Function to apply the filters to each channel of the data
 def filter_all_channels(data, fs):
     # Assuming data shape is (channels, samples)
@@ -94,6 +89,7 @@ def filter_all_channels(data, fs):
     for i in range(data.shape[0]):
         filtered_data[i] = apply_filters(data[i], fs)
     return filtered_data
+
 
 def filter_all_seeg(directory,new_directory):
     files = os.listdir(directory)  # List all files in the directory
@@ -115,6 +111,7 @@ def filter_all_seeg(directory,new_directory):
             
             # Save the filtered data with the new filename
             np.save(filtered_file_path, filtered_seeg_data)
+
 
 def dinos_preprocess(avi_path):
     transform = transforms.Compose([
@@ -155,15 +152,26 @@ def dinos_preprocess(avi_path):
         torch.save(window, f'greenbook_dinos/greenbook_dinos_{i:02d}.pt')
 
 
+def dino_reprocess(avi_path):
+    # load back each embedding
+    # from greenbook_dinos_00.pt to greenbook_dinos_1468.pt
+    # save each embedding as a separate file into numpy
+    os.makedirs('greenbook_dinos', exist_ok=True)
+    for i in range(1469):
+        file_path = avi_path + f'/greenbook_dinos/greenbook_dinos_{i:02d}.pt'
+        frame_embedding = torch.load(file_path)
+        frame_embedding = frame_embedding.numpy()
+        np.save(f'greenbook_dinos/greenbook_dinos_{i:02d}.npy', frame_embedding)
+
+
 if __name__ == "__main__":
-    videomae_preprocess('/users/ycheng70/data/ycheng70/proj-brainstorm2024/data/green_book')
-    seeg_preprocess('/users/ycheng70/data/ycheng70/proj-brainstorm2024/data/seeg_contacts.npy')
-    dinos_preprocess('/users/ycheng70/data/ycheng70/proj-brainstorm2024/data/green_book')
-
-    directory = '/gpfs/data/tserre/Shared/Brainstorm_2024/seeg/' 
-    new_directory = '/gpfs/data/tserre/Shared/Brainstorm_2024/cleaned_seeg/'
-    filter_all_seeg(directory,new_directory)
-
-   
-    
-
+    # videomae_preprocess('/users/ycheng70/data/ycheng70/proj-brainstorm2024/data/green_book')
+    # seeg_preprocess('/users/ycheng70/data/ycheng70/proj-brainstorm2024/data/seeg_contacts.npy')
+    # dinos_preprocess('/users/ycheng70/data/ycheng70/proj-brainstorm2024/data/green_book')
+    #
+    # directory = '/gpfs/data/tserre/Shared/Brainstorm_2024/seeg/'
+    # new_directory = '/gpfs/data/tserre/Shared/Brainstorm_2024/cleaned_seeg/'
+    # filter_all_seeg(directory,new_directory)
+    #
+    # dino_reprocess('/users/ycheng70/data/ycheng70/proj-brainstorm2024/')
+    pass

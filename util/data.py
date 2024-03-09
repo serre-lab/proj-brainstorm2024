@@ -18,6 +18,9 @@ def extract_videomae_features(frame_dir, output_dir, num_frame_2_sample=16, inte
     Returns:
     - features (np.ndarray): the extracted features
     """
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = VideoMAECls.from_pretrained("sayakpaul/videomae-base-finetuned-kinetics-finetuned-ucf101-subset").to(device)
     frame_file_prefix = 'greenbook_videomae_'

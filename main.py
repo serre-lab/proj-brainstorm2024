@@ -61,11 +61,13 @@ def main(args):
     num_heads = args.num_heads
     num_encoder_layers = args.num_encoder_layers
     dim_feedforward = args.dim_feedforward
+    input_length = args.seeg_len
+    num_input_channels = args.seeg_num_channels
     if seeg_encoder_ver == 'orig':
-        seeg_encoder = SEEGEncoder(num_heads, num_encoder_layers, dim_feedforward).to(device)
+        seeg_encoder = SEEGEncoder(num_heads, num_encoder_layers, dim_feedforward, num_input_channels, input_length).to(device)
     elif seeg_encoder_ver == 'proj':
         c = args.seeg_encoder_proj_c
-        seeg_encoder = SEEGEncoderProj(num_heads, num_encoder_layers, dim_feedforward, c).to(device)
+        seeg_encoder = SEEGEncoderProj(num_heads, num_encoder_layers, dim_feedforward, c, num_input_channels, input_length).to(device)
     else:
         raise ValueError("The sEEG encoder version must be either 'orig' or 'proj'")
 

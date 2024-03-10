@@ -11,9 +11,7 @@ class SEEGEncoder(nn.Module):
     - num_encoder_layers (int): The number of encoder layers in the transformer.
     - dim_feedforward (int): The dimension of the feedforward network in the transformer.
     - num_input_channels (int): The number of input channels in the sEEG data.
-    - num_output_channels (int): The number of output channels.
     - input_length (int): The length of the padded input sequence.
-    - output_length (int): The length of the output sequence.
     """
     def __init__(self, num_heads=2, num_encoder_layers=6, dim_feedforward=2048,
                  num_input_channels=84, input_length=5120):
@@ -56,33 +54,32 @@ class SEEGEncoderProj(nn.Module):
     """
     A Transformer Encoder for sEEG data.
     Parameters:
-    - num_input_channels (int): The number of input channels in the sEEG data.
-    - num_output_channels (int): The number of output channels.
-    - input_length (int): The length of the padded input sequence.
-    - output_length (int): The length of the output sequence.
     - num_heads (int): The number of heads in the multi-head attention.
     - num_encoder_layers (int): The number of encoder layers in the transformer.
     - dim_feedforward (int): The dimension of the feedforward network in the transformer.
+    - c (int): The number of time steps to group together.
+    - num_input_channels (int): The number of input channels in the sEEG data.
+    - input_length (int): The length of the padded input sequence.
     """
-    def __init__(self, num_heads=6, num_encoder_layers=6, dim_feedforward=2048,
+    def __init__(self, num_heads=6, num_encoder_layers=6, dim_feedforward=2048, c=10,
                  num_input_channels=84, input_length=5120):
         super().__init__()
 
         num_output_channels = 768
-        c = 10
+        self.c = 10
 
         # Positional encoding
-        positional_encoding = gen_pos_encoding(int((input_length / c) + 1), num_input_channels * c)
+        positional_encoding = gen_pos_encoding(int((input_length / self.c) + 1), num_input_channels * self.c)
         self.register_buffer('positional_encoding', positional_encoding)
 
         # Transformer encoder
-        encoder_layer = nn.TransformerEncoderLayer(d_model=num_input_channels * c, nhead=num_heads,
+        encoder_layer = nn.TransformerEncoderLayer(d_model=num_input_channels * self.c, nhead=num_heads,
                                                    dim_feedforward=dim_feedforward, batch_first=True)
         self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=num_encoder_layers)
 
-        self.cls_token = nn.Parameter(torch.zeros(1, 1, num_input_channels * c))
+        self.cls_token = nn.Parameter(torch.zeros(1, 1, num_input_channels *self. c))
 
-        self.proj_layer = nn.Linear(num_input_channels * c, num_output_channels)
+        self.proj_layer = nn.Linear(num_input_channels * self.c, num_output_channels)
 
     def forward(self, x):
         """
@@ -92,7 +89,7 @@ class SEEGEncoderProj(nn.Module):
         - x (torch.Tensor): A (batch_size, num_output_channels) tensor containing the sEEG embedding.
         """
         # Reshape the input to (batch_size, input_length / c, num_input_channels * c)
-        x = x.view(x.shape[0], x.shape[1], -1, 10)
+        x = x.view(x.shape[0], x.shape[1], -1, self.c)
         x = x.permute(0, 2, 1, 3)
         x = x.reshape(x.shape[0], x.shape[1], -1)
 

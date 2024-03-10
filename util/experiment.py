@@ -46,6 +46,7 @@ def get_args():
                             help="the ratio of training data to all data. The rest is validation data")
     # arg_parser.add_argument('--time_window', '-tw', type=int, default=5, help="the time window for the data")
     arg_parser.add_argument('--seeg_encoder_version', '-sv', type=str, default='orig', help="the seeg version to use, can be 'orig' or 'proj'")
+    arg_parser.add_argument('--seeg_encoder_proj_c', '-sc', type=int, default=10, help="the c parameter for the proj sEEG encoder")
     arg_parser.add_argument('--video_encoder_version', '-vv', type=str, default='dino', help="the video version to use, can be 'vdft' or 'dino'")
     arg_parser.add_argument('--num_workers', '-w', type=int, default=4, help="Number of workers for dataloader")
     arg_parser.add_argument('--num_heads', '-nh', type=int, default=6, help="Number of heads for the sEEG encoder")

@@ -66,7 +66,7 @@ class SEEGEncoderProj(nn.Module):
         super().__init__()
 
         num_output_channels = 768
-        self.c = 10
+        self.c = c
 
         # Positional encoding
         positional_encoding = gen_pos_encoding(int((input_length / self.c) + 1), num_input_channels * self.c)

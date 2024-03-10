@@ -69,7 +69,7 @@ class SEEGEncoderProj(nn.Module):
         self.c = c
 
         # Positional encoding
-        positional_encoding = gen_pos_encoding(int((input_length / self.c) + 1), num_input_channels * self.c)
+        positional_encoding = gen_pos_encoding((input_length / self.c + 1), num_input_channels * self.c)
         self.register_buffer('positional_encoding', positional_encoding)
 
         # Transformer encoder
@@ -77,7 +77,7 @@ class SEEGEncoderProj(nn.Module):
                                                    dim_feedforward=dim_feedforward, batch_first=True)
         self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=num_encoder_layers)
 
-        self.cls_token = nn.Parameter(torch.zeros(1, 1, num_input_channels *self. c))
+        self.cls_token = nn.Parameter(torch.zeros(1, 1, num_input_channels * self.c))
 
         self.proj_layer = nn.Linear(num_input_channels * self.c, num_output_channels)
 

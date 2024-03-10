@@ -69,7 +69,7 @@ class SEEGEncoderProj(nn.Module):
         self.c = c
 
         # Positional encoding
-        positional_encoding = gen_pos_encoding((input_length / self.c + 1), num_input_channels * self.c)
+        positional_encoding = gen_pos_encoding(int(input_length / self.c + 1), num_input_channels * self.c)
         self.register_buffer('positional_encoding', positional_encoding)
 
         # Transformer encoder

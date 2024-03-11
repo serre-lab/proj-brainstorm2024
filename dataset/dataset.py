@@ -12,7 +12,7 @@ class BaseDataset(Dataset):
             .reshape(84, -1, time_window * 1024).transpose(1, 0, 2).astype(np.float32)
         if sample_rate != 1:
             self.seeg_data = self.seeg_data.transpose(2, 0, 1)
-            self.seeg_data = Sampler.sample(self.seeg_data, self.seeg_data[0] // sample_rate, mode='even')
+            self.seeg_data = Sampler.sample(self.seeg_data, self.seeg_data.shape[0] // sample_rate, mode='even')
             self.seeg_data = self.seeg_data.transpose(2, 0, 1)
 
         # Load the video embeddings

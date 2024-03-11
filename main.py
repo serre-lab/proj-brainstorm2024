@@ -32,7 +32,7 @@ def main(args):
     seeg_file = args.seeg_file
     video_dir = args.video_dir
     if 'dino' in video_dir:
-        dataset = DinoDataset(seeg_file, video_dir, 5)
+        dataset = DinoDataset(seeg_file, video_dir, 5, sample_rate=args.sample_rate)
     elif 'videomae' in video_dir:
         dataset = VideoMAEDataset(seeg_file, video_dir, 2)
     else:

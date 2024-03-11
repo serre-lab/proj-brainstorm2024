@@ -54,6 +54,48 @@ def extract_videomae_features(frame_dir, output_dir, num_frame_2_sample=16, inte
             counter += 1
 
 
+def extract_dino_features(frame_dir, output_dir, num_frame_2_sample=16, interval=1):
+    """
+    Extract Dino features from the preprocessed video frames
+    Parameters:
+    - frame_dir (str): the directory containing the preprocessed video frames
+    - output_dir (str): the directory to save the extracted features
+    - num_frame_2_sample (int): the number of frames to sample from each video
+    - interval (int): the interval between the sampled frames
+    Returns:
+    - features (np.ndarray): the extracted features
+    """
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    frame_file_prefix = 'greenbook_dinos_'
+    frame_files = glob.glob(frame_dir + '/*.npy')
+    frame_files.sort(key=lambda x: int(x.replace('\\', '/').split('/')[-1].split('.')[0][len(frame_file_prefix):]))
+
+    counter = 0
+    for i in tqdm(range(len(frame_files))):
+        if i % 2 != 0:
+            continue
+        if i + 1 >= len(frame_files):
+            frames = np.load(frame_files[i])[:120].reshape(2, 60, 768)
+        else:
+            frames_1 = np.load(frame_files[i])
+            frames_2 = np.load(frame_files[i + 1])
+            frames = np.concatenate([frames_1, frames_2], axis=0).reshape(5, 60, 768)
+
+        inputs = None
+        for input in frames:
+            # Sample the middlemost frames
+            input = Sampler.sample(input, num_frame_2_sample, mode='dense', interval=interval,
+                                   start_idx=30 - num_frame_2_sample // 2)
+            inputs = input[None, :] if inputs is None else np.concatenate([inputs, input[None, :]], axis=0)
+
+        for input in inputs:
+            print(input.shape)
+            # np.save(os.path.join(output_dir, f'greenbook_dinos_{counter}.npy'), input)
+            counter += 1
+
+
 class Sampler:
     @staticmethod
     def sample(source, num_2_sample, mode='even', **kwargs):

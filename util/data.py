@@ -83,18 +83,9 @@ def extract_dino_features(frame_dir, output_dir, num_frame_2_sample=16, interval
             frames_2 = np.load(frame_files[i + 1])
             frames = np.concatenate([frames_1, frames_2], axis=0).reshape(5, 60, 768)
 
-        inputs = None
-        for input in frames:
-            # Sample the middlemost frames
-            input = Sampler.sample(input, num_frame_2_sample, mode='dense', interval=interval,
-                                   start_idx=30 - num_frame_2_sample // 2)
-            inputs = input[None, :] if inputs is None else np.concatenate([inputs, input[None, :]], axis=0)
-
-        for input in inputs:
-            print(input.shape)
-            # np.save(os.path.join(output_dir, f'greenbook_dinos_{counter}.npy'), input)
+        for frame in frames:
+            np.save(os.path.join(output_dir, f'greenbook_dinos_{counter}.npy'), frame)
             counter += 1
-    print(counter)
 
 
 class Sampler:

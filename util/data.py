@@ -94,6 +94,7 @@ def extract_dino_features(frame_dir, output_dir, num_frame_2_sample=16, interval
             print(input.shape)
             # np.save(os.path.join(output_dir, f'greenbook_dinos_{counter}.npy'), input)
             counter += 1
+    print(counter)
 
 
 class Sampler:
@@ -169,6 +170,10 @@ class Sampler:
 
 
 if __name__ == '__main__':
-    frame_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_videomae_preprocessed_frames'
-    output_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_videomae_features_2s'
-    extract_videomae_features(frame_dir, output_dir, num_frame_2_sample=16, interval=1)
+    # frame_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_videomae_preprocessed_frames'
+    # output_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_videomae_features_2s'
+    # extract_videomae_features(frame_dir, output_dir, num_frame_2_sample=16, interval=1)
+
+    frame_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_dinos'
+    output_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_dinos_2s'
+    extract_dino_features(frame_dir, output_dir, num_frame_2_sample=16, interval=1)

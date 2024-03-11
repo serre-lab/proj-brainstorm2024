@@ -11,9 +11,9 @@ class BaseDataset(Dataset):
         self.seeg_data = self.seeg_data[:, :self.seeg_data.shape[1] // (time_window * 1024) * (time_window * 1024)]\
             .reshape(84, -1, time_window * 1024).transpose(1, 0, 2).astype(np.float32)
         if sample_rate != 1:
-            self.seeg_data = self.seeg_data.permute(2, 0, 1)
+            self.seeg_data = self.seeg_data.transpose(2, 0, 1)
             self.seeg_data = Sampler.sample(self.seeg_data, sample_rate, mode='even')
-            self.seeg_data = self.seeg_data.permute(1, 2, 0)
+            self.seeg_data = self.seeg_data.transpose(2, 0, 1)
 
         # Load the video embeddings
         video_files = glob.glob(video_dir + '/*.npy')

@@ -45,7 +45,7 @@ def get_args():
     arg_parser.add_argument('--train_ratio', '-tr', type=float, default=0.7,
                             help="the ratio of training data to all data. The rest is validation data")
     arg_parser.add_argument('--sample_rate', '-sr', type=int, default=1, help="the sample rate for the seeg data")
-    # arg_parser.add_argument('--time_window', '-tw', type=int, default=5, help="the time window for the data")
+    arg_parser.add_argument('--time_window', '-tw', type=int, default=5, help="the time window for the data")
     arg_parser.add_argument('--seeg_encoder_version', '-sv', type=str, default='orig', help="the seeg version to use, can be 'orig' or 'proj'")
     arg_parser.add_argument('--seeg_encoder_proj_c', '-sec', type=int, default=10, help="the c parameter for the proj sEEG encoder")
     arg_parser.add_argument('--seeg_len', '-sl', type=int, default=5120, help="the length of the sEEG data")

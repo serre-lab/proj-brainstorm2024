@@ -19,9 +19,9 @@ class VideoEncoderDino(nn.Module):
     """
     Video Encoder for the DINO features
     """
-    def __init__(self):
+    def __init__(self, input_dim):
         super().__init__()
-        self.linear = nn.Linear(150, 1)
+        self.linear = nn.Linear(input_dim, 1)
         self.proj = nn.Linear(768, 768)
 
     def forward(self, x):

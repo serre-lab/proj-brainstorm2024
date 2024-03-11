@@ -52,7 +52,8 @@ def main(args):
     if video_encoder_ver == 'vdft':
         video_encoder = VideoEncoderVdFt().to(device)
     elif video_encoder_ver == 'dino':
-        video_encoder = VideoEncoderDino().to(device)
+        input_dim = time_window * 30
+        video_encoder = VideoEncoderDino(input_dim).to(device)
     else:
         raise ValueError("The video encoder version must be either 'vdft' or 'dino'")
 

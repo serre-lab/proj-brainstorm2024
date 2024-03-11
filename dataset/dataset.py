@@ -10,10 +10,8 @@ class BaseDataset(Dataset):
         self.seeg_data = np.load(seeg_file)
         self.seeg_data = self.seeg_data[:, :self.seeg_data.shape[1] // (time_window * 1024) * (time_window * 1024)]\
             .reshape(84, -1, time_window * 1024).transpose(1, 0, 2).astype(np.float32)
-        if sample_rate != 1:
-            self.seeg_data = self.seeg_data.transpose(2, 0, 1)
-            self.seeg_data = Sampler.sample(self.seeg_data, self.seeg_data.shape[0] // sample_rate, mode='even')
-            self.seeg_data = self.seeg_data.transpose(1, 2, 0)
+
+        self.num_frame_2_sample = self.seeg_data.shape[2] // sample_rate
 
         # Load the video embeddings
         video_files = glob.glob(video_dir + '/*.npy')
@@ -37,11 +35,14 @@ class BaseDataset(Dataset):
 
         Returns:
         - video (torch.Tensor): the video embedding data of shape(150, 768)
-        - seeg (torch.Tensor): the sEEG data of shape (num_channels, 5120)
+        - seeg (torch.Tensor): the sEEG data of shape (num_channels, num_frame_2_sample)
         """
         # Load and process the audio data
         video = self.video_data[index]
         seeg = self.seeg_data[index]
+        seeg = seeg.transpose(1, 0)
+        seeg = Sampler.sample(seeg, self.num_frame_2_sample, mode='even')
+        seeg = seeg.transpose(1, 0)
         return video, seeg
 
     def __len__(self):

@@ -2,7 +2,7 @@ import os
 import torch
 import wandb
 from util.experiment import set_seeds, get_args
-from torch.utils.data import random_split, DataLoader
+from torch.utils.data import random_split, DataLoader, Subset
 from model.videoencoder import VideoEncoderVdFt, VideoEncoderDino
 from model.seegencoder import SEEGEncoder, SEEGEncoderProj
 from train.train import train
@@ -40,8 +40,14 @@ def main(args):
         raise ValueError("The video directory must contain either 'dino' or 'videomae'")
     num_train = int(len(dataset) * args.train_ratio)
     num_val = (len(dataset) - num_train) // 2
-    num_test = len(dataset) - num_train - num_val
-    train_dataset, val_dataset, test_dataset = random_split(dataset, [num_train, num_val, num_test])
+    # num_test = len(dataset) - num_train - num_val
+    # train_dataset, val_dataset, test_dataset = random_split(dataset, [num_train, num_val, num_test])
+    train_indices = list(range(num_train))
+    val_indices = list(range(num_train, num_train + num_val))
+    test_indices = list(range(num_train + num_val, len(dataset)))
+    train_dataset = Subset(dataset, train_indices)
+    val_dataset = Subset(dataset, val_indices)
+    test_dataset = Subset(dataset, test_indices)
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers, drop_last=True)
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers)
     test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers)

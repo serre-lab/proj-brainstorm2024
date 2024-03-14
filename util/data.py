@@ -232,4 +232,4 @@ if __name__ == '__main__':
     timestamps = get_scene_timestamp(file_path)
     dino_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_dinos'
     output_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_dinos_scenes'
-    resplit_dino_features(dino_dir, timestamps, output_dir)
+    resplit_dino_by_timestamp(dino_dir, timestamps, output_dir)

@@ -198,6 +198,9 @@ def resplit_dino_by_timestamp(dino_dir, timestamps, output_dir):
     Returns:
     - None
     """
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
     frame_file_prefix = 'greenbook_dinos_'
     frame_files = glob.glob(dino_dir + '/*.npy')
     frame_files.sort(key=lambda x: int(x.replace('\\', '/').split('/')[-1].split('.')[0][len(frame_file_prefix):]))
@@ -223,7 +226,10 @@ if __name__ == '__main__':
 
     # frame_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_dinos'
     # output_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_dinos_2s'
-    # extract_dino_features(frame_dir, output_dir, num_frame_2_sample=16, interval=1)
+    # extract_dino_features(frame_dir, output_dir)
 
     file_path = '/gpfs/data/tserre/Shared/Brainstorm_2024/GreenBook.txt'
     timestamps = get_scene_timestamp(file_path)
+    dino_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_dinos'
+    output_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_dinos_scenes'
+    resplit_dino_features(dino_dir, timestamps, output_dir)

@@ -209,8 +209,8 @@ def resplit_dino_by_timestamp(dino_dir, timestamps, output_dir):
     for file in frame_files:
         feature = np.load(file)
         features.append(feature)
+    features = np.concatenate(features, axis=0)
 
-    features = np.array(features)
     for i, timestamp in tqdm(enumerate(timestamps)):
         start, end = timestamp
         start_frame = round((start[0] * 3600 + start[1] * 60 + start[2] + start[3] / 1000) * 30)

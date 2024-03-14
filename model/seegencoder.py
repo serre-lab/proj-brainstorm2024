@@ -50,7 +50,7 @@ class SEEGEncoder(nn.Module):
         return x
 
 
-class SEEGEncoderProj(nn.Module):
+class SEEGEncoderCls(nn.Module):
     """
     A Transformer Encoder for sEEG data.
     Parameters:
@@ -232,7 +232,7 @@ if __name__ == '__main__':
         output = model(seegs)
     assert output.shape == (2, 768)
 
-    model = SEEGEncoderProj(num_heads, num_encoder_layers, dim_feedforward, num_input_channels, input_length)
+    model = SEEGEncoderCls(num_heads, num_encoder_layers, dim_feedforward, num_input_channels, input_length)
     print_num_params(model)
     with torch.no_grad():
         output = model(seegs)

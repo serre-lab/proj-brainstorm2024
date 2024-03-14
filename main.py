@@ -4,7 +4,7 @@ import wandb
 from util.experiment import set_seeds, get_args
 from torch.utils.data import random_split, DataLoader, Subset
 from model.videoencoder import VideoEncoderVdFt, VideoEncoderDino
-from model.seegencoder import SEEGEncoder, SEEGEncoderProj
+from model.seegencoder import SEEGEncoder, SEEGEncoderCls
 from train.train import train
 from eval.eval import eval
 from dataset.dataset import DinoDataset, VideoMAEDataset
@@ -73,9 +73,9 @@ def main(args):
     num_input_channels = args.seeg_num_channels
     if seeg_encoder_ver == 'orig':
         seeg_encoder = SEEGEncoder(num_heads, num_encoder_layers, dim_feedforward, num_input_channels, input_length).to(device)
-    elif seeg_encoder_ver == 'proj':
-        c = args.seeg_encoder_proj_c
-        seeg_encoder = SEEGEncoderProj(num_heads, num_encoder_layers, dim_feedforward, c, num_input_channels, input_length).to(device)
+    elif seeg_encoder_ver == 'cls':
+        c = args.seeg_encoder_cls_c
+        seeg_encoder = SEEGEncoderCls(num_heads, num_encoder_layers, dim_feedforward, c, num_input_channels, input_length).to(device)
     else:
         raise ValueError("The sEEG encoder version must be either 'orig' or 'proj'")
 

@@ -160,11 +160,44 @@ class Sampler:
         return source[idxs]
 
 
+def parse_timestamp(ts):
+    """
+    Parse a timestamp in the subtitle file
+    :param ts: the timestamp
+    :return: the parsed timestamp
+    """
+    h, m, s_ms = ts.split(':')
+    s, ms = s_ms.split(',')
+    return int(h), int(m), int(s), int(ms)
+
+
+def get_scene_timestamp(file_path):
+    """
+    Get the scene timestamps from the subtitle file
+    Parameters:
+    - file (str): the subtitle file
+    Returns:
+    - timestamps (list): the scene timestamps, each element is a tuple (start, end)
+    """
+    timestamps = []
+    with open(file_path, 'r', encoding='utf-8-sig') as file:
+        for line in file:
+            if '-->' in line:
+                start_ts, end_ts = line.strip().split(' --> ')
+                start_h, start_m, start_s, start_ms = parse_timestamp(start_ts)
+                end_h, end_m, end_s, end_ms = parse_timestamp(end_ts)
+                timestamps.append(((start_h, start_m, start_s, start_ms), (end_h, end_m, end_s, end_ms)))
+    return timestamps
+
+
 if __name__ == '__main__':
     # frame_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_videomae_preprocessed_frames'
     # output_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_videomae_features_2s'
     # extract_videomae_features(frame_dir, output_dir, num_frame_2_sample=16, interval=1)
 
-    frame_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_dinos'
-    output_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_dinos_2s'
-    extract_dino_features(frame_dir, output_dir, num_frame_2_sample=16, interval=1)
+    # frame_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_dinos'
+    # output_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_dinos_2s'
+    # extract_dino_features(frame_dir, output_dir, num_frame_2_sample=16, interval=1)
+
+    file_path = '../data/GreenBook.txt'
+    timestamps = get_scene_timestamp(file_path)

@@ -161,7 +161,7 @@ if __name__ == '__main__':
     time_window = 2
     file_path = '/gpfs/data/tserre/Shared/Brainstorm_2024/GreenBook.txt'
     timestamps = get_scene_timestamp(file_path)
-    dino_scene_dataset = DinoSceneDataset(seeg_file, dino_dir, time_window, timestamps)
+    dino_scene_dataset = DinoSceneDataset(seeg_file, dino_dir, timestamps)
     for i in range(10):
         video, video_mask, seeg, seeg_mask = dino_scene_dataset[i]
         assert video.shape == (201, 768)

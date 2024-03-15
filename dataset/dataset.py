@@ -3,6 +3,7 @@ import glob
 from torch.utils.data import Dataset
 from util.data import Sampler
 from util.data import get_scene_timestamp
+from tqdm import tqdm
 
 
 class BaseDataset(Dataset):
@@ -84,7 +85,7 @@ class DinoSceneDataset(Dataset):
         # Resplit the seeg data according to the timestamps
         self.max_seeg_length = 6865
         self.seeg_data = []
-        for timestamp in timestamps:
+        for timestamp in tqdm(timestamps):
             start, end = timestamp
             start = round((start[0] * 3600 + start[1] * 60 + start[2] + start[3] / 1000) * 1024)
             end = round((end[0] * 3600 + end[1] * 60 + end[2] + end[3] / 1000) * 1024)
@@ -96,7 +97,7 @@ class DinoSceneDataset(Dataset):
         video_file_prefix_len = len('greenbook_dinos_')
         video_files = glob.glob(video_dir + '/*.npy')
         video_files.sort(key=lambda x: int(x.replace('\\', '/').split('/')[-1].split('.')[0][video_file_prefix_len:]))
-        for video_file in video_files:
+        for video_file in tqdm(video_files):
             video = np.load(video_file).astype(np.float32)
             video_mask = np.zeros((self.max_video_length, 1))
             video_mask[video.shape[0]:] = True

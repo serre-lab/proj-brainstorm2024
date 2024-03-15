@@ -32,7 +32,7 @@ class VideoEncoderDino(nn.Module):
         return x
 
 
-class VideoEncoderDinoCls(nn.Module):
+class VideoEncoderDinoScene(nn.Module):
     """
     Video Encoder for the DINO features that handles variable sequence length
     """
@@ -40,7 +40,7 @@ class VideoEncoderDinoCls(nn.Module):
         super().__init__()
         max_length = 201
 
-        positional_encoding = gen_pos_encoding(max_length, 768)
+        positional_encoding = gen_pos_encoding(max_length + 1, 768)
         self.register_buffer('positional_encoding', positional_encoding)
 
         encoder_layer = nn.TransformerEncoderLayer(d_model=768, nhead=6, dim_feedforward=1024, batch_first=True)
@@ -61,6 +61,7 @@ class VideoEncoderDinoCls(nn.Module):
         """
         cls_tokens = self.cls_token.expand(x.shape[0], -1, -1)
         x = torch.cat((cls_tokens, x), dim=1)
+        padding_mask = torch.cat((torch.zeros(x.shape[0], 1, dtype=torch.bool).to(x.device), padding_mask), dim=1)
 
         x += self.positional_encoding
         x = self.transformer_encoder(x, src_key_padding_mask=padding_mask)
@@ -104,14 +105,22 @@ class VideoEncoderDinoCls(nn.Module):
 if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    model = VideoEncoderDino().to(device)
-    inputs = torch.rand(10, 150, 768).to(device)
-    with torch.no_grad():
-        outputs = model(inputs)
-    assert outputs.shape == (10, 768)
+    # model = VideoEncoderDino().to(device)
+    # inputs = torch.rand(10, 150, 768).to(device)
+    # with torch.no_grad():
+    #     outputs = model(inputs)
+    # assert outputs.shape == (10, 768)
+    #
+    # model = VideoEncoderVdFt().to(device)
+    # inputs = torch.rand(10, 768).to(device)
+    # with torch.no_grad():
+    #     outputs = model(inputs)
+    # assert outputs.shape == (10, 768)
 
-    model = VideoEncoderVdFt().to(device)
-    inputs = torch.rand(10, 768).to(device)
+    model = VideoEncoderDinoScene().to(device)
+    inputs = torch.rand(10, 201, 768).to(device)
+    padding_mask = torch.zeros(10, 201).to(device)
+    padding_mask[:, 100:] = 1
     with torch.no_grad():
-        outputs = model(inputs)
+        outputs = model(inputs, padding_mask)
     assert outputs.shape == (10, 768)

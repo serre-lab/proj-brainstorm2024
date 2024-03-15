@@ -112,9 +112,8 @@ class SEEGEncoderScene(nn.Module):
     - num_encoder_layers (int): The number of encoder layers in the transformer.
     - dim_feedforward (int): The dimension of the feedforward network in the transformer.
     - num_input_channels (int): The number of input channels in the sEEG data.
-    - input_length (int): The length of the padded input sequence.
     """
-    def __init__(self, num_heads=6, num_encoder_layers=6, dim_feedforward=2048, num_input_channels=84, input_length=5120):
+    def __init__(self, num_heads=6, num_encoder_layers=6, dim_feedforward=2048, num_input_channels=84):
         super().__init__()
         max_length = 6865
 
@@ -286,7 +285,7 @@ if __name__ == '__main__':
     #     output = model(seegs)
     # assert output.shape == (2, 768)
 
-    model = SEEGEncoderScene(num_heads, num_encoder_layers, dim_feedforward, num_input_channels, input_length)
+    model = SEEGEncoderScene(num_heads, num_encoder_layers, dim_feedforward, num_input_channels)
     input = torch.randn(2, 84, 6865)
     padding_mask = torch.zeros(2, 6865, dtype=torch.bool)
     padding_mask[:, 5120:] = True

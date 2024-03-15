@@ -79,51 +79,37 @@ class VideoMAEDataset(BaseDataset):
 
 class DinoSceneDataset(Dataset):
     def __init__(self, seeg_file, video_dir, timestamps):
-        # Load the sEEG data
-        seeg_data = np.load(seeg_file).astype(np.float32)
+        self.timestamps = timestamps
 
-        # Resplit the seeg data according to the timestamps
+        # Load the sEEG data
         self.max_seeg_length = 6865
-        self.seeg_data = []
-        for timestamp in tqdm(timestamps):
-            start, end = timestamp
-            start = round((start[0] * 3600 + start[1] * 60 + start[2] + start[3] / 1000) * 1024)
-            end = round((end[0] * 3600 + end[1] * 60 + end[2] + end[3] / 1000) * 1024)
-            seeg = seeg_data[:, start:end]
-            self.seeg_data.append(seeg)
+        self.seeg_data = np.load(seeg_file).astype(np.float32)
 
         # Load the video embeddings
         self.max_video_length = 201
         video_file_prefix_len = len('greenbook_dinos_')
-        video_files = glob.glob(video_dir + '/*.npy')
-        video_files.sort(key=lambda x: int(x.replace('\\', '/').split('/')[-1].split('.')[0][video_file_prefix_len:]))
-        for video_file in tqdm(video_files):
-            video = np.load(video_file).astype(np.float32)
-            video_mask = np.zeros((self.max_video_length, 1))
-            video_mask[video.shape[0]:] = True
-            self.video_masks = video_mask[None, :] if not hasattr(self, 'video_masks') \
-                else np.concatenate([self.video_masks, video_mask[None, :]], axis=0)
-            video = np.pad(video, ((0, 201 - video.shape[0]), (0, 0)))
-            self.video_data = video[None, :] if not hasattr(self, 'video_data') \
-                else np.concatenate([self.video_data, video[None, :]], axis=0)
+        self.video_files = glob.glob(video_dir + '/*.npy')
+        self.video_files.sort(key=lambda x: int(x.replace('\\', '/').split('/')[-1].split('.')[0][video_file_prefix_len:]))
 
-        min_len = min(len(self.seeg_data), self.video_data.shape[0])
-        self.seeg_data = self.seeg_data[:min_len]
-        self.video_data = self.video_data[:min_len]
-        print(f'Initialized dataset with {min_len} samples')
+        self.total_num = len(timestamps)
 
-        self.total_num = min_len
+        print(f'Initialized dataset with {self.total_num} samples')
 
     def __getitem__(self, index):
-        video = self.video_data[index]
+        video_file = self.video_files[index]
+        video = np.load(video_file).astype(np.float32)
         video_mask = np.zeros((self.max_video_length, 1))
         video_mask[video.shape[0]:] = True
         video = np.pad(video, ((0, self.max_video_length - video.shape[0]), (0, 0)))
 
-        seeg = self.seeg_data[index]
+        start, end = self.timestamps[index]
+        start = round((start[0] * 3600 + start[1] * 60 + start[2] + start[3] / 1000) * 1024)
+        end = round((end[0] * 3600 + end[1] * 60 + end[2] + end[3] / 1000) * 1024)
+        seeg = self.seeg_data[:, start:end]
         seeg_mask = np.zeros((self.max_seeg_length, 1))
-        seeg_mask[seeg.shape[0]:] = True
-        seeg = np.pad(seeg, ((0, self.max_seeg_length - seeg.shape[0]), (0, 0)))
+        seeg_mask[seeg.shape[1]:] = True
+        seeg = np.pad(seeg, ((0, 0), (0, self.max_seeg_length - seeg.shape[1])))
+
         return video, video_mask, seeg, seeg_mask
 
 

@@ -149,8 +149,8 @@ if __name__ == '__main__':
         assert video.shape == (201, 768)
         assert video_mask.shape == (201, 1)
         first_nonzero = np.argmax(video_mask)
-        assert video[-1, first_nonzero - 1] != 0
-        assert np.all(video[:, first_nonzero:] == 0)
+        assert video[first_nonzero - 1, -1] != 0
+        assert np.all(video[first_nonzero:, :] == 0)
 
         assert seeg.shape == (84, 6865)
         assert seeg_mask.shape == (6865, 1)

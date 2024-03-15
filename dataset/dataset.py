@@ -157,7 +157,7 @@ if __name__ == '__main__':
     #     assert video.shape == (150, 768)
     #     assert seeg.shape == (84, 512)
 
-    dino_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024'
+    dino_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_dinos_scenes'
     time_window = 2
     file_path = '/gpfs/data/tserre/Shared/Brainstorm_2024/GreenBook.txt'
     timestamps = get_scene_timestamp(file_path)

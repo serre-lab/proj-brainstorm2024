@@ -76,23 +76,36 @@ class VideoMAEDataset(BaseDataset):
         super().__init__(seeg_file, video_dir, len(videomae_file_prefix), time_window, sample_rate)
 
 
-class DinoSceneDataset(DinoDataset):
-    def __init__(self, seeg_file, video_dir, time_window, timestamps, sample_rate=1):
-        super().__init__(seeg_file, video_dir, time_window, sample_rate)
+class DinoSceneDataset(Dataset):
+    def __init__(self, seeg_file, video_dir, timestamps):
+        # Load the sEEG data
+        seeg_data = np.load(seeg_file).astype(np.float32)
 
         # Resplit the seeg data according to the timestamps
-        self.seeg_data = self.seeg_data.transpose(0, 2, 1)
-        self.seeg_data = self.seeg_data.reshape(-1, self.seeg_data.shape[2])
-        seeg_data = []
+        self.seeg_data = []
         self.seeg_max_length = 0
         for timestamp in timestamps:
             start, end = timestamp
             start = round((start[0] * 3600 + start[1] * 60 + start[2] + start[3] / 1000) * 1024)
             end = round((end[0] * 3600 + end[1] * 60 + end[2] + end[3] / 1000) * 1024)
-            seeg = self.seeg_data[start:end].transpose(1, 0)
-            seeg_data.append(seeg)
+            seeg = seeg_data[:, start:end]
+            self.seeg_data.append(seeg)
             self.seeg_max_length = max(self.seeg_max_length, seeg.shape[1])
-        self.seeg_data = seeg_data
+
+        # Load the video embeddings
+        self.video_max_length = 201
+        video_file_prefix_len = 'greenbook_dinos_'
+        video_files = glob.glob(video_dir + '/*.npy')
+        video_files.sort(key=lambda x: int(x.replace('\\', '/').split('/')[-1].split('.')[0][video_file_prefix_len:]))
+        for video_file in video_files:
+            video = np.load(video_file).astype(np.float32)
+            video_mask = np.zeros((self.video_max_length, 1))
+            video_mask[video.shape[0]:] = True
+            self.video_masks = video_mask[None, :] if not hasattr(self, 'video_masks') \
+                else np.concatenate([self.video_masks, video_mask[None, :]], axis=0)
+            video = np.pad(video, ((0, 201 - video.shape[0]), (0, 0)))
+            self.video_data = video[None, :] if not hasattr(self, 'video_data') \
+                else np.concatenate([self.video_data, video[None, :]], axis=0)
 
         min_len = min(self.seeg_data.shape[0], self.video_data.shape[0])
         self.seeg_data = self.seeg_data[:min_len]
@@ -100,8 +113,6 @@ class DinoSceneDataset(DinoDataset):
         print(f'Initialized dataset with {min_len} samples')
 
         self.total_num = min_len
-
-        self.video_max_length = 201
 
     def __getitem__(self, index):
         video = self.video_data[index]

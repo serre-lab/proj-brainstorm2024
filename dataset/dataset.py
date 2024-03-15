@@ -92,13 +92,13 @@ class DinoSceneDataset(Dataset):
             self.seeg_data.append(seeg)
 
         # Load the video embeddings
-        self.video_max_length = 201
+        self.max_video_length = 201
         video_file_prefix_len = len('greenbook_dinos_')
         video_files = glob.glob(video_dir + '/*.npy')
         video_files.sort(key=lambda x: int(x.replace('\\', '/').split('/')[-1].split('.')[0][video_file_prefix_len:]))
         for video_file in video_files:
             video = np.load(video_file).astype(np.float32)
-            video_mask = np.zeros((self.video_max_length, 1))
+            video_mask = np.zeros((self.max_video_length, 1))
             video_mask[video.shape[0]:] = True
             self.video_masks = video_mask[None, :] if not hasattr(self, 'video_masks') \
                 else np.concatenate([self.video_masks, video_mask[None, :]], axis=0)
@@ -115,9 +115,9 @@ class DinoSceneDataset(Dataset):
 
     def __getitem__(self, index):
         video = self.video_data[index]
-        video_mask = np.zeros((self.video_max_length, 1))
+        video_mask = np.zeros((self.max_video_length, 1))
         video_mask[video.shape[0]:] = True
-        video = np.pad(video, ((0, self.video_max_length - video.shape[0]), (0, 0)))
+        video = np.pad(video, ((0, self.max_video_length - video.shape[0]), (0, 0)))
 
         seeg = self.seeg_data[index]
         seeg_mask = np.zeros((self.seeg_max_length, 1))
@@ -165,8 +165,8 @@ if __name__ == '__main__':
         assert np.all(video[first_nonzero:] != 0)
         assert np.all(video[:first_nonzero] == 0)
 
-        assert seeg.shape == (84, dino_scene_dataset.seeg_max_length)
-        assert seeg_mask.shape == (dino_scene_dataset.seeg_max_length, 1)
+        assert seeg.shape == (84, 6865)
+        assert seeg_mask.shape == (6865, 1)
         first_nonzero = np.argmax(seeg_mask)
         for j in range(84):
             assert np.all(seeg[j, first_nonzero:] != 0)

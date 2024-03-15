@@ -107,7 +107,7 @@ class DinoSceneDataset(Dataset):
             self.video_data = video[None, :] if not hasattr(self, 'video_data') \
                 else np.concatenate([self.video_data, video[None, :]], axis=0)
 
-        min_len = min(self.seeg_data.shape[0], self.video_data.shape[0])
+        min_len = min(len(self.seeg_data), self.video_data.shape[0])
         self.seeg_data = self.seeg_data[:min_len]
         self.video_data = self.video_data[:min_len]
         print(f'Initialized dataset with {min_len} samples')

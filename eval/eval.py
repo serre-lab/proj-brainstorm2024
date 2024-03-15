@@ -5,7 +5,7 @@ import torch.nn.functional as F
 from tqdm import tqdm
 
 
-def eval(video_encoder, seeg_encoder, eval_loader, device, split, t):
+def eval(video_encoder, seeg_encoder, eval_loader, device, split, t, use_mask):
     video_encoder.eval()
     seeg_encoder.eval()
 
@@ -13,14 +13,24 @@ def eval(video_encoder, seeg_encoder, eval_loader, device, split, t):
     seeg_embeddings = None
 
     with torch.no_grad():
-        for video, seeg in tqdm(eval_loader):
+        for data in tqdm(eval_loader):
+            if use_mask:
+                video, video_mask, seeg, seeg_mask = data
+            else:
+                video, seeg = data
+
             video = video.to(device)
             seeg = seeg.to(device)
+            video_mask = video_mask.to(device) if video_mask is not None else None
+            seeg_mask = seeg_mask.to(device) if seeg_mask is not None else None
 
             # Forward
-            video = video_encoder(video)
-
-            seeg = seeg_encoder(seeg)
+            if use_mask:
+                video = video_encoder(video, video_mask)
+                seeg = seeg_encoder(seeg, seeg_mask)
+            else:
+                video = video_encoder(video)
+                seeg = seeg_encoder(seeg)
 
             if video_embeddings is None:
                 video_embeddings = video

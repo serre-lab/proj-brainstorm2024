@@ -6,7 +6,7 @@ from eval.eval import AverageMeter, compute_top_k_acc
 from tqdm import tqdm
 
 
-def train(video_encoder, seeg_encoder, optimizer, train_loader, device, t):
+def train(video_encoder, seeg_encoder, optimizer, train_loader, device, t, use_mask):
     video_encoder.train()
     seeg_encoder.train()
 
@@ -15,17 +15,28 @@ def train(video_encoder, seeg_encoder, optimizer, train_loader, device, t):
     top1_acc_meter = AverageMeter()
     top5_acc_meter = AverageMeter()
 
-    for video, seeg in tqdm(train_loader):
+    for data in tqdm(train_loader):
+        if use_mask:
+            video, video_mask, seeg, seeg_mask = data
+        else:
+            video, seeg = data
+
         batch_size = video.shape[0]
 
         video = video.to(device)
         seeg = seeg.to(device)
+        video_mask = video_mask.to(device) if video_mask is not None else None
+        seeg_mask = seeg_mask.to(device) if seeg_mask is not None else None
 
         optimizer.zero_grad()
 
         # Forward
-        video = video_encoder(video)
-        seeg = seeg_encoder(seeg)
+        if use_mask:
+            video = video_encoder(video, video_mask)
+            seeg = seeg_encoder(seeg, seeg_mask)
+        else:
+            video = video_encoder(video)
+            seeg = seeg_encoder(seeg)
 
         # Flatten video and seeg embeddings
         if len(video.shape) > 2:

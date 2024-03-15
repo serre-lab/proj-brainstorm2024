@@ -2,12 +2,13 @@ import os
 import torch
 import wandb
 from util.experiment import set_seeds, get_args
-from torch.utils.data import random_split, DataLoader, Subset
-from model.videoencoder import VideoEncoderVdFt, VideoEncoderDino
-from model.seegencoder import SEEGEncoder, SEEGEncoderCls
+from torch.utils.data import DataLoader, Subset
+from model.videoencoder import VideoEncoderVdFt, VideoEncoderDino, VideoEncoderDinoScene
+from model.seegencoder import SEEGEncoder, SEEGEncoderCls, SEEGEncoderScene
 from train.train import train
 from eval.eval import eval
-from dataset.dataset import DinoDataset, VideoMAEDataset
+from dataset.dataset import DinoDataset, VideoMAEDataset, DinoSceneDataset
+from util.data import get_scene_timestamp
 
 wandb.login(key="99528c40ebd16fca6632e963a943b99ac8a5f4b7")
 
@@ -36,6 +37,10 @@ def main(args):
         dataset = DinoDataset(seeg_file, video_dir, time_window, sample_rate=args.sample_rate)
     elif 'videomae' in video_dir:
         dataset = VideoMAEDataset(seeg_file, video_dir, time_window)
+    elif 'scenes' in video_dir:
+        timestamp_file_path = '/gpfs/data/tserre/Shared/Brainstorm_2024/GreenBook.txt'
+        timestamps = get_scene_timestamp(timestamp_file_path)
+        dataset = DinoSceneDataset(seeg_file, video_dir, timestamps)
     else:
         raise ValueError("The video directory must contain either 'dino' or 'videomae'")
     num_train = int(len(dataset) * args.train_ratio)
@@ -60,6 +65,8 @@ def main(args):
     elif video_encoder_ver == 'dino':
         input_dim = time_window * 30
         video_encoder = VideoEncoderDino(input_dim).to(device)
+    elif video_encoder_ver == 'scene':
+        video_encoder = VideoEncoderDinoScene().to(device)
     else:
         raise ValueError("The video encoder version must be either 'vdft' or 'dino'")
 
@@ -76,6 +83,8 @@ def main(args):
     elif seeg_encoder_ver == 'cls':
         c = args.seeg_encoder_cls_c
         seeg_encoder = SEEGEncoderCls(num_heads, num_encoder_layers, dim_feedforward, c, num_input_channels, input_length).to(device)
+    elif seeg_encoder_ver == 'scene':
+        seeg_encoder = SEEGEncoderScene(num_heads, num_encoder_layers, dim_feedforward, num_input_channels).to(device)
     else:
         raise ValueError("The sEEG encoder version must be either 'orig' or 'proj'")
 
@@ -83,6 +92,11 @@ def main(args):
     optimizer = torch.optim.Adam(list(video_encoder.parameters()) + list(seeg_encoder.parameters()), lr=args.lr)
 
     t = args.temperature
+
+    if args.video_encoder_version == 'scene':
+        use_mask = True
+    else:
+        use_mask = False
 
     best_val_acc1 = None
     best_epoch = 0
@@ -102,10 +116,10 @@ def main(args):
         print(f'Epoch: {epoch + 1}')
 
         # Training
-        train(video_encoder, seeg_encoder, optimizer, train_loader, device, t)
+        train(video_encoder, seeg_encoder, optimizer, train_loader, device, t, use_mask)
 
         # Validation
-        loss, acc1, acc5 = eval(video_encoder, seeg_encoder, val_loader, device, 'val', t)
+        loss, acc1, acc5 = eval(video_encoder, seeg_encoder, val_loader, device, 'val', t, use_mask)
 
         if best_val_acc1 is None or acc1 > best_val_acc1:
             best_val_acc1 = acc1
@@ -139,7 +153,7 @@ def main(args):
     ckpt_state = torch.load(ckpt_file)
     seeg_encoder.load_state_dict(ckpt_state['seeg_encoder'])
     video_encoder.load_state_dict(ckpt_state['video_encoder'])
-    test_loss, test_acc1, test_acc5 = eval(video_encoder, seeg_encoder, test_loader, device, 'test', t)
+    test_loss, test_acc1, test_acc5 = eval(video_encoder, seeg_encoder, test_loader, device, 'test', t, use_mask)
 
 
 if __name__ == '__main__':

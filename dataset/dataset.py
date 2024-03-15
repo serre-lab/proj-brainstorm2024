@@ -112,6 +112,9 @@ class DinoSceneDataset(Dataset):
 
         return video, video_mask, seeg, seeg_mask
 
+    def __len__(self):
+        return self.total_num
+
 
 if __name__ == '__main__':
     seeg_file = '/gpfs/data/tserre/Shared/Brainstorm_2024/all_seeg_data.npy'

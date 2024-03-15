@@ -82,15 +82,14 @@ class DinoSceneDataset(Dataset):
         seeg_data = np.load(seeg_file).astype(np.float32)
 
         # Resplit the seeg data according to the timestamps
+        self.max_seeg_length = 6865
         self.seeg_data = []
-        self.seeg_max_length = 0
         for timestamp in timestamps:
             start, end = timestamp
             start = round((start[0] * 3600 + start[1] * 60 + start[2] + start[3] / 1000) * 1024)
             end = round((end[0] * 3600 + end[1] * 60 + end[2] + end[3] / 1000) * 1024)
             seeg = seeg_data[:, start:end]
             self.seeg_data.append(seeg)
-            self.seeg_max_length = max(self.seeg_max_length, seeg.shape[1])
 
         # Load the video embeddings
         self.video_max_length = 201

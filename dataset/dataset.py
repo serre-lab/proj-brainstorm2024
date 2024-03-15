@@ -94,7 +94,7 @@ class DinoSceneDataset(Dataset):
 
         # Load the video embeddings
         self.video_max_length = 201
-        video_file_prefix_len = 'greenbook_dinos_'
+        video_file_prefix_len = len('greenbook_dinos_')
         video_files = glob.glob(video_dir + '/*.npy')
         video_files.sort(key=lambda x: int(x.replace('\\', '/').split('/')[-1].split('.')[0][video_file_prefix_len:]))
         for video_file in video_files:
@@ -157,7 +157,7 @@ if __name__ == '__main__':
     #     assert video.shape == (150, 768)
     #     assert seeg.shape == (84, 512)
 
-    dino_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_dinos_scenes'
+    dino_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024'
     time_window = 2
     file_path = '/gpfs/data/tserre/Shared/Brainstorm_2024/GreenBook.txt'
     timestamps = get_scene_timestamp(file_path)

@@ -48,7 +48,6 @@ def get_args():
     arg_parser.add_argument('--time_window', '-tw', type=int, default=5, help="the time window for the data")
     arg_parser.add_argument('--seeg_encoder_version', '-sv', type=str, default='orig', help="the seeg version to use, can be 'orig', 'cls' or 'scene'")
     arg_parser.add_argument('--seeg_encoder_cls_c', '-sec', type=int, default=10, help="the c parameter for the cls sEEG encoder")
-    arg_parser.add_argument('--seeg_len', '-sl', type=int, default=5120, help="the length of the sEEG data")
     arg_parser.add_argument('--seeg_num_channels', '-sc', type=int, default=84, help="the number of channels for the sEEG data")
     arg_parser.add_argument('--video_encoder_version', '-vv', type=str, default='dino', help="the video version to use, can be 'vdft', 'dino' or 'scene'")
     arg_parser.add_argument('--num_workers', '-w', type=int, default=4, help="Number of workers for dataloader")

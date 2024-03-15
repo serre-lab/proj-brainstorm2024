@@ -76,7 +76,7 @@ def main(args):
     num_heads = args.num_heads
     num_encoder_layers = args.num_encoder_layers
     dim_feedforward = args.dim_feedforward
-    input_length = args.seeg_len
+    input_length = time_window * 1024
     num_input_channels = args.seeg_num_channels
     if seeg_encoder_ver == 'orig':
         seeg_encoder = SEEGEncoder(num_heads, num_encoder_layers, dim_feedforward, num_input_channels, input_length).to(device)

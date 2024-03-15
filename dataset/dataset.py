@@ -162,13 +162,13 @@ if __name__ == '__main__':
         assert video.shape == (201, 768)
         assert video_mask.shape == (201, 1)
         first_nonzero = np.argmax(video_mask)
-        assert np.all(video[first_nonzero:] == 0)
-        assert np.all(video[:first_nonzero] != 0)
+        assert np.all(video[first_nonzero:] != 0)
+        assert np.all(video[:first_nonzero] == 0)
 
         assert seeg.shape == (84, dino_scene_dataset.seeg_max_length)
         assert seeg_mask.shape == (dino_scene_dataset.seeg_max_length, 1)
         first_nonzero = np.argmax(seeg_mask)
         for j in range(84):
-            assert np.all(seeg[j, first_nonzero:] == 0)
-            assert np.all(seeg[j, :first_nonzero] != 0)
+            assert np.all(seeg[j, first_nonzero:] != 0)
+            assert np.all(seeg[j, :first_nonzero] == 0)
 

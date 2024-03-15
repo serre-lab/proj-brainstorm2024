@@ -98,7 +98,7 @@ class DinoSceneDataset(Dataset):
     def __getitem__(self, index):
         video_file = self.video_files[index]
         video = np.load(video_file).astype(np.float32)
-        video_mask = np.zeros((self.max_video_length, 1))
+        video_mask = np.zeros((self.max_video_length,))
         video_mask[video.shape[0]:] = True
         video = np.pad(video, ((0, self.max_video_length - video.shape[0]), (0, 0)))
 
@@ -106,7 +106,7 @@ class DinoSceneDataset(Dataset):
         start = round((start[0] * 3600 + start[1] * 60 + start[2] + start[3] / 1000) * 1024)
         end = round((end[0] * 3600 + end[1] * 60 + end[2] + end[3] / 1000) * 1024)
         seeg = self.seeg_data[:, start:end]
-        seeg_mask = np.zeros((self.max_seeg_length, 1))
+        seeg_mask = np.zeros((self.max_seeg_length,))
         seeg_mask[seeg.shape[1]:] = True
         seeg = np.pad(seeg, ((0, 0), (0, self.max_seeg_length - seeg.shape[1])))
 
@@ -150,13 +150,13 @@ if __name__ == '__main__':
     for i in range(10):
         video, video_mask, seeg, seeg_mask = dino_scene_dataset[i]
         assert video.shape == (201, 768)
-        assert video_mask.shape == (201, 1)
+        assert video_mask.shape == (201,)
         first_nonzero = np.argmax(video_mask)
         assert video[first_nonzero - 1, -1] != 0
         assert np.all(video[first_nonzero:, :] == 0)
 
         assert seeg.shape == (84, 6865)
-        assert seeg_mask.shape == (6865, 1)
+        assert seeg_mask.shape == (6865,)
         first_nonzero = np.argmax(seeg_mask)
         assert seeg[-1, first_nonzero - 1] != 0
         assert np.all(seeg[:, first_nonzero:] == 0)

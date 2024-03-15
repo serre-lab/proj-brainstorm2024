@@ -33,11 +33,11 @@ def main(args):
     seeg_file = args.seeg_file
     video_dir = args.video_dir
     time_window = args.time_window
-    if 'dino' in video_dir:
+    if video_dir.endswith('dinos'):
         dataset = DinoDataset(seeg_file, video_dir, time_window, sample_rate=args.sample_rate)
     elif 'videomae' in video_dir:
         dataset = VideoMAEDataset(seeg_file, video_dir, time_window)
-    elif 'scenes' in video_dir:
+    elif video_dir.endswith('dinos_scenes'):
         timestamp_file_path = '/gpfs/data/tserre/Shared/Brainstorm_2024/GreenBook.txt'
         timestamps = get_scene_timestamp(timestamp_file_path)
         dataset = DinoSceneDataset(seeg_file, video_dir, timestamps)

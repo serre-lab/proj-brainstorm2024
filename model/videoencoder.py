@@ -34,41 +34,56 @@ class VideoEncoderDino(nn.Module):
 
 class VideoEncoderDinoScene(nn.Module):
     """
-    Video Encoder for the DINO features that handles variable sequence length
+    Video Encoder for the DINO features
     """
     def __init__(self):
         super().__init__()
-        max_length = 201
-
-        positional_encoding = gen_pos_encoding(max_length + 1, 768)
-        self.register_buffer('positional_encoding', positional_encoding)
-
-        encoder_layer = nn.TransformerEncoderLayer(d_model=768, nhead=6, dim_feedforward=1024, batch_first=True)
-        self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=2)
-
-        self.cls_token = nn.Parameter(torch.zeros(1, 1, 768))
-
         self.proj = nn.Linear(768, 768)
 
     def forward(self, x, padding_mask):
-        """
-        Parameters:
-        - x (torch.Tensor): A (batch_size, max_length, 768) tensor containing the input DINO features.
-        - padding_mask (torch.Tensor): A (batch_size, max_length) boolean tensor containing the mask for the padding.
-        True indicates a padding position and False indicates a valid data position.
-        Returns:
-        - x (torch.Tensor): A (batch_size, 768) tensor containing the DINO embedding.
-        """
-        cls_tokens = self.cls_token.expand(x.shape[0], -1, -1)
-        x = torch.cat((cls_tokens, x), dim=1)
-        padding_mask = torch.cat((torch.zeros(x.shape[0], 1, dtype=torch.bool).to(x.device), padding_mask), dim=1)
-
-        x += self.positional_encoding
-        x = self.transformer_encoder(x, src_key_padding_mask=padding_mask)
-        x = x[:, 0, :]
-
+        valid_lengths = (~padding_mask).sum(dim=1)
+        x = x.sum(dim=1) / valid_lengths.unsqueeze(-1)
         x = self.proj(x)
         return x
+
+
+# class VideoEncoderDinoScene(nn.Module):
+#     """
+#     Video Encoder for the DINO features that handles variable sequence length
+#     """
+#     def __init__(self):
+#         super().__init__()
+#         max_length = 201
+#
+#         positional_encoding = gen_pos_encoding(max_length + 1, 768)
+#         self.register_buffer('positional_encoding', positional_encoding)
+#
+#         encoder_layer = nn.TransformerEncoderLayer(d_model=768, nhead=6, dim_feedforward=1024, batch_first=True)
+#         self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=2)
+#
+#         self.cls_token = nn.Parameter(torch.zeros(1, 1, 768))
+#
+#         self.proj = nn.Linear(768, 768)
+#
+#     def forward(self, x, padding_mask):
+#         """
+#         Parameters:
+#         - x (torch.Tensor): A (batch_size, max_length, 768) tensor containing the input DINO features.
+#         - padding_mask (torch.Tensor): A (batch_size, max_length) boolean tensor containing the mask for the padding.
+#         True indicates a padding position and False indicates a valid data position.
+#         Returns:
+#         - x (torch.Tensor): A (batch_size, 768) tensor containing the DINO embedding.
+#         """
+#         cls_tokens = self.cls_token.expand(x.shape[0], -1, -1)
+#         x = torch.cat((cls_tokens, x), dim=1)
+#         padding_mask = torch.cat((torch.zeros(x.shape[0], 1, dtype=torch.bool).to(x.device), padding_mask), dim=1)
+#
+#         x += self.positional_encoding
+#         x = self.transformer_encoder(x, src_key_padding_mask=padding_mask)
+#         x = x[:, 0, :]
+#
+#         x = self.proj(x)
+#         return x
 
 
 # class VideoEncoderProj(nn.Module):
@@ -121,6 +136,7 @@ if __name__ == '__main__':
     inputs = torch.rand(10, 201, 768).to(device)
     padding_mask = torch.zeros(10, 201).to(device)
     padding_mask[:, 100:] = 1
+    padding_mask = padding_mask.bool()
     with torch.no_grad():
         outputs = model(inputs, padding_mask)
     assert outputs.shape == (10, 768)

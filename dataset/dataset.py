@@ -121,9 +121,9 @@ class DinoSceneDataset(Dataset):
         video = np.pad(video, ((0, self.max_video_length - video.shape[0]), (0, 0)))
 
         seeg = self.seeg_data[index]
-        seeg_mask = np.zeros((self.seeg_max_length, 1))
+        seeg_mask = np.zeros((self.max_seeg_length, 1))
         seeg_mask[seeg.shape[0]:] = True
-        seeg = np.pad(seeg, ((0, self.seeg_max_length - seeg.shape[0]), (0, 0)))
+        seeg = np.pad(seeg, ((0, self.max_seeg_length - seeg.shape[0]), (0, 0)))
         return video, video_mask, seeg, seeg_mask
 
 

@@ -2,6 +2,7 @@ import numpy as np
 import glob
 from torch.utils.data import Dataset
 from util.data import Sampler
+from util.data import get_scene_timestamp
 
 
 class BaseDataset(Dataset):
@@ -34,8 +35,8 @@ class BaseDataset(Dataset):
         - index (int): index of the data to retrieve
 
         Returns:
-        - video (torch.Tensor): the video embedding data of shape(150, 768)
-        - seeg (torch.Tensor): the sEEG data of shape (num_channels, num_frame_2_sample)
+        - video (np.ndarray): the video data of shape (150, 768)
+        - seeg (np.ndarray): the sEEG data of shape (num_channels, num_frame_2_sample)
         """
         # Load and process the audio data
         video = self.video_data[index]
@@ -75,29 +76,93 @@ class VideoMAEDataset(BaseDataset):
         super().__init__(seeg_file, video_dir, len(videomae_file_prefix), time_window, sample_rate)
 
 
+class DinoSceneDataset(DinoDataset):
+    def __init__(self, seeg_file, video_dir, time_window, timestamps, sample_rate=1):
+        super().__init__(seeg_file, video_dir, time_window, sample_rate)
+
+        # Resplit the seeg data according to the timestamps
+        self.seeg_data = self.seeg_data.transpose(0, 2, 1)
+        self.seeg_data = self.seeg_data.reshape(-1, self.seeg_data.shape[2])
+        seeg_data = []
+        self.seeg_max_length = 0
+        for timestamp in timestamps:
+            start, end = timestamp
+            start = round((start[0] * 3600 + start[1] * 60 + start[2] + start[3] / 1000) * 1024)
+            end = round((end[0] * 3600 + end[1] * 60 + end[2] + end[3] / 1000) * 1024)
+            seeg = self.seeg_data[start:end].transpose(1, 0)
+            seeg_data.append(seeg)
+            self.seeg_max_length = max(self.seeg_max_length, seeg.shape[1])
+        self.seeg_data = seeg_data
+
+        min_len = min(self.seeg_data.shape[0], self.video_data.shape[0])
+        self.seeg_data = self.seeg_data[:min_len]
+        self.video_data = self.video_data[:min_len]
+        print(f'Initialized dataset with {min_len} samples')
+
+        self.total_num = min_len
+
+        self.video_max_length = 201
+
+    def __getitem__(self, index):
+        video = self.video_data[index]
+        video_mask = np.zeros((self.video_max_length, 1))
+        video_mask[video.shape[0]:] = True
+        video = np.pad(video, ((0, self.video_max_length - video.shape[0]), (0, 0)))
+
+        seeg = self.seeg_data[index]
+        seeg = seeg.transpose(1, 0)
+        seeg = Sampler.sample(seeg, self.num_frame_2_sample, mode='even')
+        seeg = seeg.transpose(1, 0)
+        seeg_mask = np.zeros((self.seeg_max_length, 1))
+        seeg_mask[seeg.shape[0]:] = True
+        seeg = np.pad(seeg, ((0, self.seeg_max_length - seeg.shape[0]), (0, 0)))
+        return video, video_mask, seeg, seeg_mask
+
+
 if __name__ == '__main__':
     seeg_file = '/gpfs/data/tserre/Shared/Brainstorm_2024/all_seeg_data.npy'
-    dino_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_dinos'
-    time_window = 5
-    dino_dataset = DinoDataset(seeg_file, dino_dir, time_window)
-    for i in range(10):
-        video, seeg = dino_dataset[i]
-        assert video.shape == (150, 768)
-        assert seeg.shape == (84, 5120)
+    # dino_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_dinos'
+    # time_window = 5
+    # dino_dataset = DinoDataset(seeg_file, dino_dir, time_window)
+    # for i in range(10):
+    #     video, seeg = dino_dataset[i]
+    #     assert video.shape == (150, 768)
+    #     assert seeg.shape == (84, 5120)
+    #
+    # videomae_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_videomae_features_2s'
+    # time_window = 2
+    # videomae_dataset = VideoMAEDataset(seeg_file, videomae_dir, time_window)
+    # for i in range(10):
+    #     video, seeg = videomae_dataset[i]
+    #     assert video.shape == (768, )
+    #     assert seeg.shape == (84, 2048)
+    #
+    # dino_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_dinos'
+    # time_window = 5
+    # sample_rate = 10
+    # dino_dataset = DinoDataset(seeg_file, dino_dir, time_window, sample_rate)
+    # for i in range(10):
+    #     video, seeg = dino_dataset[i]
+    #     assert video.shape == (150, 768)
+    #     assert seeg.shape == (84, 512)
 
-    videomae_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_videomae_features_2s'
+    dino_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_dinos_scenes'
     time_window = 2
-    videomae_dataset = VideoMAEDataset(seeg_file, videomae_dir, time_window)
+    file_path = '/gpfs/data/tserre/Shared/Brainstorm_2024/GreenBook.txt'
+    timestamps = get_scene_timestamp(file_path)
+    dino_scene_dataset = DinoSceneDataset(seeg_file, dino_dir, time_window, timestamps)
     for i in range(10):
-        video, seeg = videomae_dataset[i]
-        assert video.shape == (768, )
-        assert seeg.shape == (84, 2048)
+        video, video_mask, seeg, seeg_mask = dino_scene_dataset[i]
+        assert video.shape == (201, 768)
+        assert video_mask.shape == (201, 1)
+        first_nonzero = np.argmax(video_mask)
+        assert np.all(video[first_nonzero:] == 0)
+        assert np.all(video[:first_nonzero] != 0)
 
-    dino_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_dinos'
-    time_window = 5
-    sample_rate = 10
-    dino_dataset = DinoDataset(seeg_file, dino_dir, time_window, sample_rate)
-    for i in range(10):
-        video, seeg = dino_dataset[i]
-        assert video.shape == (150, 768)
-        assert seeg.shape == (84, 512)
+        assert seeg.shape == (84, dino_scene_dataset.seeg_max_length)
+        assert seeg_mask.shape == (dino_scene_dataset.seeg_max_length, 1)
+        first_nonzero = np.argmax(seeg_mask)
+        for j in range(84):
+            assert np.all(seeg[j, first_nonzero:] == 0)
+            assert np.all(seeg[j, :first_nonzero] != 0)
+

@@ -54,8 +54,8 @@ def main(args):
     val_dataset = Subset(dataset, val_indices)
     test_dataset = Subset(dataset, test_indices)
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers, drop_last=True)
-    val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers)
-    test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers)
+    val_loader = DataLoader(val_dataset, batch_size=10, shuffle=False, num_workers=args.num_workers)
+    test_loader = DataLoader(test_dataset, batch_size=10, shuffle=False, num_workers=args.num_workers)
 
     # Define the video encoder
     print('Creating video encoder ...')

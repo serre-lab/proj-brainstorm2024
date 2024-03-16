@@ -41,7 +41,7 @@ def eval(video_encoder, seeg_encoder, eval_loader, device, split, t, use_mask):
             if video_embeddings is None:
                 video_embeddings = video
                 seeg_embeddings = seeg
-                
+
                 print_gpu_memory_usage()
 
             else:

@@ -53,7 +53,7 @@ class VideoEncoderDinoScene(nn.Module):
 #     """
 #     def __init__(self):
 #         super().__init__()
-#         max_length = 201
+#         max_length = 189
 #
 #         positional_encoding = gen_pos_encoding(max_length + 1, 768)
 #         self.register_buffer('positional_encoding', positional_encoding)
@@ -133,8 +133,8 @@ if __name__ == '__main__':
     # assert outputs.shape == (10, 768)
 
     model = VideoEncoderDinoScene().to(device)
-    inputs = torch.rand(10, 201, 768).to(device)
-    padding_mask = torch.zeros(10, 201).to(device)
+    inputs = torch.rand(10, 189, 768).to(device)
+    padding_mask = torch.zeros(10, 189).to(device)
     padding_mask[:, 100:] = 1
     padding_mask = padding_mask.bool()
     with torch.no_grad():

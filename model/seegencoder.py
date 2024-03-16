@@ -115,7 +115,7 @@ class SEEGEncoderScene(nn.Module):
     """
     def __init__(self, num_heads=6, num_encoder_layers=6, dim_feedforward=2048, num_input_channels=84):
         super().__init__()
-        max_length = 6865
+        max_length = 6443
 
         positional_encoding = gen_pos_encoding(max_length + 1, num_input_channels)
         self.register_buffer('positional_encoding', positional_encoding)
@@ -286,8 +286,8 @@ if __name__ == '__main__':
     # assert output.shape == (2, 768)
 
     model = SEEGEncoderScene(num_heads, num_encoder_layers, dim_feedforward, num_input_channels)
-    input = torch.randn(2, 84, 6865)
-    padding_mask = torch.zeros(2, 6865, dtype=torch.bool)
+    input = torch.randn(2, 84, 6443)
+    padding_mask = torch.zeros(2, 6443, dtype=torch.bool)
     padding_mask[:, 5120:] = True
     with torch.no_grad():
         output = model(input, padding_mask)

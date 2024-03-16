@@ -117,7 +117,7 @@ class SEEGEncoderScene(nn.Module):
         super().__init__()
         max_length = 6443
 
-        positional_encoding = gen_pos_encoding(max_length + 1, num_input_channels)
+        positional_encoding = gen_pos_encoding(max_length, num_input_channels)
         self.register_buffer('positional_encoding', positional_encoding)
 
         # Transformer Encoder
@@ -125,9 +125,9 @@ class SEEGEncoderScene(nn.Module):
                                                    dim_feedforward=dim_feedforward, batch_first=True)
         self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=num_encoder_layers)
 
-        self.cls_token = nn.Parameter(torch.zeros(1, 1, num_input_channels))
-
-        self.proj = nn.Linear(num_input_channels, 768)
+        self.length_downsample_layer2 = nn.Linear(input_length, 1)
+        # Linear Layer to transform the channel dimension
+        self.linear = nn.Linear(num_input_channels, 128)
 
     def forward(self, x, padding_mask):
         """
@@ -139,16 +139,17 @@ class SEEGEncoderScene(nn.Module):
         - x (torch.Tensor): A (batch_size, num_output_channels) tensor containing the sEEG embedding.
         """
         x = x.permute(0, 2, 1)
-        cls_tokens = self.cls_token.expand(x.shape[0], -1, -1)
-        x = torch.cat((cls_tokens, x), dim=1)
-        padding_mask = torch.cat((torch.zeros(x.shape[0], 1, dtype=torch.bool).to(x.device), padding_mask), dim=1)
 
         x += self.positional_encoding
-        x = self.transformer_encoder(x, src_key_padding_mask=padding_mask)
-        x = x[:, 0, :]
+        output = self.transformer_encoder(x, src_key_padding_mask=padding_mask)
 
-        x = self.proj(x)
-        return x
+        output = output.permute(0, 2, 1)
+        output = self.length_downsample_layer2(output)
+        output = output.permute(0, 2, 1)
+
+        output = self.linear(output)
+
+        return output
 
 
 # class SEEGEncoderChaFirst(SEEGEncoder):

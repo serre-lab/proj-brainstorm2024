@@ -85,6 +85,7 @@ def main(args):
         seeg_encoder = SEEGEncoderCls(num_heads, num_encoder_layers, dim_feedforward, c, num_input_channels, input_length).to(device)
     elif seeg_encoder_ver == 'scene':
         seeg_encoder = SEEGEncoderScene(num_heads, num_encoder_layers, dim_feedforward, num_input_channels).to(device)
+        seeg_encoder.load_state_dict(torch.load('seeg_encoder_epoch_99.pth'), strict=False)
     else:
         raise ValueError("The sEEG encoder version must be either 'orig' or 'proj'")
 

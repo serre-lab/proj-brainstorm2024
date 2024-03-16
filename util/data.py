@@ -213,8 +213,8 @@ def resplit_dino_by_timestamp(dino_dir, timestamps, output_dir):
 
     for i, timestamp in tqdm(enumerate(timestamps)):
         start, end = timestamp
-        start_frame = round((start[0] * 3600 + start[1] * 60 + start[2] + start[3] / 1000) * 30)
-        end_frame = round((end[0] * 3600 + end[1] * 60 + end[2] + end[3] / 1000) * 30)
+        start_frame = round((start[0] * 3600 + start[1] * 60 + start[2] + start[3] / 1000 - 1.5) * 30)
+        end_frame = round((end[0] * 3600 + end[1] * 60 + end[2] + end[3] / 1000 - 1.5) * 30)
         feature = features[start_frame:end_frame]
         np.save(os.path.join(output_dir, f'greenbook_dinos_{i}.npy'), feature)
 

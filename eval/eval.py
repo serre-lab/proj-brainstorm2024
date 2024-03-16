@@ -3,16 +3,18 @@ import numpy as np
 import wandb
 import torch.nn.functional as F
 from tqdm import tqdm
-
+from util.experiment import print_gpu_memory_usage
 
 def eval(video_encoder, seeg_encoder, eval_loader, device, split, t, use_mask):
     torch.cuda.empty_cache()
-    
+
     video_encoder.eval()
     seeg_encoder.eval()
 
     video_embeddings = None
     seeg_embeddings = None
+
+    print_gpu_memory_usage()
 
     with torch.no_grad():
         for data in tqdm(eval_loader):
@@ -26,6 +28,8 @@ def eval(video_encoder, seeg_encoder, eval_loader, device, split, t, use_mask):
             video_mask = video_mask.to(device) if video_mask is not None else None
             seeg_mask = seeg_mask.to(device) if seeg_mask is not None else None
 
+            print_gpu_memory_usage()
+
             # Forward
             if use_mask:
                 video = video_encoder(video, video_mask)
@@ -37,9 +41,14 @@ def eval(video_encoder, seeg_encoder, eval_loader, device, split, t, use_mask):
             if video_embeddings is None:
                 video_embeddings = video
                 seeg_embeddings = seeg
+                
+                print_gpu_memory_usage()
+
             else:
                 video_embeddings = torch.cat((video_embeddings, video), dim=0)
                 seeg_embeddings = torch.cat((seeg_embeddings, seeg), dim=0)
+
+                print_gpu_memory_usage()
 
         # Flatten video and seeg embeddings
         if len(video_embeddings.shape) > 2:

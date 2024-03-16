@@ -6,6 +6,8 @@ from tqdm import tqdm
 
 
 def eval(video_encoder, seeg_encoder, eval_loader, device, split, t, use_mask):
+    torch.cuda.empty_cache()
+    
     video_encoder.eval()
     seeg_encoder.eval()
 

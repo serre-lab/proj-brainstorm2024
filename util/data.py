@@ -228,7 +228,7 @@ if __name__ == '__main__':
     # output_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_dinos_2s'
     # extract_dino_features(frame_dir, output_dir)
 
-    file_path = '/gpfs/data/tserre/Shared/Brainstorm_2024/GreenBook.srt'
+    file_path = '/gpfs/data/tserre/Shared/Brainstorm_2024/Green Book.srt'
     timestamps = get_scene_timestamp(file_path)
     dino_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_dinos'
     output_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_dinos_scenes'

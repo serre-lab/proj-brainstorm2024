@@ -14,8 +14,6 @@ def eval(video_encoder, seeg_encoder, eval_loader, device, split, t, use_mask):
     video_embeddings = None
     seeg_embeddings = None
 
-    print_gpu_memory_usage()
-
     with torch.no_grad():
         for data in tqdm(eval_loader):
             if use_mask:
@@ -27,8 +25,6 @@ def eval(video_encoder, seeg_encoder, eval_loader, device, split, t, use_mask):
             seeg = seeg.to(device)
             video_mask = video_mask.to(device) if video_mask is not None else None
             seeg_mask = seeg_mask.to(device) if seeg_mask is not None else None
-
-            print_gpu_memory_usage()
 
             # Forward
             if use_mask:
@@ -42,12 +38,17 @@ def eval(video_encoder, seeg_encoder, eval_loader, device, split, t, use_mask):
                 video_embeddings = video
                 seeg_embeddings = seeg
 
+                print(video_embeddings.shape)
+                print(seeg_embeddings.shape)
+
                 print_gpu_memory_usage()
 
             else:
                 video_embeddings = torch.cat((video_embeddings, video), dim=0)
                 seeg_embeddings = torch.cat((seeg_embeddings, seeg), dim=0)
 
+                print(video_embeddings.shape)
+                print(seeg_embeddings.shape)
                 print_gpu_memory_usage()
 
         # Flatten video and seeg embeddings

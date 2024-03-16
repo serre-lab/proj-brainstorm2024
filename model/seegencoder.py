@@ -127,7 +127,7 @@ class SEEGEncoderScene(nn.Module):
 
         self.length_downsample_layer2 = nn.Linear(6443, 1)
         # Linear Layer to transform the channel dimension
-        self.linear = nn.Linear(num_input_channels, 128)
+        self.linear = nn.Linear(num_input_channels, 64)
 
     def forward(self, x, padding_mask):
         """

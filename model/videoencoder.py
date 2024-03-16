@@ -38,7 +38,7 @@ class VideoEncoderDinoScene(nn.Module):
     """
     def __init__(self):
         super().__init__()
-        self.proj = nn.Linear(768, 128)
+        self.proj = nn.Linear(768, 64)
 
     def forward(self, x, padding_mask):
         valid_lengths = (~padding_mask).sum(dim=1)

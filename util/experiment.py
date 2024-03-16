@@ -46,11 +46,10 @@ def get_args():
                             help="the ratio of training data to all data. The rest is validation data")
     arg_parser.add_argument('--sample_rate', '-sr', type=int, default=1, help="the sample rate for the seeg data")
     arg_parser.add_argument('--time_window', '-tw', type=int, default=5, help="the time window for the data")
-    arg_parser.add_argument('--seeg_encoder_version', '-sv', type=str, default='orig', help="the seeg version to use, can be 'orig' or 'cls'")
+    arg_parser.add_argument('--seeg_encoder_version', '-sv', type=str, default='orig', help="the seeg version to use, can be 'orig', 'cls' or 'scene'")
     arg_parser.add_argument('--seeg_encoder_cls_c', '-sec', type=int, default=10, help="the c parameter for the cls sEEG encoder")
-    arg_parser.add_argument('--seeg_len', '-sl', type=int, default=5120, help="the length of the sEEG data")
     arg_parser.add_argument('--seeg_num_channels', '-sc', type=int, default=84, help="the number of channels for the sEEG data")
-    arg_parser.add_argument('--video_encoder_version', '-vv', type=str, default='dino', help="the video version to use, can be 'vdft' or 'dino'")
+    arg_parser.add_argument('--video_encoder_version', '-vv', type=str, default='dino', help="the video version to use, can be 'vdft', 'dino' or 'scene'")
     arg_parser.add_argument('--num_workers', '-w', type=int, default=4, help="Number of workers for dataloader")
     arg_parser.add_argument('--num_heads', '-nh', type=int, default=6, help="Number of heads for the sEEG encoder")
     arg_parser.add_argument('--num_encoder_layers', '-ne', type=int, default=6, help="number of encoder layers for the "

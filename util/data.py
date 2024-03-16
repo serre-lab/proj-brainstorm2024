@@ -54,22 +54,20 @@ def extract_videomae_features(frame_dir, output_dir, num_frame_2_sample=16, inte
             counter += 1
 
 
-def extract_dino_features(frame_dir, output_dir, num_frame_2_sample=16, interval=1):
+def resplit_dino_features(dino_dir, output_dir):
     """
-    Extract Dino features from the preprocessed video frames
+    Resplit the dino features into 2s windows
     Parameters:
-    - frame_dir (str): the directory containing the preprocessed video frames
+    - dino_dir (str): the directory containing the dino features
     - output_dir (str): the directory to save the extracted features
-    - num_frame_2_sample (int): the number of frames to sample from each video
-    - interval (int): the interval between the sampled frames
     Returns:
-    - features (np.ndarray): the extracted features
+    - None
     """
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
     frame_file_prefix = 'greenbook_dinos_'
-    frame_files = glob.glob(frame_dir + '/*.npy')
+    frame_files = glob.glob(dino_dir + '/*.npy')
     frame_files.sort(key=lambda x: int(x.replace('\\', '/').split('/')[-1].split('.')[0][len(frame_file_prefix):]))
 
     counter = 0
@@ -160,11 +158,78 @@ class Sampler:
         return source[idxs]
 
 
+def parse_timestamp(ts):
+    """
+    Parse a timestamp in the subtitle file
+    :param ts: the timestamp
+    :return: the parsed timestamp
+    """
+    h, m, s_ms = ts.split(':')
+    s, ms = s_ms.split(',')
+    return int(h), int(m), int(s), int(ms)
+
+
+def get_scene_timestamp(file_path):
+    """
+    Get the scene timestamps from the subtitle file
+    Parameters:
+    - file (str): the subtitle file
+    Returns:
+    - timestamps (list): the scene timestamps, each element is a tuple (start, end)
+    """
+    timestamps = []
+    with open(file_path, 'r', encoding='utf-8-sig') as file:
+        for line in file:
+            if '-->' in line:
+                start_ts, end_ts = line.strip().split(' --> ')
+                start_h, start_m, start_s, start_ms = parse_timestamp(start_ts)
+                end_h, end_m, end_s, end_ms = parse_timestamp(end_ts)
+                timestamps.append(((start_h, start_m, start_s, start_ms), (end_h, end_m, end_s, end_ms)))
+    return timestamps
+
+
+def resplit_dino_by_timestamp(dino_dir, timestamps, output_dir):
+    """
+    Resplit the dino features by the scene timestamps
+    Parameters:
+    - dino_dir (str): the directory containing the dino features
+    - timestamps (list): the scene timestamps
+    - output_dir (str): the directory to save the extracted features
+    Returns:
+    - None
+    """
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    frame_file_prefix = 'greenbook_dinos_'
+    frame_files = glob.glob(dino_dir + '/*.npy')
+    frame_files.sort(key=lambda x: int(x.replace('\\', '/').split('/')[-1].split('.')[0][len(frame_file_prefix):]))
+
+    features = []
+    for file in frame_files:
+        feature = np.load(file)
+        features.append(feature)
+    features = np.concatenate(features, axis=0)
+
+    for i, timestamp in tqdm(enumerate(timestamps)):
+        start, end = timestamp
+        start_frame = round((start[0] * 3600 + start[1] * 60 + start[2] + start[3] / 1000) * 30)
+        end_frame = round((end[0] * 3600 + end[1] * 60 + end[2] + end[3] / 1000) * 30)
+        feature = features[start_frame:end_frame]
+        np.save(os.path.join(output_dir, f'greenbook_dinos_{i}.npy'), feature)
+
+
 if __name__ == '__main__':
     # frame_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_videomae_preprocessed_frames'
     # output_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_videomae_features_2s'
     # extract_videomae_features(frame_dir, output_dir, num_frame_2_sample=16, interval=1)
 
-    frame_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_dinos'
-    output_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_dinos_2s'
-    extract_dino_features(frame_dir, output_dir, num_frame_2_sample=16, interval=1)
+    # frame_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_dinos'
+    # output_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_dinos_2s'
+    # extract_dino_features(frame_dir, output_dir)
+
+    file_path = '/gpfs/data/tserre/Shared/Brainstorm_2024/GreenBook.txt'
+    timestamps = get_scene_timestamp(file_path)
+    dino_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_dinos'
+    output_dir = '/gpfs/data/tserre/Shared/Brainstorm_2024/greenbook_dinos_scenes'
+    resplit_dino_by_timestamp(dino_dir, timestamps, output_dir)
